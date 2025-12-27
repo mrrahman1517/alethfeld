@@ -60,30 +60,38 @@ $$B_n = \frac{1}{e} \sum_{k=0}^{\infty} \frac{k^n}{k!}$$
 
 ---
 
-## Example 4: Random Purification Channel
+## Example 4: n-Copy Quantum Purification Channel
 
 **Source:** [arXiv:2511.23451](https://arxiv.org/abs/2511.23451) — "Random purification channel made simple" (November 2025)
 
-**Theorem:** A lemma concerning the random purification channel, which converts $n$ i.i.d. copies of a mixed quantum state into a uniform convex combination of purifications.
+**Theorem:** Existence of a CPTP channel $\Phi^{(n)}$ whose action on $n$-fold product states equals the Haar average of purifications with a single unitary applied coherently to all copies.
 
-**Background:** The random purification channel has become an important tool in quantum learning theory. The cited paper provides a simplified construction that makes the channel's properties transparent.
+**Background:** The random purification channel has become an important tool in quantum learning theory. The cited paper provides a simplified construction. This example attempts to prove the existence result for the $n$-copy case.
 
-**Why this example:** A result from quantum information theory—a domain requiring careful handling of operator algebras, tensor products, and probabilistic constructions. Tests whether the system can navigate the formalism of quantum mechanics without introducing the subtle errors common in this area.
+### ⚠️ Work in Progress — Proof Difficulties
 
-### ⚠️ Known Error
+**The proof has grown considerably longer than anticipated.** What was expected to be a straightforward generalization has become a complex multi-step argument requiring:
 
-**The theorem statement was incorrectly transcribed.** The brackets indicating operator ordering were wrong in the input—the expectation was placed before the tensor product when it should be after. The system then proved the (incorrect) theorem it was given.
+- Schur–Weyl duality and Weingarten calculus
+- Careful treatment of tensor reordering isomorphisms
+- A subtle distinction between Hadamard-product and matrix-product formulations
+- A non-trivial linearization lemma
 
-The proof itself appears to be correct *for the statement as provided*. The error was in the problem specification, not the reasoning.
+**Scope limitation:** The current proof assumes $d \geq n$ (dimension at least as large as the number of copies). This constraint appears in assumption A4 and is used to ensure linear independence of permutation operators via Schur–Weyl duality.
 
-This illustrates a different failure mode: **garbage in, garbage out**. The system will faithfully prove incorrect theorems if given incorrect statements. It does not (and cannot) verify that the theorem you asked it to prove is the theorem you meant to prove.
+**The full result should hold for all three regimes:**
+- $d < n$ (more copies than dimension)
+- $d = n$ (equal)
+- $d > n$ (current proof covers this case)
 
-We include this example as a reminder: always check the theorem statement carefully before evaluating the proof.
+The cases $d < n$ and $d = n$ require modified analysis where some permutation operators become linearly dependent. This is noted in the proof but not fully addressed.
+
+**Previous error (now superseded):** An earlier version of this example had an incorrectly transcribed theorem statement (expectation placed before tensor product). That version has been replaced.
 
 **Files:**
-- `random-purification/proof.edn` — Structured proof (correct for the stated theorem)
-- `random-purification/proof.tex` — LaTeX output
-- `random-purification/proof.lean` — Lean 4 (unverified)
+- `n-copy-purification-channel.edn` — Structured proof (d ≥ n case only)
+- `n-copy-purification-channel.tex` — LaTeX output
+- `n-copy-purification-channel.lean` — Lean 4 (not yet generated)
 
 ---
 
@@ -114,7 +122,7 @@ Publication-ready output. Compile with `pdflatex`. Uses Lamport-style step numbe
 | Dobinski | 23 | 0 | ❌ | — |
 | Prime Determinant | 31 | 1 | ❌ | — |
 | Lemniscate | 28 | 2 | ❌ | — |
-| Random Purification | 34 | 1 | ❌ | Theorem statement error (see above) |
+| n-Copy Purification | 47 | 0 | ❌ | Covers d≥n only; proof unexpectedly long |
 
 "Admitted steps" are gaps explicitly acknowledged by the system. "Human Verified" would indicate a mathematician has checked the proof—none of these have been fully verified.
 

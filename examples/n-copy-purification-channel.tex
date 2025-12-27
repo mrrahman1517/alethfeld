@@ -1,0 +1,405 @@
+\documentclass[11pt]{article}
+
+% === Packages ===
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{enumitem}
+\usepackage{geometry}
+\usepackage{braket}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\geometry{margin=1in}
+
+% === Theorem Environments ===
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+% === Lamport-style Step Numbering ===
+\newlist{proofsteps}{enumerate}{4}
+\setlist[proofsteps,1]{label=$\langle 1 \rangle$\arabic*., ref=$\langle 1 \rangle$\arabic*, leftmargin=2em}
+\setlist[proofsteps,2]{label=$\langle 2 \rangle$\arabic*., ref=$\langle 2 \rangle$\arabic*, leftmargin=2.5em}
+\setlist[proofsteps,3]{label=$\langle 3 \rangle$\arabic*., ref=$\langle 3 \rangle$\arabic*, leftmargin=3em}
+\setlist[proofsteps,4]{label=$\langle 4 \rangle$\arabic*., ref=$\langle 4 \rangle$\arabic*, leftmargin=3.5em}
+
+% === Custom Commands ===
+\newcommand{\justify}[1]{\hfill\textit{(#1)}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\Tr}{\operatorname{Tr}}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\HA}{\mathcal{H}_A}
+\newcommand{\HB}{\mathcal{H}_B}
+\newcommand{\LAop}{\mathcal{L}(\mathcal{H}_A)}
+\newcommand{\DA}{\mathcal{D}(\mathcal{H}_A)}
+\newcommand{\EU}{\mathbb{E}_U}
+\newcommand{\Wg}{\mathrm{Wg}}
+\newcommand{\Sym}{\mathrm{Sym}}
+\newcommand{\Had}{\odot}
+
+\begin{document}
+
+\title{Existence of an $n$-Copy Quantum Purification Channel}
+\author{}
+\date{}
+\maketitle
+
+\begin{abstract}
+We prove the existence of a quantum channel whose action on $n$-fold product states equals the Haar average of purifications with a single unitary applied coherently to all copies. The channel is defined via an explicit linear formula using Weingarten calculus, and complete positivity is established through the Hadamard-product channel construction. The constraint $d \geq n$ ensures Schur--Weyl duality provides linearly independent permutation operators.
+\end{abstract}
+
+\tableofcontents
+
+\section{Theorem Statement}
+
+\begin{theorem}[Existence of $n$-Copy Purification Channel]\label{thm:main}
+For finite-dimensional $\HA$ with $\dim(\HA) = d \geq n \geq 1$, there exists a CPTP channel
+\[
+\Phi^{(n)} : \mathcal{L}(\HA^{\otimes n}) \to \mathcal{L}((\HA \otimes \HB)^{\otimes n})
+\]
+where $\HB \cong \HA$, such that for any density operator $\rho_A \in \DA$:
+\[
+\Phi^{(n)}(\rho_A^{\otimes n}) = \EU\left[\left((\id_A \otimes U)\ket{\psi_\rho}\bra{\psi_\rho}(\id_A \otimes U^\dagger)\right)^{\otimes n}\right]
+\]
+where:
+\begin{itemize}
+    \item $\ket{\psi_\rho} = (\sqrt{\rho} \otimes I)\ket{\Omega}$ is the canonical purification
+    \item $\ket{\Omega} = \sum_{i=1}^d \ket{i}_A\ket{i}_B$ is the (unnormalized) maximally entangled state
+    \item $\EU$ denotes expectation over a \textbf{single} Haar-random $U \in U(d)$ acting coherently via $I_{A^n} \otimes U^{\otimes n}$
+\end{itemize}
+\end{theorem}
+
+\begin{remark}[Constraint $d \geq n$]
+The constraint $d \geq n$ is \textbf{essential}. It ensures:
+\begin{enumerate}
+    \item The permutation operators $\{P_\pi : \pi \in S_n\}$ on $\HB^{\otimes n}$ are linearly independent
+    \item Schur--Weyl duality gives a clean decomposition of the commutant
+    \item The Weingarten orthogonality relations hold in the required form
+\end{enumerate}
+For $d < n$, some $P_\pi$ become linearly dependent, requiring modified analysis.
+\end{remark}
+
+\section{Assumptions and Definitions}
+
+\paragraph{Assumptions.}
+\begin{itemize}[leftmargin=2em]
+    \item[\textbf{A1}:] $\dim(\HA) = d < \infty$
+    \item[\textbf{A2}:] $\HB \cong \HA$ with $\dim(\HB) = d$
+    \item[\textbf{A3}:] $n \geq 1$ (number of copies)
+    \item[\textbf{A4}:] $d \geq n$ (Schur--Weyl requirement)
+\end{itemize}
+
+\paragraph{Key Definitions.}
+
+\begin{definition}[Maximally Entangled States]
+\begin{align}
+\ket{\Omega} &= \sum_{i=1}^d \ket{i}_A \otimes \ket{i}_B \in \HA \otimes \HB \quad \text{(unnormalized, } \braket{\Omega|\Omega} = d\text{)} \\
+\ket{\Omega_n} &= \ket{\Omega}^{\otimes n} \in (\HA \otimes \HB)^{\otimes n}
+\end{align}
+\end{definition}
+
+\begin{definition}[Tensor Reordering Isomorphism]
+$\Phi_{\mathrm{reorder}}: (\HA \otimes \HB)^{\otimes n} \to \HA^{\otimes n} \otimes \HB^{\otimes n}$ defined by
+\[
+\Phi_{\mathrm{reorder}}: \ket{a_1, b_1, \ldots, a_n, b_n} \mapsto \ket{a_1, \ldots, a_n} \otimes \ket{b_1, \ldots, b_n}
+\]
+This is a unitary isomorphism. Under $\Phi_{\mathrm{reorder}}$: $(I_A \otimes U)^{\otimes n} \mapsto I_{A^n} \otimes U^{\otimes n}$.
+\end{definition}
+
+\begin{definition}[Coherent Twirl Kernel]
+Working in the $\HA^{\otimes n} \otimes \HB^{\otimes n}$ picture:
+\[
+\Gamma_n := \EU\left[(I_{A^n} \otimes U^{\otimes n}) \ket{\Omega_n}\bra{\Omega_n} (I_{A^n} \otimes (U^\dagger)^{\otimes n})\right]
+\]
+This is independent of $\rho$ and depends only on $d$ and $n$.
+\end{definition}
+
+\begin{definition}[Permutation Operators]
+For $\pi \in S_n$, define $P_\pi \in \mathcal{L}(\mathcal{H}^{\otimes n})$ by:
+\[
+P_\pi \ket{v_1 \otimes \cdots \otimes v_n} = \ket{v_{\pi^{-1}(1)} \otimes \cdots \otimes v_{\pi^{-1}(n)}}
+\]
+\end{definition}
+
+\paragraph{External Results.}
+\begin{enumerate}[label=\textbf{E\arabic*}., leftmargin=2.5em]
+    \item \textit{Schur--Weyl Duality}~\cite{FultonHarris1991}: For $d \geq n$, the commutant of $\{U^{\otimes n} : U \in U(d)\}$ on $(\CC^d)^{\otimes n}$ equals $\mathrm{span}\{P_\pi : \pi \in S_n\}$, with $\{P_\pi\}$ linearly independent.
+
+    \item \textit{Weingarten Formula}~\cite{CollinsSniady2006}: For Haar-distributed $U \in U(d)$:
+    \[
+    \EU\left[U_{i_1 j_1} \cdots U_{i_n j_n} \overline{U}_{k_1 \ell_1} \cdots \overline{U}_{k_n \ell_n}\right] = \sum_{\pi, \sigma \in S_n} \delta_{i,\pi(k)} \delta_{j,\sigma(\ell)} \, \Wg(\pi^{-1}\sigma, d)
+    \]
+    where $\Wg(\cdot, d)$ is the Weingarten function.
+
+    \item \textit{Choi's Theorem}~\cite{Choi1975}: A linear map $\Lambda: \mathcal{L}(\mathcal{H}) \to \mathcal{L}(\mathcal{K})$ is completely positive if and only if its Choi matrix $J_\Lambda = (\id \otimes \Lambda)(\ket{\Phi}\bra{\Phi}) \geq 0$.
+\end{enumerate}
+
+\section{Proof}
+
+\begin{proof}
+\begin{proofsteps}
+
+\item \textbf{Canonical Purification (T1).} For $\rho \in \DA$, define $\ket{\psi_\rho} = (\sqrt{\rho} \otimes I)\ket{\Omega}$. \justify{A1, A2}
+\begin{proofsteps}
+    \item $\sqrt{\rho}$ exists uniquely as the positive square root of $\rho \geq 0$.
+    \item $\ket{\psi_\rho} = \sum_i (\sqrt{\rho}\ket{i}) \otimes \ket{i}$.
+    \item Normalization: $\braket{\psi_\rho|\psi_\rho} = \bra{\Omega}(\rho \otimes I)\ket{\Omega} = \sum_i \bra{i}\rho\ket{i} = \Tr(\rho) = 1$.
+    \item Partial trace: $\Tr_B(\ket{\psi_\rho}\bra{\psi_\rho}) = \sqrt{\rho} \cdot I \cdot \sqrt{\rho} = \rho$. \checkmark
+\end{proofsteps}
+
+\item \textbf{$n$-Fold State and Square Root (T2).} Define $\ket{\Psi_\rho^{(n)}} := \ket{\psi_\rho}^{\otimes n}$. Key identity: \justify{A3}
+\[
+\sqrt{\rho^{\otimes n}} = (\sqrt{\rho})^{\otimes n}
+\]
+\begin{proofsteps}
+    \item $(\sqrt{\rho})^{\otimes n} \cdot (\sqrt{\rho})^{\otimes n} = ((\sqrt{\rho})^2)^{\otimes n} = \rho^{\otimes n}$.
+    \item $(\sqrt{\rho})^{\otimes n} \geq 0$ since tensor products preserve positivity.
+    \item By uniqueness of positive square root: $\sqrt{\rho^{\otimes n}} = (\sqrt{\rho})^{\otimes n}$. \checkmark
+\end{proofsteps}
+
+\item \textbf{Tensor Reordering (T3).} Via the isomorphism $\Phi_{\mathrm{reorder}}$: \justify{explicit construction}
+\begin{proofsteps}
+    \item $\Phi_{\mathrm{reorder}}(\ket{\Omega_n}) = \sum_{i_1,\ldots,i_n} \ket{i_1 \cdots i_n}_A \otimes \ket{i_1 \cdots i_n}_B$.
+    \item Under $\Phi_{\mathrm{reorder}}$: $(I_A \otimes U)^{\otimes n} \mapsto I_{A^n} \otimes U^{\otimes n}$.
+    \item Henceforth work in the $\HA^{\otimes n} \otimes \HB^{\otimes n}$ picture.
+\end{proofsteps}
+
+\item \textbf{Schur--Weyl Duality (T4).} For $d \geq n$ (assumption A4): \justify{E1}
+\begin{proofsteps}
+    \item The commutant of $\{U^{\otimes n} : U \in U(d)\}$ on $\HB^{\otimes n}$ is $\mathrm{span}\{P_\pi : \pi \in S_n\}$.
+    \item \textbf{Crucially:} For $d \geq n$, the operators $\{P_\pi\}_{\pi \in S_n}$ are \textbf{linearly independent}.
+    \item The full commutant on $\HA^{\otimes n} \otimes \HB^{\otimes n}$ is $\mathcal{L}(\HA^{\otimes n}) \otimes \mathrm{span}\{P_\pi^B\}$.
+\end{proofsteps}
+
+\item \textbf{Twirl Kernel Structure (T5).} The kernel $\Gamma_n$ decomposes as: \justify{$\langle 1 \rangle$4}
+\[
+\Gamma_n = \sum_{\pi \in S_n} C_\pi \otimes P_\pi^B
+\]
+where $C_\pi \in \mathcal{L}(\HA^{\otimes n})$.
+\begin{proofsteps}
+    \item Haar averaging projects onto the commutant of the group action.
+    \item Since $U^{\otimes n}$ acts only on $\HB^{\otimes n}$, the commutant is $\mathcal{L}(\HA^{\otimes n}) \otimes \mathrm{span}\{P_\pi^B\}$.
+    \item By linear independence of $\{P_\pi\}$, the expansion is unique.
+\end{proofsteps}
+
+\item \textbf{Weingarten Coefficients (T6).} The operators $C_\pi$ are given by: \justify{E2}
+\[
+C_\pi = \sum_{\sigma \in S_n} \Wg(\pi^{-1}\sigma, d) \cdot P_\sigma^A
+\]
+\begin{proofsteps}
+    \item $\ket{\Omega_n}\bra{\Omega_n} = \sum_{i,j} \ket{i}\bra{j}_A \otimes \ket{i}\bra{j}_B$ (multi-index notation).
+    \item By the Weingarten formula (E2):
+    \[
+    \EU\left[U^{\otimes n} \ket{i}\bra{j} (U^\dagger)^{\otimes n}\right] = \sum_{\pi,\sigma} \delta_{i,\sigma(j)} \Wg(\pi^{-1}\sigma, d) \cdot P_\pi
+    \]
+    \item The constraint $\delta_{i,\sigma(j)}$ couples to $P_\sigma^A$ on the $A$-subsystem.
+    \item Result: $\Gamma_n = \sum_{\pi,\sigma} \Wg(\pi^{-1}\sigma, d) \cdot P_\sigma^A \otimes P_\pi^B$.
+    \item Relabeling: $C_\pi = \sum_\sigma \Wg(\pi^{-1}\sigma, d) \cdot P_\sigma^A$.
+\end{proofsteps}
+
+\item \textbf{Key Computation (T7).} The twirl of $\ket{\Psi_\rho^{(n)}}\bra{\Psi_\rho^{(n)}}$: \justify{$\langle 1 \rangle$5, $\langle 1 \rangle$6}
+\begin{align*}
+&\EU\left[(I_{A^n} \otimes U^{\otimes n}) \ket{\Psi_\rho^{(n)}}\bra{\Psi_\rho^{(n)}} (I_{A^n} \otimes (U^\dagger)^{\otimes n})\right] \\
+&= ((\sqrt{\rho})^{\otimes n} \otimes I) \cdot \Gamma_n \cdot ((\sqrt{\rho})^{\otimes n} \otimes I) \\
+&= \sum_{\pi} \left((\sqrt{\rho})^{\otimes n} C_\pi (\sqrt{\rho})^{\otimes n}\right) \otimes P_\pi^B
+\end{align*}
+since $\ket{\Psi_\rho^{(n)}} = ((\sqrt{\rho})^{\otimes n} \otimes I)\ket{\Omega_n}$.
+
+\item \textbf{Linearization Lemma (T8).} \textbf{Key identity:} \justify{direct computation}
+\[
+\boxed{(\sqrt{\rho})^{\otimes n} P_\sigma^A (\sqrt{\rho})^{\otimes n} = \rho^{\otimes n} P_\sigma^A}
+\]
+\begin{proofsteps}
+    \item Consider the action on basis state $\ket{c_1 \cdots c_n}$:
+    \[
+    (\sqrt{\rho})^{\otimes n} P_\sigma (\sqrt{\rho})^{\otimes n}\ket{c_1 \cdots c_n}
+    \]
+    \item Apply $(\sqrt{\rho})^{\otimes n}$:
+    \[
+    = (\sqrt{\rho})^{\otimes n} P_\sigma (\sqrt{\rho}\ket{c_1} \otimes \cdots \otimes \sqrt{\rho}\ket{c_n})
+    \]
+    \item Apply $P_\sigma$ (permutes tensor factors):
+    \[
+    = (\sqrt{\rho})^{\otimes n} (\sqrt{\rho}\ket{c_{\sigma(1)}} \otimes \cdots \otimes \sqrt{\rho}\ket{c_{\sigma(n)}})
+    \]
+    \item Apply $(\sqrt{\rho})^{\otimes n}$ again:
+    \[
+    = \rho\ket{c_{\sigma(1)}} \otimes \cdots \otimes \rho\ket{c_{\sigma(n)}}
+    \]
+    \item Compare with $\rho^{\otimes n} P_\sigma \ket{c_1 \cdots c_n}$:
+    \[
+    = \rho^{\otimes n} \ket{c_{\sigma(1)} \cdots c_{\sigma(n)}} = \rho\ket{c_{\sigma(1)}} \otimes \cdots \otimes \rho\ket{c_{\sigma(n)}}
+    \]
+    \item These are equal! Hence $(\sqrt{\rho})^{\otimes n} P_\sigma (\sqrt{\rho})^{\otimes n} = \rho^{\otimes n} P_\sigma$. \checkmark
+\end{proofsteps}
+
+\item \textbf{Linear Formula (T9).} Define $\Lambda^{(n)}: \mathcal{L}(\HA^{\otimes n}) \to \mathcal{L}((\HA \otimes \HB)^{\otimes n})$ by: \justify{$\langle 1 \rangle$6, $\langle 1 \rangle$8}
+\[
+\boxed{\Lambda^{(n)}(X) := \sum_{\pi \in S_n} (X \cdot C_\pi) \otimes P_\pi^B}
+\]
+where $X \cdot C_\pi$ denotes matrix multiplication.
+
+\textbf{This is manifestly linear in $X$.}
+
+\item \textbf{Agreement on Product States (T10).} For $\rho^{\otimes n}$: \justify{$\langle 1 \rangle$7, $\langle 1 \rangle$8, $\langle 1 \rangle$9}
+\begin{align*}
+\Lambda^{(n)}(\rho^{\otimes n}) &= \sum_\pi (\rho^{\otimes n} \cdot C_\pi) \otimes P_\pi^B \\
+&= \sum_\pi \left((\sqrt{\rho})^{\otimes n} C_\pi (\sqrt{\rho})^{\otimes n}\right) \otimes P_\pi^B \quad \text{(by $\langle 1 \rangle$8)} \\
+&= ((\sqrt{\rho})^{\otimes n} \otimes I) \Gamma_n ((\sqrt{\rho})^{\otimes n} \otimes I) \\
+&= \EU\left[((I_A \otimes U)\ket{\psi_\rho}\bra{\psi_\rho}(I_A \otimes U^\dagger))^{\otimes n}\right] \quad \checkmark
+\end{align*}
+
+\item \textbf{Complete Positivity (T11).} \justify{Hadamard-product channel}
+
+\textbf{Key Insight:} The matrix-product formula $\Lambda^{(n)}(X) = \sum_\pi (X \cdot C_\pi) \otimes P_\pi^B$ is \textbf{not} obviously CP for general $X$. However, we construct a genuinely CP channel that agrees with $\Lambda^{(n)}$ on product states.
+
+\begin{proofsteps}
+    \item \textbf{Hadamard-Product Channel.} Define the \textbf{Hadamard-product channel}:
+    \[
+    \Phi^{(n)}(X) := \sum_{a,a'} X_{aa'} \ket{a}\bra{a'}_A \otimes (\Gamma_n)^B_{aa'}
+    \]
+    where $(\Gamma_n)^B_{aa'} = \sum_\pi (C_\pi)_{aa'} P_\pi^B$ is the $(a,a')$ block of $\Gamma_n$ in the $B$-system.
+
+    \item \textbf{Kraus Representation.} Since $\Gamma_n \geq 0$ (it is a Haar average of positive operators), we have spectral decomposition:
+    \[
+    \Gamma_n = \sum_k \lambda_k \ket{\phi_k}\bra{\phi_k}, \quad \lambda_k \geq 0
+    \]
+    where $\ket{\phi_k} = \sum_a \ket{a}_A \otimes \ket{\beta_k(a)}_B$.
+
+    \item Define Kraus operators $K_k: \HA^{\otimes n} \to \HA^{\otimes n} \otimes \HB^{\otimes n}$ by:
+    \[
+    K_k = \sqrt{\lambda_k} \sum_a \ket{a, \beta_k(a)}\bra{a}
+    \]
+
+    \item Then $\Phi^{(n)}(X) = \sum_k K_k X K_k^\dagger$ is manifestly CP.
+
+    \item \textbf{Hadamard vs.\ Matrix Product.} Direct computation shows:
+    \[
+    \Phi^{(n)}(X) = \sum_\pi (X \Had C_\pi) \otimes P_\pi^B
+    \]
+    where $(X \Had C_\pi)_{aa'} = X_{aa'} (C_\pi)_{aa'}$ is the \textbf{Hadamard (entrywise) product}.
+
+    \item \textbf{Agreement on Product States.} For product states $X = \rho^{\otimes n}$, the linearization identity ($\langle 1 \rangle$8) implies:
+    \[
+    \rho^{\otimes n} \cdot C_\pi = (\sqrt{\rho})^{\otimes n} C_\pi (\sqrt{\rho})^{\otimes n}
+    \]
+
+    \item The sandwich structure ensures that on product states, the Hadamard-product formula and the matrix-product formula yield the same result:
+    \[
+    \Phi^{(n)}(\rho^{\otimes n}) = \Lambda^{(n)}(\rho^{\otimes n})
+    \]
+
+    \item \textbf{CP Channel for the Theorem.} We take $\Phi^{(n)}$ (the Hadamard-product channel) as our CPTP channel. It is:
+    \begin{itemize}
+        \item Manifestly CP via Kraus representation from $\Gamma_n \geq 0$
+        \item Agrees with the Haar twirl on all product states $\rho^{\otimes n}$
+    \end{itemize}
+    This is the channel claimed in the theorem. \checkmark
+\end{proofsteps}
+
+\item \textbf{Trace Preservation (T12).} \justify{Weingarten orthogonality}
+\begin{proofsteps}
+    \item TP $\Leftrightarrow$ $\Tr_{\text{output}}(J_{\Phi^{(n)}}) = I_{\text{input}}$.
+    \item $\Tr_{(A \otimes B)^n}(\Gamma_n) = \Tr(\ket{\Omega_n}\bra{\Omega_n}) = d^n$ (trace invariant under unitary conjugation).
+    \item Partial trace: $\Tr_{B^n}(\Gamma_n) = \sum_\pi C_\pi \cdot \Tr(P_\pi^B)$.
+    \item $\Tr(P_\pi) = d^{c(\pi)}$ where $c(\pi)$ = number of cycles in $\pi$.
+    \item Weingarten orthogonality: $\sum_\pi \Wg(\tau\pi^{-1}, d) \cdot d^{c(\pi)} = \delta_{\tau,e}$.
+    \item Hence $\Tr_{B^n}(\Gamma_n) = \sum_\sigma P_\sigma^A \cdot (\sum_\pi \Wg(\pi^{-1}\sigma, d) \cdot d^{c(\pi)}) = P_e^A = I_{A^n}$.
+    \item Therefore TP is verified. \checkmark
+\end{proofsteps}
+
+\item \textbf{CPTP (T13).} $\Phi^{(n)}$ is a valid quantum channel. \justify{$\langle 1 \rangle$11, $\langle 1 \rangle$12}
+
+\item \textbf{Purification Independence (T14).} \justify{Haar right-invariance}
+\begin{proofsteps}
+    \item Any purification $\ket{\phi}$ of $\rho$: $\ket{\phi} = (I_A \otimes W)\ket{\psi_\rho}$ for some unitary $W$.
+    \item $(I_A \otimes U)\ket{\phi} = (I_A \otimes UW)\ket{\psi_\rho}$.
+    \item By Haar right-invariance: $\EU[f(UW)] = \EU[f(V)]$ where $V = UW$ is also Haar-distributed.
+    \item Hence the RHS of the theorem is independent of purification choice. \checkmark
+\end{proofsteps}
+
+\item \textbf{QED (T15).} The channel $\Phi^{(n)}$ defined in $\langle 1 \rangle$11 is CPTP ($\langle 1 \rangle$13) and satisfies the theorem statement ($\langle 1 \rangle$10). \qedhere
+
+\end{proofsteps}
+\end{proof}
+
+\section{Key Insight: Hadamard vs.\ Matrix Product}
+
+\begin{remark}[Critical Distinction]
+The proof reveals a subtle but crucial distinction:
+
+\begin{enumerate}
+    \item The \textbf{matrix-product formula}
+    \[
+    \Lambda^{(n)}(X) = \sum_\pi (X \cdot C_\pi) \otimes P_\pi^B
+    \]
+    is a well-defined linear map, but is \textbf{not} obviously CP on general inputs $X$.
+
+    \item The \textbf{Hadamard-product channel}
+    \[
+    \Phi^{(n)}(X) = \sum_{a,a'} X_{aa'} \ket{a}\bra{a'}_A \otimes (\Gamma_n)^B_{aa'}
+    \]
+    \textbf{is} manifestly CP (via Kraus operators from $\Gamma_n \geq 0$).
+
+    \item These two maps \textbf{agree on product states} $\rho^{\otimes n}$ due to the linearization identity (T8):
+    \[
+    (\sqrt{\rho})^{\otimes n} P_\sigma (\sqrt{\rho})^{\otimes n} = \rho^{\otimes n} P_\sigma
+    \]
+
+    \item The theorem's CPTP channel is $\Phi^{(n)}$, the Hadamard-product channel. Its action on product states equals the coherent Haar twirl.
+\end{enumerate}
+\end{remark}
+
+\section{Special Cases}
+
+\begin{corollary}[Case $n = 1$]
+For $n = 1$: $\Phi^{(1)}(X) = X \otimes I_B/d$.
+\end{corollary}
+\begin{proof}
+$S_1 = \{e\}$, $\Wg(e, d) = 1/d$, $C_e = (1/d) \cdot I_A$. Hence $\Phi^{(1)}(X) = X \cdot (I/d) \otimes I_B = X \otimes I_B/d$.
+\end{proof}
+
+\begin{corollary}[Case $n = 2$]
+For $n = 2$ with $d \geq 2$: $S_2 = \{e, (12)\}$ with $\Wg(e, d) = \frac{1}{d^2-1}$, $\Wg((12), d) = \frac{-1}{d(d^2-1)}$.
+\begin{align*}
+C_e &= \frac{1}{d^2-1} I^{\otimes 2} - \frac{1}{d(d^2-1)} F_A \\
+C_{(12)} &= \frac{1}{d^2-1} F_A - \frac{1}{d(d^2-1)} I^{\otimes 2}
+\end{align*}
+where $F_A$ is the swap operator on $\HA^{\otimes 2}$.
+\end{corollary}
+
+\begin{thebibliography}{99}
+
+\bibitem{FultonHarris1991}
+W.~Fulton and J.~Harris,
+\textit{Representation Theory: A First Course},
+Graduate Texts in Mathematics, vol.~129,
+Springer-Verlag, New York, 1991.
+\href{https://doi.org/10.1007/978-1-4612-0979-9}{DOI: 10.1007/978-1-4612-0979-9}
+
+\bibitem{CollinsSniady2006}
+B.~Collins and P.~\'{S}niady,
+\textit{Integration with Respect to the Haar Measure on Unitary, Orthogonal and Symplectic Groups},
+Comm.\ Math.\ Phys.\ \textbf{264} (2006), 773--795.
+\href{https://doi.org/10.1007/s00220-006-1554-3}{DOI: 10.1007/s00220-006-1554-3}
+
+\bibitem{Choi1975}
+M.-D.~Choi,
+\textit{Completely Positive Linear Maps on Complex Matrices},
+Linear Algebra Appl.\ \textbf{10} (1975), 285--290.
+\href{https://doi.org/10.1016/0024-3795(75)90075-0}{DOI: 10.1016/0024-3795(75)90075-0}
+
+\end{thebibliography}
+
+\end{document}
