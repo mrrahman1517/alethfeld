@@ -6,12 +6,13 @@ This document serves as a guide for **Prover** and **Formalizer** agents using t
 
 *   **Package Name**: `AlethfeldLean`
 *   **Dependency**: `mathlib` (v4.26.0)
-*   **Verification Status**: **COMPLETE** (As of Dec 2025)
+*   **Verification Status**: (As of Dec 2025)
     *   L1 (Fourier): ✅ 0 sorries
     *   L2 (Influence): ✅ 0 sorries
     *   L3 (Entropy): ✅ 0 sorries
     *   ShannonMax: ✅ Verified (0 sorries)
     *   L4Maximum: ✅ Verified (0 sorries)
+    *   L5Asymptotic: ⚠️ In Progress (~10 sorries in Taylor/numerical bounds)
 *   **Build Command**:
     ```bash
     lake build
@@ -33,6 +34,15 @@ The library is organized under the `AlethfeldLean` namespace.
             *   `L3Entropy`: General entropy formula (Lemma L3).
             *   `ShannonMax`: Maximum entropy for 3-outcome distributions.
             *   `L4Maximum`: Maximum entropy-influence ratio at magic state (Lemma L4).
+            *   `L5Asymptotic`: Asymptotic entropy-influence ratio (Lemma L5).
+                *   `Step1_Definitions`: epsilon, p_zero, g(n) definitions.
+                *   `Step2_EpsilonSetup`: Epsilon bounds and validity.
+                *   `Step3_TaylorExpansion`: Taylor series for entropy term.
+                *   `Step4_InfluenceTerm`: Influence term expansion.
+                *   `Step5_GnSubstitution`: Substitution into g(n).
+                *   `Step6_Cancellation`: Key cancellation 2^{n-1} * epsilon = 1.
+                *   `Step7_LimitComputation`: Individual limit computations.
+                *   `Step8_MainTheorem`: Main theorem (QED).
 
 ## 3. Key Types and Definitions
 
@@ -107,6 +117,19 @@ The library is organized under the `AlethfeldLean` namespace.
 | `magicBlochVector` | $(1/\sqrt{3}, 1/\sqrt{3}, 1/\sqrt{3})$ | The magic Bloch vector. |
 | `magicProductState` | `fun _ => magicBlochVector` | Product state with all qubits magic. |
 | `blochToProbDist3 v` | `{p := fun i => v.q (i+1)}` | Convert Bloch vector to ProbDist3. |
+
+### L5 Asymptotic (`AlethfeldLean.QBF.Rank1.L5Asymptotic`)
+
+| Symbol | Definition | Description |
+| :--- | :--- | :--- |
+| `epsilon n` | $2^{1-n}$ | Small parameter for large $n$ expansion. |
+| `epsilon_eq_div n` | `epsilon n = 2 / 2^n` | Alternative form as ratio. |
+| `p_zero_eq_sq_one_minus_eps n` | `p_zero n = (1 - epsilon n)^2` | $p_0$ in terms of epsilon. |
+| `one_minus_p_zero_eq_eps n` | `1 - p_zero n = 2ε - ε²` | $1 - p_0$ expansion. |
+| `g n` | $(2^{n-1}/n) \cdot [-p_0 \log_2 p_0 + (2n-2)(1-p_0)]$ | Correction term $g(n) = S/I - \log_2 3$. |
+| `entropyTerm_p0 n` | $-p_0 \log_2 p_0$ | Entropy contribution from $p_0$. |
+| `influenceTerm_p0 n` | $(2n-2)(1-p_0)$ | Influence contribution. |
+| `entropy_influence_ratio n` | $\log_2 3 + g(n)$ | The ratio $S/I$ at magic state. |
 
 ## 4. Main Theorems
 
@@ -219,6 +242,38 @@ These are the primary verified results available for use in higher-level proofs.
 *   **`l4_maximum_total_entropy (bloch) (hq)`** (Lemma L4 - Corollary):
     Total entropy bound: $\sum_k f_k \leq n \cdot \log_2 3$ with equality iff all magic.
     *Usage*: Product state version of the maximum entropy result.
+
+### L5 Asymptotic Ratio (`AlethfeldLean.QBF.Rank1.L5Asymptotic`)
+
+*   **`epsilon_pos (n)`**:
+    $$\varepsilon_n = 2^{1-n} > 0$$
+    *Usage*: Positivity of the expansion parameter.
+
+*   **`epsilon_tendsto_zero`**:
+    $$\lim_{n \to \infty} \varepsilon_n = 0$$
+    *Usage*: The expansion parameter vanishes as $n \to \infty$.
+
+*   **`epsilon_lt_one {n} (hn : n ≥ 2)`**:
+    $$\varepsilon_n < 1$$
+    *Usage*: Ensures Taylor series convergence for $n \geq 2$.
+
+*   **`key_cancellation (n) (hn : n ≥ 1)`**:
+    $$2^{n-1} \cdot \varepsilon_n = 2^{n-1} \cdot 2^{1-n} = 1$$
+    *Usage*: **Key identity** that simplifies $g(n)$ from exponential to polynomial form.
+
+*   **`g_tendsto_four`**:
+    $$\lim_{n \to \infty} g(n) = 4$$
+    *Usage*: The correction term converges to 4.
+
+*   **`l5_asymptotic_ratio`** (Lemma L5 - Main Theorem):
+    $$\lim_{n \to \infty} \frac{S_{\max}}{I} = \log_2 3 + 4 \approx 5.585$$
+    *Usage*: **Main result** - asymptotic entropy-influence ratio at the magic state.
+
+*   **`ratio_limit_approx`**:
+    $$|\log_2 3 + 4 - 5.585| < 0.001$$
+    *Usage*: Numerical approximation of the limit.
+
+**Note**: Several theorems in L5 contain `sorry` placeholders for Taylor expansion bounds and numerical verification. The proof structure is complete.
 
 ## 5. Agent Guidelines
 
