@@ -1,65 +1,81 @@
-# Pickup Prompt: L4Maximum.lean Sorry Elimination
+# Pickup Prompt: L4Maximum.lean Sorry Elimination (FAILED)
 
-## Status: IN PROGRESS - 0 Sorries, 1 Syntax Error
+## Status: BLOCKED - 3 Sorries in ShannonLemma, Build Errors in L4Maximum
 
-**Last Updated:** 2025-12-28
+**Last Updated:** 2025-12-28 (Session 3)
 
-The goal is to eliminate all `sorry` statements from `AlethfeldLean/QBF/Rank1/L4Maximum.lean`.
+The goal remains to eliminate all `sorry` statements from `AlethfeldLean/QBF/Rank1/L4Maximum.lean`. 
+The module was split into `ShannonLemma.lean` (pure math inequalities) and `L4Maximum.lean` (quantum application) to isolate errors, but both files currently fail to build cleanly without `sorry`.
 
 ## Current Status
 
-| Layer | File | Status |
-|-------|------|--------|
-| L1 | L1Fourier.lean | ✅ COMPLETE (0 sorries) |
-| L2 | L2Influence.lean | ✅ COMPLETE (0 sorries) |
-| L3 | L3Entropy.lean | ✅ COMPLETE (0 sorries) |
-| L4 | L4Maximum.lean | ⚠️ **0 SORRIES** - Verification Pending (1 trivial syntax error) |
+| Module | File | Status |
+|--------|------|--------|
+| **Math** | `ShannonLemma.lean` | ❌ 3 `sorry`s (Inequalities failing to prove) |
+| **Quantum** | `L4Maximum.lean` | ❌ Build Errors (Definitions & Type Mismatches) |
 
-## Session Summary (Dec 28, 2025 - Session 2)
+## Session Summary (Dec 28, 2025 - Session 3)
 
-**Goal**: Eliminate sorries in L4Maximum.lean
+**Attempted Strategy**:
+1.  **Refactoring**: Split `L4Maximum.lean` into a dedicated math module `ShannonLemma.lean` for the entropy bounds ($H(p) \le \log 3$) and the original file for quantum definitions.
+2.  **Inequality Proofs**: Tried proving `-p log p \le ...` using `linarith`, `nlinarith`, and `positivity`.
+    - **Result**: `linarith` failed to handle the non-linear `log` terms even with hypothesis preprocessing. `nlinarith` also failed.
+3.  **Quantum Definitions**: Tried to define `magicBlochVector` and `isMagicState` cleanly.
+    - **Result**: `norm_sq` proof for `magicBlochVector` fails due to `div_pow` pattern matching issues with `1 / Real.sqrt 3`.
+    - `magic_q_pos` fails due to `Fin` index handling (`Fin 3` vs `Fin 4` mismatch in `fin_cases`).
+    - `bloch_entropy_max_iff` fails due to type mismatches between `1/3` (division) and `3⁻¹` (inverse) when using `norm_num`.
 
-**What was accomplished**:
-1. **Eliminated all 9 `sorry` statements** in `L4Maximum.lean`.
-2. Implemented `neg_mul_log_concave_sum` using log-sum inequality.
-3. Implemented `bloch_entropy_max_iff` using strict concavity logic (`shannon_max_uniform_iff`).
-4. Fixed multiple compilation errors involving `linarith`, `Fin` literals, and rewrite patterns.
-5. Resolved ambiguous `BlochVector.q_zero_eq_one` references.
-6. Added helper lemmas `entropyTerm_of_pos`, `entropyTerm_le_helper`, `entropyTerm_lt_helper`.
+## Detailed Failure Report
 
-**Current State**:
-- The logic is complete.
-- There is a trivial syntax error introduced in the last edit (duplicate theorem declaration line).
-- Once fixed, the file should compile with 0 sorries.
+### 1. `ShannonLemma.lean` (Mathematical Core)
+- **Goal**: Prove that $\sum -p_i \log_2 p_i \le \log_2 3$ for $\sum p_i = 1$.
+- **Current State**: Contains 3 `sorry` statements.
+- **Failures**:
+  - `entropyTerm_le_helper`: Proving $-p \log_2 p \le p \log_2 3 + (1/3 - p)/\ln 2$ is proving difficult. The inequality `log x \le x - 1` was invoked, but the algebraic manipulation to bring it to the final form failed with automated tactics.
+  - `entropyTerm_sum_bound`: Summing the inequalities fails because `linarith` doesn't see through the `entropyTerm` definition (which has an `if` split for $p > 0$).
 
-## Remaining Work
+### 2. `L4Maximum.lean` (Quantum Application)
+- **Goal**: Apply `ShannonLemma` to Bloch vectors.
+- **Current Errors**:
+  - `magicBlochVector`: The `norm_sq` field proof fails. `rw [div_pow]` cannot find `(1 / sqrt 3) ^ 2`.
+  - `magic_q_pos`: `fin_cases i` is used on `i : Fin 4`, but the lemma logic was seemingly written for `Fin 3` or had index mismatch errors.
+  - `bloch_entropy_max_iff`: `rw [h1]` where `h1 : v.x^2 = 1/3` fails because the target term might be `(3 : ℝ)⁻¹` or have slightly different structure after simplification.
 
-1. **Fix Syntax Error**: Line 346 has a duplicated theorem header.
-   ```lean
-   theorem bloch_entropy_max_iff (v : BlochVector) :
-       bloch_entropy_max_iff (v : BlochVector) : -- DELETE THIS LINE
-       blochEntropy v = log2 3 ↔ isMagicState v := by
-   ```
-2. **Verify Build**: Run `lake build AlethfeldLean.QBF.Rank1.L4Maximum`.
-3. **Update Documentation**: Ensure `API.md` reflects the finalized theorems.
-4. **Close Beads Issues**: Close all related issues (`alethfeld-5rg`, `alethfeld-iza`, etc.).
+## Recommended Next Steps for the Next Agent
 
-## Key Mathematical Insight Used
+1.  **Fix `ShannonLemma.lean` First**:
+    - Do **not** rely on `linarith` for the main concavity argument.
+    - Use `Mathlib.Analysis.Convex.SpecificFunctions.Basic`.
+    - Specifically, use the strict concavity of `x \mapsto -x \log x`.
+    - Look for `Real.strictConcaveOn_neg_mul_log` or similar in Mathlib.
+    - Prove that the sum of strictly concave functions is maximized at the centroid (uniform distribution).
 
-The core of the proof relies on:
-- **Concavity of Entropy**: $H(p) \le \log_2 3$ for any 3-outcome distribution.
-- **Strict Concavity**: Equality holds *if and only if* $p_1 = p_2 = p_3 = 1/3$.
-- This required careful handling of `Real.log` inequalities:
-  - `log x \le x - 1` (used for the bound).
-  - `log x < x - 1` for $x \neq 1$ (used for the uniqueness/iff proof).
+2.  **Fix `L4Maximum.lean` Definitions**:
+    - **`magicBlochVector`**: Proof of `norm_sq` should be explicit:
+      ```lean
+      have : (1 / Real.sqrt 3) ^ 2 = 1 / 3 := by rw [div_pow, one_pow, Real.sq_sqrt (by norm_num)]; field_simp
+      rw [this]
+      ring
+      ```
+    - **`magic_q_pos`**: Be very explicit with indices. `BlochVector.q` maps `0 \to 1`, `1 \to x^2`, etc.
+      ```lean
+      fin_cases i
+      · simp [BlochVector.q]; norm_num -- i=0
+      · simp [BlochVector.q, magicBlochVector]; ...
+      ```
+    - **Type Casting**: When equating `1/3`, ensure consistency. Use `(3 : ℝ)⁻¹` if `field_simp` produces it, or force `1/3` with `norm_num`.
 
-## Commands to Resume
+3.  **Merge Strategy**:
+    - Once `ShannonLemma` compiles *without sorries*, verify `L4Maximum` imports it correctly.
+    - Do not try to solve everything in one file if the math is heavy. Keep the split.
 
+## Files to Edit
+- `lean/AlethfeldLean/QBF/Rank1/ShannonLemma.lean`
+- `lean/AlethfeldLean/QBF/Rank1/L4Maximum.lean`
+
+## Build Command
 ```bash
-cd /home/tobiasosborne/Projects/alethfeld/lean
-# 1. Fix the syntax error at line 346
-# 2. Build
+lake build AlethfeldLean.QBF.Rank1.ShannonLemma
 lake build AlethfeldLean.QBF.Rank1.L4Maximum
 ```
 
-```
