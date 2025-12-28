@@ -101,19 +101,16 @@ theorem sum_qProduct (bloch : Fin n → BlochVector) :
     ∑ α : MultiIndex n, qProduct bloch α = (2 : ℝ)^n := by
   unfold qProduct
   -- Apply Fubini: ∑_α ∏_k f(α_k) = ∏_k ∑_m f(m)
-  rw [Fintype.prod_sum]
+  rw [← Fintype.prod_sum (fun k m => (bloch k).q m)]
   -- Each factor is ∑_m q_k^m = 2
   have h : ∀ k : Fin n, ∑ m : Fin 4, (bloch k).q m = 2 := fun k => sum_q_eq_two (bloch k)
-  simp only [h]
-  -- Product of 2's is 2^n
-  simp only [Finset.prod_const, Finset.card_fin]
-  norm_cast
+  simp only [h, Finset.prod_const, Finset.card_fin, Nat.cast_pow]
 
 /-- Sum of all Fourier weights (including α = 0) -/
 theorem sum_all_fourier_weights (bloch : Fin n → BlochVector) :
     ∑ α : MultiIndex n, fourierWeight bloch α = (2 : ℝ)^(2 - (n : ℤ)) := by
   unfold fourierWeight probability
-  rw [← Finset.sum_mul]
+  rw [← Finset.mul_sum]
   rw [sum_qProduct]
   -- 2^{2-2n} * 2^n = 2^{2-n}
   rw [← zpow_natCast (2 : ℝ) n]
@@ -129,7 +126,7 @@ theorem multiIndex_eq_zero_iff (α : MultiIndex n) :
     rw [h]
     rfl
   · intro h
-    ext k
+    funext k
     exact h k
 
 /-- ¬(∃ k, α k ≠ 0) iff α = 0 -/
@@ -137,12 +134,7 @@ theorem not_exists_ne_zero_iff (α : MultiIndex n) :
     ¬(∃ k, α k ≠ 0) ↔ α = zeroMultiIndex := by
   rw [multiIndex_eq_zero_iff]
   push_neg
-  constructor
-  · intro h k
-    by_contra hc
-    exact h k hc
-  · intro h k hk
-    exact hk (h k)
+  simp only [not_not]
 
 /-- Simplify 1 - p_zero n -/
 theorem one_minus_p_zero (n : ℕ) :
@@ -156,15 +148,15 @@ theorem one_minus_p_zero (n : ℕ) :
       rw [← zpow_add₀ (by norm_num : (2 : ℝ) ≠ 0)]
       congr 1
       omega
-    ring_nf
-    rw [hpow]
-    ring
+    calc (1 - (2 : ℝ)^(1 - (n : ℤ)))^2
+        = 1 - 2 * (2 : ℝ)^(1 - (n : ℤ)) + (2 : ℝ)^(1 - (n : ℤ)) * (2 : ℝ)^(1 - (n : ℤ)) := by ring
+      _ = 1 - 2 * (2 : ℝ)^(1 - (n : ℤ)) + (2 : ℝ)^(2 - 2*(n : ℤ)) := by rw [hpow]
   rw [h1]
   have h2 : 2 * (2 : ℝ)^(1 - (n : ℤ)) = (2 : ℝ)^(2 - (n : ℤ)) := by
-    have : (2 : ℝ) = (2 : ℝ)^(1 : ℤ) := by simp
-    rw [this, ← zpow_add₀ (by norm_num : (2 : ℝ) ≠ 0)]
-    congr 1
-    omega
+    calc 2 * (2 : ℝ)^(1 - (n : ℤ))
+        = (2 : ℝ)^(1 : ℤ) * (2 : ℝ)^(1 - (n : ℤ)) := by simp
+      _ = (2 : ℝ)^(1 + (1 - (n : ℤ))) := by rw [← zpow_add₀ (by norm_num : (2 : ℝ) ≠ 0)]
+      _ = (2 : ℝ)^(2 - (n : ℤ)) := by congr 1; omega
   rw [h2]
   ring
 
@@ -172,26 +164,41 @@ theorem one_minus_p_zero (n : ℕ) :
 theorem sum_fourier_weights (bloch : Fin n → BlochVector) :
     ∑ α : MultiIndex n, (if ∃ k, α k ≠ 0 then fourierWeight bloch α else 0) =
     1 - p_zero n := by
-  -- Strategy: total sum - contribution at α=0 = sum over α≠0
-  -- Split: ∑_α f(α) = ∑_{α≠0} f(α) + f(0)
-  have h_split : ∑ α : MultiIndex n, fourierWeight bloch α =
-      ∑ α : MultiIndex n, (if ∃ k, α k ≠ 0 then fourierWeight bloch α else 0) +
-      fourierWeight bloch zeroMultiIndex := by
-    rw [← Finset.sum_add_distrib]
-    apply Finset.sum_congr rfl
-    intro α _
-    by_cases h : ∃ k, α k ≠ 0
-    · simp only [h, ↓reduceIte, add_zero]
-    · simp only [h, ↓reduceIte, zero_add]
-      rw [not_exists_ne_zero_iff] at h
-      rw [h]
-  -- Rearrange to get the sum we want
-  rw [sum_all_fourier_weights, fourierWeight_zero] at h_split
-  -- ∑_{α≠0} f = total - f(0) = 2^{2-n} - 2^{2-2n}
-  have h_result : ∑ α : MultiIndex n, (if ∃ k, α k ≠ 0 then fourierWeight bloch α else 0) =
-      (2 : ℝ)^(2 - (n : ℤ)) - (2 : ℝ)^(2 - 2*(n : ℤ)) := by
-    linarith
-  rw [h_result, ← one_minus_p_zero]
+  -- Strategy: ∑_{α≠0} p_α = ∑_α p_α - p_0 = 2^{2-n} - 2^{2-2n} = 1 - p_zero n
+  have h_total : ∑ α : MultiIndex n, fourierWeight bloch α = (2 : ℝ)^(2 - (n : ℤ)) :=
+    sum_all_fourier_weights bloch
+  have h_zero : fourierWeight bloch zeroMultiIndex = (2 : ℝ)^(2 - 2*(n : ℤ)) :=
+    fourierWeight_zero bloch
+  -- The sum with the if-condition equals the sum over nonzero terms plus 0 for zero term
+  have h_if_sum : ∑ α : MultiIndex n, (if ∃ k, α k ≠ 0 then fourierWeight bloch α else 0) =
+      ∑ α : MultiIndex n, fourierWeight bloch α - fourierWeight bloch zeroMultiIndex := by
+    have h1 : ∑ α : MultiIndex n, fourierWeight bloch α =
+        fourierWeight bloch zeroMultiIndex +
+        ∑ α ∈ Finset.univ.erase zeroMultiIndex, fourierWeight bloch α := by
+      rw [← Finset.add_sum_erase Finset.univ _ (Finset.mem_univ zeroMultiIndex)]
+    have h2 : ∑ α : MultiIndex n, (if ∃ k, α k ≠ 0 then fourierWeight bloch α else 0) =
+        ∑ α ∈ Finset.univ.erase zeroMultiIndex, fourierWeight bloch α := by
+      rw [← Finset.sum_filter]
+      congr 1
+      ext α
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_erase, ne_eq]
+      constructor
+      · intro ⟨k, hk⟩
+        constructor
+        · intro h
+          have heq : α k = zeroMultiIndex k := by rw [h]
+          simp only [zeroMultiIndex] at heq
+          exact hk heq
+        · trivial
+      · intro ⟨hne, _⟩
+        by_contra h
+        push_neg at h
+        have heq : α = zeroMultiIndex := by funext k; exact h k
+        exact hne heq
+    rw [h2, h1]
+    ring
+  -- Now substitute and solve
+  rw [h_if_sum, h_total, h_zero, ← one_minus_p_zero]
 
 /-- Total Shannon entropy S(U) of the Fourier distribution -/
 noncomputable def totalEntropy (bloch : Fin n → BlochVector) : ℝ :=
@@ -265,16 +272,16 @@ theorem first_sum_formula (bloch : Fin n → BlochVector) :
     ∑ α : MultiIndex n,
       (if ∃ k, α k ≠ 0 then fourierWeight bloch α * (2*(n : ℤ) - 2) else 0) =
     (2*(n : ℤ) - 2) * (1 - p_zero n) := by
-  rw [← Finset.sum_mul]
-  congr 1
-  conv_lhs =>
-    congr
-    ext α
-    rw [show (if ∃ k, α k ≠ 0 then fourierWeight bloch α * (2*(n : ℤ) - 2) else 0) =
-            (if ∃ k, α k ≠ 0 then fourierWeight bloch α else 0) * (2*(n : ℤ) - 2) by
-      split_ifs <;> ring]
-  rw [Finset.sum_mul]
-  rw [sum_fourier_weights bloch]
+  -- Factor out the constant: ∑ p_α * c = c * ∑ p_α
+  have h : ∑ α : MultiIndex n,
+      (if ∃ k, α k ≠ 0 then fourierWeight bloch α * (2*(n : ℤ) - 2) else 0) =
+      (2*(n : ℤ) - 2) * ∑ α : MultiIndex n,
+      (if ∃ k, α k ≠ 0 then fourierWeight bloch α else 0) := by
+    rw [Finset.mul_sum]
+    apply Finset.sum_congr rfl
+    intro α _
+    split_ifs <;> ring
+  rw [h, sum_fourier_weights]
 
 /-! ### L3-step3: Zero case helpers
 
@@ -447,28 +454,27 @@ theorem entropy_sum_decomposition (bloch : Fin n → BlochVector)
     ∑ α : MultiIndex n, (if ∃ k, α k ≠ 0 then fourierWeight bloch α * (2*(n : ℤ) - 2) else 0) -
     ∑ α : MultiIndex n, (if ∃ k, α k ≠ 0 then
       fourierWeight bloch α * ∑ k, log2 ((bloch k).q (α k)) else 0) := by
-  -- Expand entropyTerm using log_decomposition
-  have h_expand : ∀ α : MultiIndex n, (∃ k, α k ≠ 0) →
-      entropyTerm (fourierWeight bloch α) =
-      fourierWeight bloch α * (2*(n : ℤ) - 2) -
-      fourierWeight bloch α * ∑ k, log2 ((bloch k).q (α k)) := by
-    intro α hα
-    have hpos := hp α hα
-    rw [entropyTerm_pos _ hpos]
-    -- Need hypothesis that all q values are positive for log_decomposition
-    have hq : ∀ k, (bloch k).q (α k) > 0 := by
-      intro k
-      by_cases hk : α k = 0
-      · rw [hk, BlochVector.q_zero_eq_one]; norm_num
-      · exact hq_all k (α k) hk
-    rw [log_decomposition bloch α hq]
-    ring
+  -- Use Finset.sum_sub_distrib to combine the RHS
   rw [← Finset.sum_sub_distrib]
+  -- Now show each term is equal
   apply Finset.sum_congr rfl
   intro α _
   split_ifs with h
-  · exact h_expand α h
-  · ring
+  · -- For nonzero α, use entropyTerm_pos and log_decomposition
+    have hpos : fourierWeight bloch α > 0 := hp α h
+    rw [entropyTerm_pos _ hpos]
+    -- Need to show: -p_α * log₂(p_α) = p_α(2n-2) - p_α Σ_k log₂(q_k^{α_k})
+    -- First we need the hypotheses for log_decomposition
+    have hq : ∀ k, (bloch k).q (α k) > 0 := by
+      intro k
+      by_cases hk : α k = 0
+      · rw [hk, BlochVector.q_zero_eq_one]; exact one_pos
+      · have hne : α k ≠ 0 := hk
+        -- α k ∈ {1, 2, 3}, so use hq_all
+        exact hq_all k (α k) hne
+    exact log_decomposition bloch α hq
+  · -- For zero α, both sides are 0
+    ring
 
 /-- L3-qed: General Entropy Formula for Rank-1 Product State QBFs
 
@@ -526,17 +532,28 @@ theorem entropy_formula (bloch : Fin n → BlochVector)
     intro j _
     apply Finset.sum_congr rfl
     intro α _
-    -- Simplify: if (∃k, αk≠0) ∧ (αj≠0) then ... else 0
-    -- But if αj≠0 then ∃k, αk≠0, so we can simplify
-    split_ifs with h1 h2
-    · rfl
-    · exfalso; exact h2 ⟨j, h1⟩
-    · rfl
-    · rfl
+    -- Simplify: if (∃k, αk≠0) then (if αj≠0 then X else 0) else 0 = if αj≠0 then X else 0
+    -- When αj≠0: LHS = X, RHS = X
+    -- When αj=0: LHS = 0, RHS = 0
+    by_cases hαj : α j ≠ 0
+    · -- α j ≠ 0 case: both sides equal the inner expression
+      have hex : ∃ k, α k ≠ 0 := ⟨j, hαj⟩
+      simp only [hαj, hex, ↓reduceIte, ite_true]
+    · -- α j = 0 case: both sides equal 0
+      push_neg at hαj
+      simp only [hαj, ne_eq, not_true_eq_false, ↓reduceIte, ite_false]
+      split_ifs <;> rfl
   rw [h_exchange]
   -- Step 4: Apply entropy_sum_factorization
   rw [← entropy_sum_factorization bloch hq_all]
-  ring
+  -- The goal needs: a + (b - ∑∑f) = a + b + ∑(-∑f)
+  -- First convert -∑∑f to ∑(-∑f)
+  have h_sum_neg : -∑ x : Fin n, ∑ x_1 : MultiIndex n,
+      (if x_1 x ≠ 0 then fourierWeight bloch x_1 * log2 ((bloch x).q (x_1 x)) else 0) =
+      ∑ x : Fin n, -∑ x_1 : MultiIndex n,
+      (if x_1 x ≠ 0 then fourierWeight bloch x_1 * log2 ((bloch x).q (x_1 x)) else 0) := by
+    rw [Finset.sum_neg_distrib]
+  linarith [h_sum_neg]
 
 /-! ## Corollaries -/
 
@@ -573,20 +590,7 @@ theorem BlochVector.q_le_one (v : BlochVector) (ℓ : Fin 4) (hℓ : ℓ ≠ 0) 
   have h1 : v.q 1 ≥ 0 := BlochVector.q_nonneg v 1
   have h2 : v.q 2 ≥ 0 := BlochVector.q_nonneg v 2
   have h3 : v.q 3 ≥ 0 := BlochVector.q_nonneg v 3
-  rcases Fin.eq_zero_or_eq_succ ℓ with h0 | ⟨k, hk⟩
-  · exact absurd h0 hℓ
-  · rcases Fin.eq_zero_or_eq_succ k with hk0 | ⟨k', hk'⟩
-    · -- ℓ = 1
-      simp only [hk, hk0] at hsum ⊢
-      linarith
-    · rcases Fin.eq_zero_or_eq_succ k' with hk'0 | ⟨k'', hk''⟩
-      · -- ℓ = 2
-        simp only [hk, hk', hk'0] at hsum ⊢
-        linarith
-      · -- ℓ = 3
-        have : k'' = 0 := Fin.eq_zero k''
-        simp only [hk, hk', hk'', this] at hsum ⊢
-        linarith
+  fin_cases ℓ <;> simp_all <;> linarith
 
 /-- Bloch entropy is non-negative -/
 theorem blochEntropy_nonneg (v : BlochVector) : blochEntropy v ≥ 0 := by
@@ -616,9 +620,7 @@ theorem p_zero_le_one {n : ℕ} (hn : n ≥ 1) : p_zero n ≤ 1 := by
   unfold p_zero
   have h : (2 : ℝ)^(1 - (n : ℤ)) ≤ 1 := by
     have hexp : 1 - (n : ℤ) ≤ 0 := by omega
-    calc (2 : ℝ)^(1 - (n : ℤ)) ≤ (2 : ℝ)^(0 : ℤ) := by
-          apply zpow_le_zpow_right (by norm_num : 1 ≤ (2 : ℝ)) hexp
-      _ = 1 := by simp
+    exact zpow_le_one_of_nonpos₀ (by norm_num : 1 ≤ (2 : ℝ)) hexp
   have hpos : (2 : ℝ)^(1 - (n : ℤ)) > 0 := zpow_pos (by norm_num : (0 : ℝ) < 2) _
   have h' : 1 - (2 : ℝ)^(1 - (n : ℤ)) ≥ 0 := by linarith
   have h'' : 1 - (2 : ℝ)^(1 - (n : ℤ)) ≤ 1 := by linarith
@@ -648,8 +650,11 @@ theorem entropy_nonneg (bloch : Fin n → BlochVector)
     entropyTerm_nonneg (p_zero_nonneg n) (p_zero_le_one hn)
   have h2 : (2*(n : ℤ) - 2) * (1 - p_zero n) ≥ 0 := by
     apply mul_nonneg
-    · have : (n : ℤ) ≥ 1 := by omega
-      linarith
+    · have hint : (0 : ℤ) ≤ 2 * (n : ℤ) - 2 := by omega
+      have : (0 : ℝ) ≤ ((2 * (n : ℤ) - 2) : ℤ) := by exact Int.cast_nonneg hint
+      convert this using 1
+      push_cast
+      ring
     · exact one_minus_p_zero_nonneg hn
   have h3 : (2 : ℝ)^(1 - (n : ℤ)) * totalBlochEntropy bloch ≥ 0 := by
     apply mul_nonneg
