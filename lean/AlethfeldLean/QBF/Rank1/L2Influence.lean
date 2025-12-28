@@ -61,6 +61,16 @@ theorem qProduct_split (bloch : Fin n → BlochVector) (j : Fin n) (α : MultiIn
   intro k
   simp only [Finset.mem_erase, Finset.mem_univ, and_true, ne_eq]
 
+/-- Cardinality of complement: |{k : Fin n // k ≠ j}| = n - 1 (L2-S2a) -/
+theorem card_complement_singleton {n : ℕ} (j : Fin n) :
+    Fintype.card {k : Fin n // k ≠ j} = n - 1 := by
+  have equiv : {k : Fin n // k ≠ j} ≃ {k : Fin n // k ∈ Finset.univ.erase j} :=
+    Equiv.subtypeEquivRight (fun k => by simp)
+  rw [Fintype.card_congr equiv]
+  simp only [Fintype.card_subtype, Finset.filter_mem_eq_inter, Finset.univ_inter,
+             Finset.card_erase_of_mem (Finset.mem_univ j)]
+  simp only [Finset.card_fin]
+
 /-! ## Factorization Lemma (L2-08)
 
 When α_j = ℓ is fixed and ℓ ≠ 0, the sum over α factors.
@@ -134,10 +144,35 @@ theorem influence_pos (bloch : Fin n → BlochVector) (hn : n ≥ 1) :
   · exact Nat.cast_pos.mpr hn
   · exact zpow_pos (by norm_num : (0 : ℝ) < 2) _
 
-/-- Influence decreases exponentially with n -/
+/-- Natural number inequality: n ≤ 2^{n-1} for n ≥ 1 (L2-S4a) -/
+theorem nat_le_pow_two_sub_one (n : ℕ) (hn : n ≥ 1) : n ≤ 2^(n-1) := by
+  match n with
+  | 0 => omega
+  | 1 => simp
+  | k + 2 =>
+    have hk : k + 1 ≥ 1 := by omega
+    have ih := nat_le_pow_two_sub_one (k + 1) hk
+    simp only [Nat.add_sub_cancel] at ih ⊢
+    calc k + 2 = (k + 1) + 1 := by ring
+      _ ≤ 2^k + 1 := Nat.add_le_add_right ih 1
+      _ ≤ 2^k + 2^k := Nat.add_le_add_left Nat.one_le_two_pow _
+      _ = 2^(k + 1) := by omega
+
+/-- Real inequality: n * 2^{1-n} ≤ 1 for n ≥ 1 (L2-S4b) -/
+theorem influence_bound_real {n : ℕ} (hn : n ≥ 1) :
+    (n : ℝ) * (2 : ℝ)^(1 - (n : ℤ)) ≤ 1 := by
+  have h := nat_le_pow_two_sub_one n hn
+  have key : (1 : ℤ) - (n : ℤ) = -(((n - 1) : ℕ) : ℤ) := by omega
+  rw [key, zpow_neg, zpow_natCast]
+  have hpow_pos : (0 : ℝ) < (2 : ℝ)^(n - 1) := by positivity
+  rw [← div_eq_mul_inv, div_le_one hpow_pos]
+  calc (n : ℝ) ≤ ((2^(n-1) : ℕ) : ℝ) := Nat.cast_le.mpr h
+    _ = (2 : ℝ)^(n-1) := by norm_cast
+
+/-- Influence decreases exponentially with n (L2-S4c) -/
 theorem influence_decreasing (bloch : Fin n → BlochVector) (hn : n ≥ 1) :
     totalInfluence bloch ≤ 1 := by
   rw [total_influence_formula]
-  sorry -- n * 2^{1-n} ≤ 1 for n ≥ 1
+  exact influence_bound_real hn
 
 end Alethfeld.QBF.Rank1.L2Influence
