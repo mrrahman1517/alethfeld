@@ -1,8 +1,12 @@
-# Pickup Prompt: Sorry Elimination for AlethfeldLean L1-Fourier
+# Pickup Prompt: AlethfeldLean Formalization
 
 ## Current Status
 
-**Build Status:** ✅ COMPLETE - All sorries eliminated!
+| Layer | File | Status |
+|-------|------|--------|
+| L1 | L1Fourier.lean | ✅ COMPLETE (0 sorries) |
+| L2 | L2Influence.lean | ✅ COMPLETE (0 sorries) |
+| L3 | L3Entropy.lean | 🔄 IN PROGRESS (1 sorry) |
 
 **Last Updated:** 2025-12-28
 
@@ -19,127 +23,150 @@ cd /home/tobiasosborne/Projects/alethfeld/lean
 lake build
 ```
 
----
+## Issue Tracking
 
-## Completed Work
+This project uses **beads** for issue tracking:
 
-### AlethfeldLean/Quantum/Pauli.lean — COMPLETE (0 sorries)
-
-All 3 original sorries have been eliminated:
-
-#### 1. `pauliString` definition (lines 67-79)
-**Solution:** Recursive definition using Kronecker products with proper index reindexing:
-```lean
-def finPow2SuccEquiv (n : ℕ) : Fin (2^(n+1)) ≃ Fin (2^n) × Fin 2 :=
-  (finCongr (Nat.pow_succ 2 n)).trans finProdFinEquiv.symm
-
-noncomputable def pauliString : {n : ℕ} → MultiIndex n → QubitMat n
-  | 0, _ => !![1]
-  | n+1, α =>
-    let rest := pauliString (fun k => α k.succ)
-    let first := σ (α 0)
-    let kron := rest ⊗ₖ first
-    kron.submatrix (finPow2SuccEquiv n) (finPow2SuccEquiv n)
+```bash
+bd ready              # Find available work
+bd list --status=open # All open issues
+bd show <id>          # View issue details
 ```
 
-#### 2. `trace_kronecker` (lines 81-84)
-**Solution:** Direct application of Mathlib's theorem:
+---
+
+## L3 Entropy Formula — IN PROGRESS
+
+**Goal:** Prove the General Entropy Formula for Rank-1 Product State QBFs:
+$$S = -p_0 \log_2 p_0 + (2n-2)(1-p_0) + 2^{1-n} \sum_k f_k$$
+
+where $f_k = H(x_k^2, y_k^2, z_k^2)$ is the Bloch entropy.
+
+### File: `AlethfeldLean/QBF/Rank1/L3Entropy.lean`
+
+### Completed (4 issues closed)
+
+1. **Skeleton created** (`alethfeld-013`)
+   - Imports from L2Influence
+   - Namespace `Alethfeld.QBF.Rank1.L3Entropy`
+
+2. **Shannon entropy definitions** (`alethfeld-9bm`)
+   - `log2` - binary logarithm
+   - `log2_zpow`, `log2_two`, `log2_one`, `log2_mul`, `log2_prod` - helper lemmas
+   - `entropyTerm` - Shannon entropy term with 0·log(0)=0 convention
+   - `blochEntropy` - entropy of Bloch vector components
+
+3. **Probability definitions** (`alethfeld-ban`)
+   - `p_zero n` = (1 - 2^{1-n})²
+   - `fourierWeight` - alias to L2's probability function
+   - `totalEntropy` - total Shannon entropy S(U)
+
+4. **L3-step1: Log decomposition** (`alethfeld-uho`)
+   - `fourierWeight_nonneg`, `qProduct_pos`, `fourierWeight_pos_of_qProduct_pos`
+   - `log2_fourierWeight` - logarithm decomposition
+   - `log_decomposition` - main result: -p_α log₂ p_α = p_α(2n-2) - p_α Σ_k log₂ q_k^{α_k}
+
+### Remaining Work (8 issues open)
+
+| Issue ID | Title | Status |
+|----------|-------|--------|
+| `alethfeld-x4n` | L3-step2: first_sum_formula | Ready |
+| `alethfeld-yy4` | L3-step3: zero case helpers | Ready |
+| `alethfeld-680` | L3-step5: qubit_log_contribution | Blocked |
+| `alethfeld-esk` | L3-step6: entropy sum factorization | Blocked |
+| `alethfeld-7j9` | L3-qed: main entropy_formula | Blocked |
+| `alethfeld-xi1` | entropy_nonneg corollary | Blocked |
+| `alethfeld-45f` | Update API.md | Blocked |
+| `alethfeld-5zy` | Verify lake build | Blocked |
+
+### Current Sorry
+
 ```lean
-theorem trace_kronecker (A B : Mat2) :
-    Matrix.trace (A ⊗ₖ B) = Matrix.trace A * Matrix.trace B :=
-  Matrix.trace_kronecker A B
+-- In L3Entropy.lean line 85
+theorem sum_fourier_weights (bloch : Fin n → BlochVector) :
+    ∑ α : MultiIndex n, (if ∃ k, α k ≠ 0 then fourierWeight bloch α else 0) =
+    1 - p_zero n := by
+  sorry -- Will prove using Parseval's identity
 ```
 
-#### 3. `trace_pauliString` (lines 104-129)
-**Solution:** Induction proof with two helper lemmas:
-- `trace_submatrix_equiv`: Trace is preserved under reindexing by equivalence
-- `isZeroIndex_succ_iff`: Decomposition of isZeroIndex for n+1
+### Next Steps
 
-The proof uses `by_cases` on both `α 0 = 0` and `isZeroIndex (fun k => α k.succ)` to handle all four cases.
+1. **Prove `first_sum_formula`** (`alethfeld-x4n`):
+   Show Σ_{α≠0} p_α(2n-2) = (2n-2)(1-p₀)
 
----
+2. **Prove zero case helpers** (`alethfeld-yy4`):
+   Show log₂(q^{(0)}) = log₂(1) = 0, so only α_j ≠ 0 contributes
 
-## Completed Work
+3. **Prove `qubit_log_contribution`** (`alethfeld-680`):
+   Show -Σ_{α: α_j≠0} p_α log₂ q_j^{α_j} = 2^{1-n} f_j
 
-### AlethfeldLean/Quantum/Bloch.lean — COMPLETE (0 sorries)
-
-All 4 expectation theorems have been proven:
-
-1. **`expectation_σI`**: Uses `exp_mul_conj_exp_eq_one` helper + `Real.cos_sq_add_sin_sq`
-2. **`expectation_σX`**: Uses `exp_add_exp_conj` helper + `Real.sin_two_mul`
-3. **`expectation_σY`**: Uses `exp_conj_sub_exp` helper + `I_mul_I` + `Real.sin_two_mul`
-4. **`expectation_σZ`**: Uses `exp_mul_conj_exp_eq_one` helper + `Real.cos_two_mul'`
-
-**Helper lemmas added:**
-- `exp_mul_conj_exp_eq_one`: exp(iφ) * conj(exp(iφ)) = 1
-- `exp_add_exp_conj`: exp(iφ) + conj(exp(iφ)) = 2cos(φ)
-- `exp_conj_sub_exp`: conj(exp(iφ)) - exp(iφ) = -2i*sin(φ)
+4. **Combine for main theorem** (`alethfeld-7j9`)
 
 ---
 
-### AlethfeldLean/QBF/Rank1/L1Fourier.lean — COMPLETE (0 sorries)
+## L2 Influence Independence — COMPLETE
 
-Both zpow algebra theorems have been proven:
+**File:** `AlethfeldLean/QBF/Rank1/L2Influence.lean`
 
-1. **`fourierCoeff_rank1_expand`**: Uses `zpow_add₀` to show 2^{-n} · 2 = 2^{1-n}
-2. **`term1_simplify`**: Uses `zpow_add₀` to show 2^{-n} · 2^n = 1
+**Main Result:** For any rank-1 product state QBF on n qubits:
+$$I(U) = n \cdot 2^{1-n}$$
+
+This is INDEPENDENT of the choice of Bloch vectors.
+
+### Key Theorems Proven
+
+- `influence_j_formula`: I_j = 2^{1-n}
+- `total_influence_formula`: I(U) = n * 2^{1-n}
+- `influence_independent_of_bloch`: I(bloch₁) = I(bloch₂)
+- `influence_decreasing`: I(U) ≤ 1 for n ≥ 1
+
+### Helper Lemmas Used in L3
+
+- `probability bloch α` - Fourier weight 2^{2-2n} ∏_k q_k^{α_k}
+- `qProduct bloch α` - Product of squared Bloch components
+- `BlochVector.q m` - Extended Bloch components (q^{(0)}=1, q^{(1)}=x², etc.)
+- `BlochVector.q_nonneg` - q values are non-negative
+- `BlochVector.q_sum_eq_two` - q^{(0)} + q^{(1)} + q^{(2)} + q^{(3)} = 2
 
 ---
 
-## Key Mathlib Lemmas Used/Needed
+## L1 Fourier Formula — COMPLETE
 
-### Complex Numbers
-- `Complex.conj_ofReal` : conj of real is itself
-- `Complex.normSq_eq_conj_mul_self` : z * conj(z) = |z|²
-- `Complex.normSq_eq_norm_sq` : normSq z = ‖z‖²
-- `Complex.norm_exp_ofReal_mul_I` : ‖exp(r*I)‖ = 1 for real r
-- `Complex.exp_mul_I` : exp(r*I) = cos(r) + sin(r)*I
-- `Complex.cos_conj`, `Complex.sin_conj` : conj(cos z) = cos(conj z)
-- `Complex.ofReal_cos`, `Complex.ofReal_sin` : ↑(Real.cos x) = Complex.cos ↑x
-- `I_sq` : I² = -1
+**File:** `AlethfeldLean/QBF/Rank1/L1Fourier.lean`
 
-### Trigonometry
-- `Real.cos_sq_add_sin_sq` : cos²(x) + sin²(x) = 1
-- `Real.cos_two_mul'` : cos(2x) = cos²(x) - sin²(x)
-- `Real.sin_two_mul` : sin(2x) = 2sin(x)cos(x)
+**Main Result:** For U = I - 2|ψ⟩⟨ψ| where |ψ⟩ is a product state:
+$$\hat{U}(\alpha) = \delta_{\alpha,0} - 2^{1-n} \prod_k r_k^{\alpha_k}$$
+
+---
+
+## Key Mathlib Lemmas for L3
+
+### Logarithms
+- `Real.log_prod` : log(∏ f) = Σ log(f) for positive f
+- `Real.log_zpow` : log(a^k) = k * log(a)
+- `Real.log_mul` : log(xy) = log(x) + log(y)
+- `Real.log_one` : log(1) = 0
+- `Real.log_pos` : 1 < x → 0 < log(x)
 
 ### Zpow (Integer Powers)
 - `zpow_add₀` : a^(m+n) = a^m * a^n (for a ≠ 0)
-- `zpow_natCast` : a^(↑n : ℤ) = a^n
-- `zpow_neg` : a^(-n) = (a^n)⁻¹
+- `zpow_pos` : 0 < a → 0 < a^k
 
-### Matrix
-- `Matrix.trace_kronecker` : Tr(A ⊗ B) = Tr(A) * Tr(B)
-- `Equiv.sum_comp` : ∑ f ∘ e = ∑ f for equivalence e
-
----
-
-## Files Modified
-
-1. `/home/tobiasosborne/Projects/alethfeld/lean/AlethfeldLean/Quantum/Pauli.lean` — COMPLETE
-   - Added `finPow2SuccEquiv` equivalence
-   - Defined `pauliString` recursively
-   - Added `trace_submatrix_equiv` helper
-   - Added `isZeroIndex_succ_iff` helper
-   - Completed `trace_pauliString` induction proof
-
-2. `/home/tobiasosborne/Projects/alethfeld/lean/AlethfeldLean/Quantum/Bloch.lean` — COMPLETE
-   - Added 3 helper lemmas for complex exponential conjugation
-   - Proved all 4 expectation value theorems
-
-3. `/home/tobiasosborne/Projects/alethfeld/lean/AlethfeldLean/QBF/Rank1/L1Fourier.lean` — COMPLETE
-   - Proved 2 zpow algebra theorems
+### Sums/Products
+- `Finset.sum_div` : (Σ f) / c = Σ (f / c)
+- `Finset.prod_pos` : (∀ x, 0 < f x) → 0 < ∏ f
+- `Finset.prod_nonneg` : (∀ x, 0 ≤ f x) → 0 ≤ ∏ f
 
 ---
 
 ## Verification
 
-All sorries have been eliminated:
-
 ```bash
-lake build 2>&1 | grep -c "declaration uses 'sorry'"
-# Outputs: 0
+# Check for sorries
+lake build 2>&1 | grep "declaration uses 'sorry'"
+# Expected: 1 sorry in L3Entropy.lean (sum_fourier_weights)
 
+# Full build
 lake build
-# Build completed successfully (2065 jobs).
+# Build completed successfully (2070 jobs).
 ```
