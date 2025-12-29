@@ -12,7 +12,10 @@ This document serves as a guide for **Prover** and **Formalizer** agents using t
     *   L3 (Entropy): ✅ 0 sorries
     *   ShannonMax: ✅ Verified (0 sorries)
     *   L4Maximum: ✅ Verified (0 sorries)
-    *   L5Asymptotic: ⚠️ In Progress (~10 sorries in Taylor/numerical bounds)
+    *   L5Asymptotic: ⚠️ In Progress
+        *   Step1-2: ✅ 0 sorries
+        *   Step3 (Taylor): ✅ 0 sorries
+        *   Step4-8: ⚠️ ~5 sorries remaining (numerical bounds)
 *   **Build Command**:
     ```bash
     lake build
@@ -257,6 +260,38 @@ These are the primary verified results available for use in higher-level proofs.
     $$\varepsilon_n < 1$$
     *Usage*: Ensures Taylor series convergence for $n \geq 2$.
 
+#### Step3: Taylor Expansion Theorems
+
+*   **`mercator_series_valid {x} (hx : |x| < 1)`**:
+    $$\log(1-x) = -\sum_{n=0}^{\infty} \frac{x^{n+1}}{n+1}$$
+    *Usage*: Mercator series for natural logarithm (from Mathlib).
+
+*   **`log_one_minus_eps_approx (eps) (heps : |eps| < 1)`**:
+    $$\exists R,\; |R| \leq \frac{\varepsilon^2}{1-|\varepsilon|} \land \log(1-\varepsilon) = -\varepsilon + R$$
+    *Usage*: First-order Taylor approximation for $\log(1-\varepsilon)$.
+
+*   **`log2_one_minus_eps {n} (hn : n ≥ 2)`**:
+    $$\exists R,\; |R| \leq \frac{2\varepsilon^2}{\ln 2} \land \log_2(1-\varepsilon) = -\frac{\varepsilon}{\ln 2} + R$$
+    *Usage*: Base-2 logarithm Taylor expansion.
+
+*   **`log2_p_zero_expansion {n} (hn : n ≥ 2)`**:
+    $$\exists R,\; |R| \leq \frac{4\varepsilon^2}{\ln 2} \land \log_2(p_0) = -\frac{2\varepsilon}{\ln 2} + R$$
+    *Usage*: Taylor expansion for $\log_2(p_0)$ where $p_0 = (1-\varepsilon)^2$.
+
+*   **`entropy_term_step5 {n} (hn : n ≥ 2)`**:
+    $$\exists R,\; |R| \leq \frac{4\varepsilon^2}{\ln 2} \land -p_0 \log_2(p_0) = \frac{2p_0\varepsilon}{\ln 2} + R$$
+    *Usage*: Intermediate step for entropy term expansion.
+
+*   **`entropy_term_expansion {n} (hn : n ≥ 2)`** (L5-step1-7):
+    $$\exists R,\; |R| \leq \frac{10\varepsilon^2}{\ln 2} \land -p_0 \log_2(p_0) = \frac{2\varepsilon}{\ln 2} + R$$
+    *Usage*: **Key result** - Taylor expansion of the entropy term $-p_0 \log_2 p_0$.
+
+*   **`entropyTerm_asymptotic {n} (hn : n ≥ 2)`**:
+    $$\text{entropyTerm\_p0}(n) = \frac{2\varepsilon}{\ln 2} + O(\varepsilon^2)$$
+    *Usage*: Asymptotic form of entropy term as $n \to \infty$.
+
+#### Step6: Key Cancellation
+
 *   **`key_cancellation (n) (hn : n ≥ 1)`**:
     $$2^{n-1} \cdot \varepsilon_n = 2^{n-1} \cdot 2^{1-n} = 1$$
     *Usage*: **Key identity** that simplifies $g(n)$ from exponential to polynomial form.
@@ -273,7 +308,7 @@ These are the primary verified results available for use in higher-level proofs.
     $$|\log_2 3 + 4 - 5.585| < 0.001$$
     *Usage*: Numerical approximation of the limit.
 
-**Note**: Several theorems in L5 contain `sorry` placeholders for Taylor expansion bounds and numerical verification. The proof structure is complete.
+**Note**: Step3 Taylor expansion theorems are now fully proven (0 sorries). Remaining `sorry` placeholders in L5 are in Step4-8 for numerical verification of logarithm bounds (e.g., `log(2) ≈ 0.693`, `log(3) ≈ 1.099`). The proof structure is complete.
 
 ## 5. Agent Guidelines
 
