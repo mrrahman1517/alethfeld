@@ -81,7 +81,7 @@ Proofs are represented in [EDN](https://github.com/edn-format/edn) (Extensible D
 
 **For extensibility:** New fields can be added without breaking existing tooling. Proofs are data, not strings.
 
-**For tooling:** The Clojure ecosystem offers powerful tools for working with structured data—spec checking, generative testing, data transformation.
+**For tooling:** The Clojure ecosystem offers powerful tools for working with structured data—spec checking, generative testing, data transformation. The [`validate-graph`](scripts/validate-graph/) tool uses Malli to validate proof graphs against the schema.
 
 A proof schema in Malli might look like:
 
@@ -305,6 +305,41 @@ These failure modes are why the system produces *candidate* proofs, not *verifie
 *Feld* is German for field—a space where something is cultivated.
 
 Alethfeld is a field for cultivating unconcealed proofs: every step visible, every inference named, every dependency traced. Truth through structured disclosure.
+
+## Tools
+
+### validate-graph
+
+A Clojure CLI tool for validating semantic proof graph EDN files. Located in [`scripts/validate-graph/`](scripts/validate-graph/).
+
+```bash
+cd scripts/validate-graph
+clojure -M:run path/to/proof.edn
+```
+
+**Features:**
+- Schema validation using Malli (types, required fields, enum values)
+- Referential integrity checks (all references point to existing entities)
+- Acyclicity verification (dependency graph is a valid DAG)
+- Scope tracking validation (local assumptions correctly managed)
+- Taint propagation checks (admitted/rejected status propagates correctly)
+
+**Options:**
+- `-v, --verbose` — Detailed error output
+- `-q, --quiet` — Minimal output (for CI/CD)
+- `-s, --schema-only` — Skip semantic checks
+
+See the [validate-graph README](scripts/validate-graph/README.md) for full documentation.
+
+### fix-schema.clj
+
+A utility script for fixing common schema issues in proof graph files:
+
+```bash
+clojure scripts/validate-graph/fix-schema.clj input.edn output.edn
+```
+
+Automatically adds missing fields, fixes content hashes, and normalizes timestamps.
 
 ## Contributing
 
