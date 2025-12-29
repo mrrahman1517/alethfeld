@@ -1,1047 +1,1501 @@
-{:graph-id "L3-entropy-verify-2024"
- :version 58
- :phase :verified
-
- :theorem
- {:id :theorem
-  :statement "$S = -p_0 \\log_2 p_0 + (2n-2)(1-p_0) + 2^{1-n} \\sum_{k=1}^n f_k$ where $f_k = H(x_k^2, y_k^2, z_k^2)$ is the Bloch entropy."
-  :content-hash "e7f8a9b0"}
-
- ;; ===============================================================
- ;; ASSUMPTIONS AND DEPENDENCIES (Depth 0)
- ;; ===============================================================
-
+{:theorem
+ {:id :theorem,
+  :statement
+  "$S = -p_0 \\log_2 p_0 + (2n-2)(1-p_0) + 2^{1-n} \\sum_{k=1}^n f_k$ where $f_k = H(x_k^2, y_k^2, z_k^2)$ is the Bloch entropy.",
+  :content-hash "802dace4c61859f5"},
+ :obligations [],
+ :archived-nodes {},
+ :phase :verified,
+ :external-refs {},
  :nodes
- {;; --- Assumptions ---
+ {:L3-step1b1
+  {:statement
+   "Logarithm of product: $\\log_2(ab) = \\log_2 a + \\log_2 b$.",
+   :taint :clean,
+   :parent :L3-step1b,
+   :content-hash "bd513471040c3c9e",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step1b1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
   :0-A1
-  {:id :0-A1
-   :type :assumption
-   :statement "Let $U = I - 2\\ket{\\psi}\\bra{\\psi}$ be a rank-1 QBF with $\\ket{\\psi} = \\bigotimes_{k=1}^n \\ket{\\phi_k}$ a product state."
-   :dependencies #{}
-   :scope #{}
-   :justification :assumption
-   :status :verified
-   :taint :clean
-   :depth 0
-   :parent nil
-   :display-order 0}
-
-  :0-D1
-  {:id :0-D1
-   :type :definition
-   :statement "Each qubit $k$ has Bloch vector $\\vec{r}_k = (x_k, y_k, z_k)$ with $x_k^2 + y_k^2 + z_k^2 = 1$."
-   :dependencies #{}
-   :scope #{}
-   :justification :assumption
-   :status :verified
-   :taint :clean
-   :depth 0
-   :parent nil
-   :display-order 1}
-
-  :0-D2
-  {:id :0-D2
-   :type :definition
-   :statement "Define $q_k^{(0)} = 1$ and $(q_k^{(1)}, q_k^{(2)}, q_k^{(3)}) = (x_k^2, y_k^2, z_k^2)$."
-   :dependencies #{}
-   :scope #{}
-   :justification :assumption
-   :status :verified
-   :taint :clean
-   :depth 0
-   :parent nil
-   :display-order 2}
-
-  :0-D3
-  {:id :0-D3
-   :type :definition
-   :statement "Bloch entropy: $f_k = H(x_k^2, y_k^2, z_k^2) = -\\sum_{\\ell=1}^3 q_k^{(\\ell)} \\log_2 q_k^{(\\ell)}$."
-   :dependencies #{:0-D2}
-   :scope #{}
-   :justification :assumption
-   :status :verified
-   :taint :clean
-   :depth 0
-   :parent nil
-   :display-order 3}
-
-  :0-L1cor
-  {:id :0-L1cor
-   :type :lemma-ref
-   :statement "For $\\alpha \\neq 0$: $p_\\alpha = 2^{2-2n} \\prod_{k=1}^n q_k^{(\\alpha_k)}$"
-   :dependencies #{}
-   :scope #{}
-   :lemma-id "L1-corollary"
-   :justification :lemma-application
-   :status :verified
-   :taint :clean
-   :depth 0
-   :parent nil
-   :display-order 4}
-
-  :0-L2
-  {:id :0-L2
-   :type :lemma-ref
-   :statement "For $\\ell \\in \\{1,2,3\\}$: $\\sum_{\\alpha: \\alpha_j = \\ell} p_\\alpha = 2^{1-n} q_j^{(\\ell)}$"
-   :dependencies #{:0-L1cor}
-   :scope #{}
-   :lemma-id "L2-influence"
-   :justification :lemma-application
-   :status :verified
-   :taint :clean
-   :depth 0
-   :parent nil
-   :display-order 5}
-
-  ;; ===============================================================
-  ;; L3-lem4: Shannon Entropy Definition (Depth 1, expanded to Depth 3)
-  ;; ===============================================================
-
-  :L3-lem4
-  {:id :L3-lem4
-   :type :claim
-   :statement "$S = -p_0 \\log_2 p_0 - \\sum_{\\alpha \\neq 0} p_\\alpha \\log_2 p_\\alpha$"
-   :dependencies #{:L3-lem4a :L3-lem4b :L3-lem4c}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 1
-   :parent nil
-   :display-order 0}
-
-  :L3-lem4a
-  {:id :L3-lem4a
-   :type :claim
-   :statement "Shannon entropy is defined as $S = -\\sum_{\\alpha \\in \\{0,1,2,3\\}^n} p_\\alpha \\log_2 p_\\alpha$."
-   :dependencies #{:L3-lem4a1}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-lem4
-   :display-order 0}
-
-  :L3-lem4a1
-  {:id :L3-lem4a1
-   :type :claim
-   :statement "The Shannon entropy $H(X)$ of a discrete probability distribution $\\{p_i\\}$ is $H(X) = -\\sum_i p_i \\log_2 p_i$."
-   :dependencies #{}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-lem4a
-   :display-order 0}
-
-  :L3-lem4b
-  {:id :L3-lem4b
-   :type :claim
-   :statement "The index set $\\{0,1,2,3\\}^n$ partitions as $\\{\\vec{0}\\} \\cup \\{\\alpha : \\alpha \\neq 0\\}$."
-   :dependencies #{:L3-lem4b1 :L3-lem4b2}
-   :scope #{}
-   :justification :case-split
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-lem4
-   :display-order 1}
-
-  :L3-lem4b1
-  {:id :L3-lem4b1
-   :type :claim
-   :statement "The zero multi-index $\\vec{0} = (0,0,\\ldots,0)$ corresponds to $\\alpha = 0$."
-   :dependencies #{}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-lem4b
-   :display-order 0}
-
-  :L3-lem4b2
-  {:id :L3-lem4b2
-   :type :claim
-   :statement "All other $4^n - 1$ multi-indices satisfy $\\alpha \\neq 0$ (at least one component nonzero)."
-   :dependencies #{:L3-lem4b1}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-lem4b
-   :display-order 1}
-
-  :L3-lem4c
-  {:id :L3-lem4c
-   :type :claim
-   :statement "Therefore $S = -p_0 \\log_2 p_0 - \\sum_{\\alpha \\neq 0} p_\\alpha \\log_2 p_\\alpha$."
-   :dependencies #{:L3-lem4a :L3-lem4b :L3-lem4c1}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-lem4
-   :display-order 2}
-
-  :L3-lem4c1
-  {:id :L3-lem4c1
-   :type :claim
-   :statement "Splitting the sum: $-\\sum_{\\alpha} = -p_0 \\log p_0 - \\sum_{\\alpha \\neq 0}$ by disjoint union."
-   :dependencies #{:L3-lem4b}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-lem4c
-   :display-order 0}
-
-  ;; ===============================================================
-  ;; L3-step1: Logarithm Expansion (Depth 1, expanded to Depth 4)
-  ;; ===============================================================
-
-  :L3-step1
-  {:id :L3-step1
-   :type :claim
-   :statement "For $\\alpha \\neq 0$: $-p_\\alpha \\log_2 p_\\alpha = p_\\alpha(2n-2) - p_\\alpha \\sum_k \\log_2 q_k^{(\\alpha_k)}$"
-   :dependencies #{:0-L1cor :L3-step1a :L3-step1b :L3-step1c}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 1
-   :parent nil
-   :display-order 1}
-
-  :L3-step1a
-  {:id :L3-step1a
-   :type :claim
-   :statement "From L1-corollary: $\\log_2 p_\\alpha = \\log_2(2^{2-2n} \\prod_{k=1}^n q_k^{(\\alpha_k)})$."
-   :dependencies #{:0-L1cor :L3-step1a1}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step1
-   :display-order 0}
-
-  :L3-step1a1
-  {:id :L3-step1a1
-   :type :claim
-   :statement "Substituting the explicit formula for $p_\\alpha$ from L1-corollary into $\\log_2$."
-   :dependencies #{:0-L1cor}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step1a
-   :display-order 0}
-
-  :L3-step1b
-  {:id :L3-step1b
-   :type :claim
-   :statement "By log rules: $\\log_2(2^{2-2n} \\prod_k q_k) = (2-2n) + \\sum_k \\log_2 q_k^{(\\alpha_k)}$."
-   :dependencies #{:L3-step1a :L3-step1b1 :L3-step1b2 :L3-step1b3}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step1
-   :display-order 1}
-
-  :L3-step1b1
-  {:id :L3-step1b1
-   :type :claim
-   :statement "Logarithm of product: $\\log_2(ab) = \\log_2 a + \\log_2 b$."
-   :dependencies #{}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step1b
-   :display-order 0}
-
-  :L3-step1b2
-  {:id :L3-step1b2
-   :type :claim
-   :statement "Logarithm of power: $\\log_2(2^{2-2n}) = 2-2n$."
-   :dependencies #{}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step1b
-   :display-order 1}
-
-  :L3-step1b3
-  {:id :L3-step1b3
-   :type :claim
-   :statement "Logarithm of product extends: $\\log_2(\\prod_k q_k) = \\sum_k \\log_2 q_k$."
-   :dependencies #{:L3-step1b1 :L3-step1b3a}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step1b
-   :display-order 2}
-
-  :L3-step1b3a
-  {:id :L3-step1b3a
-   :type :claim
-   :statement "By induction on $n$: $\\log(\\prod_{k=1}^n a_k) = \\sum_{k=1}^n \\log a_k$."
-   :dependencies #{:L3-step1b1}
-   :scope #{}
-   :justification :induction-step
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L3-step1b3
-   :display-order 0}
-
-  :L3-step1c
-  {:id :L3-step1c
-   :type :claim
-   :statement "Therefore: $-p_\\alpha \\log_2 p_\\alpha = -p_\\alpha(2-2n) - p_\\alpha \\sum_k \\log_2 q_k = p_\\alpha(2n-2) - p_\\alpha \\sum_k \\log_2 q_k$."
-   :dependencies #{:L3-step1b :L3-step1c1 :L3-step1c2}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step1
-   :display-order 2}
-
-  :L3-step1c1
-  {:id :L3-step1c1
-   :type :claim
-   :statement "Multiplying by $-p_\\alpha$: $-p_\\alpha \\log_2 p_\\alpha = -p_\\alpha[(2-2n) + \\sum_k \\log_2 q_k]$."
-   :dependencies #{:L3-step1b}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step1c
-   :display-order 0}
-
-  :L3-step1c2
-  {:id :L3-step1c2
-   :type :claim
-   :statement "Sign simplification: $-(2-2n) = 2n-2$."
-   :dependencies #{}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step1c
-   :display-order 1}
-
-  ;; ===============================================================
-  ;; L3-step2: Constant Factor Sum (Depth 1, expanded to Depth 3)
-  ;; ===============================================================
-
-  :L3-step2
-  {:id :L3-step2
-   :type :claim
-   :statement "$\\sum_{\\alpha \\neq 0} p_\\alpha(2n-2) = (2n-2)(1 - p_0)$"
-   :dependencies #{:L3-step1 :L3-step2a :L3-step2b :L3-step2c}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 1
-   :parent nil
-   :display-order 2}
-
-  :L3-step2a
-  {:id :L3-step2a
-   :type :claim
-   :statement "The constant $(2n-2)$ factors out: $\\sum_{\\alpha \\neq 0} p_\\alpha(2n-2) = (2n-2) \\sum_{\\alpha \\neq 0} p_\\alpha$."
-   :dependencies #{:L3-step2a1}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step2
-   :display-order 0}
-
-  :L3-step2a1
-  {:id :L3-step2a1
-   :type :claim
-   :statement "Linearity of summation: $\\sum_i c \\cdot a_i = c \\cdot \\sum_i a_i$ for constant $c$."
-   :dependencies #{}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step2a
-   :display-order 0}
-
-  :L3-step2b
-  {:id :L3-step2b
-   :type :claim
-   :statement "Probability normalization: $\\sum_{\\alpha} p_\\alpha = 1$."
-   :dependencies #{:L3-step2b1}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step2
-   :display-order 1}
-
-  :L3-step2b1
-  {:id :L3-step2b1
-   :type :claim
-   :statement "The $\\{p_\\alpha\\}$ form a probability distribution by construction: $\\sum_\\alpha |\\hat{U}(\\alpha)|^2 = 1$."
-   :dependencies #{}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step2b
-   :display-order 0}
-
-  :L3-step2c
-  {:id :L3-step2c
-   :type :claim
-   :statement "Therefore $\\sum_{\\alpha \\neq 0} p_\\alpha = 1 - p_0$."
-   :dependencies #{:L3-step2b :L3-step2c1}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step2
-   :display-order 2}
-
-  :L3-step2c1
-  {:id :L3-step2c1
-   :type :claim
-   :statement "Rearranging: $\\sum_{\\alpha \\neq 0} p_\\alpha = \\sum_\\alpha p_\\alpha - p_0 = 1 - p_0$."
-   :dependencies #{:L3-step2b}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step2c
-   :display-order 0}
-
-  ;; ===============================================================
-  ;; L3-step3: Case Split on alpha_j (Depth 1, expanded to Depth 3)
-  ;; ===============================================================
-
+  {:statement
+   "Let $U = I - 2\\ket{\\psi}\\bra{\\psi}$ be a rank-1 QBF with $\\ket{\\psi} = \\bigotimes_{k=1}^n \\ket{\\phi_k}$ a product state.",
+   :taint :clean,
+   :parent nil,
+   :content-hash "07f3e5947ad03e73",
+   :display-order 0,
+   :type :assumption,
+   :scope #{},
+   :justification :assumption,
+   :status :verified,
+   :id :0-A1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 0,
+   :dependencies #{}},
   :L3-step3
-  {:id :L3-step3
-   :type :claim
-   :statement "For $\\alpha_j = 0$: $\\log_2 q_j^{(0)} = 0$, so only $\\alpha_j \\neq 0$ contributes."
-   :dependencies #{:L3-step3a :L3-step3b :L3-step3c}
-   :scope #{}
-   :justification :case-split
-   :status :verified
-   :taint :clean
-   :depth 1
-   :parent nil
-   :display-order 3}
-
-  :L3-step3a
-  {:id :L3-step3a
-   :type :claim
-   :statement "From D2: $q_j^{(0)} = 1$."
-   :dependencies #{:0-D2 :L3-step3a1}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step3
-   :display-order 0}
-
-  :L3-step3a1
-  {:id :L3-step3a1
-   :type :claim
-   :statement "Definition D2 explicitly states $q_k^{(0)} = 1$ for all $k$."
-   :dependencies #{:0-D2}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step3a
-   :display-order 0}
-
-  :L3-step3b
-  {:id :L3-step3b
-   :type :claim
-   :statement "$\\log_2(1) = 0$ by definition of logarithm."
-   :dependencies #{:L3-step3b1}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step3
-   :display-order 1}
-
-  :L3-step3b1
-  {:id :L3-step3b1
-   :type :claim
-   :statement "Since $2^0 = 1$, we have $\\log_2(1) = 0$."
-   :dependencies #{}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step3b
-   :display-order 0}
-
-  :L3-step3c
-  {:id :L3-step3c
-   :type :claim
-   :statement "Therefore $-p_\\alpha \\log_2 q_j^{(0)} = -p_\\alpha \\cdot 0 = 0$, contributing nothing."
-   :dependencies #{:L3-step3a :L3-step3b :L3-step3c1}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step3
-   :display-order 2}
-
-  :L3-step3c1
-  {:id :L3-step3c1
-   :type :claim
-   :statement "Any term multiplied by zero equals zero: $a \\cdot 0 = 0$."
-   :dependencies #{}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step3c
-   :display-order 0}
-
-  ;; ===============================================================
-  ;; L3-step4: Application of L2 (Depth 1, expanded to Depth 3)
-  ;; ===============================================================
-
-  :L3-step4
-  {:id :L3-step4
-   :type :claim
-   :statement "From L2: $\\sum_{\\alpha: \\alpha_j = \\ell} p_\\alpha = 2^{1-n} q_j^{(\\ell)}$ for $\\ell \\in \\{1,2,3\\}$."
-   :dependencies #{:0-L2 :L3-step4a :L3-step4b :L3-step4c}
-   :scope #{}
-   :justification :lemma-application
-   :status :verified
-   :taint :clean
-   :depth 1
-   :parent nil
-   :display-order 4}
-
-  :L3-step4a
-  {:id :L3-step4a
-   :type :claim
-   :statement "L2-influence states: for any $j \\in \\{1,\\ldots,n\\}$ and $\\ell \\in \\{1,2,3\\}$, the marginal sum equals $2^{1-n} q_j^{(\\ell)}$."
-   :dependencies #{:0-L2 :L3-step4a1}
-   :scope #{}
-   :justification :lemma-application
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step4
-   :display-order 0}
-
-  :L3-step4a1
-  {:id :L3-step4a1
-   :type :claim
-   :statement "This is the key result from L2: marginalizing the probability distribution over all indices except $j$ gives $2^{1-n} q_j^{(\\ell)}$."
-   :dependencies #{:0-L2}
-   :scope #{}
-   :justification :lemma-application
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step4a
-   :display-order 0}
-
-  :L3-step4b
-  {:id :L3-step4b
-   :type :claim
-   :statement "The current context (product state QBF) satisfies all L2 preconditions."
-   :dependencies #{:0-A1 :L3-step4b1}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step4
-   :display-order 1}
-
-  :L3-step4b1
-  {:id :L3-step4b1
-   :type :claim
-   :statement "L2 requires: rank-1 QBF from product state with Bloch vector normalization. These hold by A1, D1."
-   :dependencies #{:0-A1 :0-D1}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step4b
-   :display-order 0}
-
-  :L3-step4c
-  {:id :L3-step4c
-   :type :claim
-   :statement "Index range: $\\ell \\in \\{1,2,3\\}$ (not $\\ell = 0$, handled in L3-step3)."
-   :dependencies #{:L3-step3 :L3-step4c1}
-   :scope #{}
-   :justification :case-split
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step4
-   :display-order 2}
-
-  :L3-step4c1
-  {:id :L3-step4c1
-   :type :claim
-   :statement "L3-step3 established that $\\ell = 0$ contributes zero; thus we need only $\\ell \\in \\{1,2,3\\}$."
-   :dependencies #{:L3-step3}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step4c
-   :display-order 0}
-
-  ;; ===============================================================
-  ;; L3-step5: Bloch Entropy Identification (Depth 1, expanded to Depth 4)
-  ;; ===============================================================
-
-  :L3-step5
-  {:id :L3-step5
-   :type :claim
-   :statement "$-\\sum_{\\alpha: \\alpha_j \\neq 0} p_\\alpha \\log_2 q_j^{(\\alpha_j)} = 2^{1-n} f_j$"
-   :dependencies #{:L3-step4 :0-D3 :L3-step5a :L3-step5b :L3-step5c}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 1
-   :parent nil
-   :display-order 5}
-
-  :L3-step5a
-  {:id :L3-step5a
-   :type :claim
-   :statement "Partition: $\\sum_{\\alpha: \\alpha_j \\neq 0} = \\sum_{\\ell=1}^3 \\sum_{\\alpha: \\alpha_j = \\ell}$."
-   :dependencies #{:L3-step5a1 :L3-step5a2}
-   :scope #{}
-   :justification :case-split
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step5
-   :display-order 0}
-
-  :L3-step5a1
-  {:id :L3-step5a1
-   :type :claim
-   :statement "The condition $\\alpha_j \\neq 0$ is equivalent to $\\alpha_j \\in \\{1,2,3\\}$."
-   :dependencies #{}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step5a
-   :display-order 0}
-
-  :L3-step5a2
-  {:id :L3-step5a2
-   :type :claim
-   :statement "This partitions the sum into three disjoint cases: $\\alpha_j = 1$, $\\alpha_j = 2$, $\\alpha_j = 3$."
-   :dependencies #{:L3-step5a1}
-   :scope #{}
-   :justification :case-split
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step5a
-   :display-order 1}
-
-  :L3-step5b
-  {:id :L3-step5b
-   :type :claim
-   :statement "Apply L3-step4: $-\\sum_{\\ell=1}^3 (\\sum_{\\alpha: \\alpha_j=\\ell} p_\\alpha) \\log_2 q_j^{(\\ell)} = -\\sum_{\\ell=1}^3 2^{1-n} q_j^{(\\ell)} \\log_2 q_j^{(\\ell)}$."
-   :dependencies #{:L3-step4 :L3-step5a :L3-step5b1 :L3-step5b2}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step5
-   :display-order 1}
-
-  :L3-step5b1
-  {:id :L3-step5b1
-   :type :claim
-   :statement "For fixed $\\ell$, $\\log_2 q_j^{(\\ell)}$ is constant across the inner sum over $\\alpha$."
-   :dependencies #{}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step5b
-   :display-order 0}
-
-  :L3-step5b2
-  {:id :L3-step5b2
-   :type :claim
-   :statement "Thus: $\\sum_{\\alpha: \\alpha_j=\\ell} p_\\alpha \\log_2 q_j^{(\\ell)} = (\\sum_{\\alpha: \\alpha_j=\\ell} p_\\alpha) \\log_2 q_j^{(\\ell)} = 2^{1-n} q_j^{(\\ell)} \\log_2 q_j^{(\\ell)}$."
-   :dependencies #{:L3-step4 :L3-step5b1 :L3-step5b2a}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step5b
-   :display-order 1}
-
-  :L3-step5b2a
-  {:id :L3-step5b2a
-   :type :claim
-   :statement "Substituting the L3-step4 result for the marginal sum."
-   :dependencies #{:L3-step4}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L3-step5b2
-   :display-order 0}
-
-  :L3-step5c
-  {:id :L3-step5c
-   :type :claim
-   :statement "By D3: $-\\sum_{\\ell=1}^3 q_j^{(\\ell)} \\log_2 q_j^{(\\ell)} = f_j$, hence result is $2^{1-n} f_j$."
-   :dependencies #{:0-D3 :L3-step5b :L3-step5c1 :L3-step5c2}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step5
-   :display-order 2}
-
-  :L3-step5c1
-  {:id :L3-step5c1
-   :type :claim
-   :statement "Definition D3: $f_k = H(x_k^2, y_k^2, z_k^2) = -\\sum_{\\ell=1}^3 q_k^{(\\ell)} \\log_2 q_k^{(\\ell)}$."
-   :dependencies #{:0-D3}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step5c
-   :display-order 0}
-
-  :L3-step5c2
-  {:id :L3-step5c2
-   :type :claim
-   :statement "Factor out $2^{1-n}$: $-2^{1-n} \\sum_{\\ell=1}^3 q_j^{(\\ell)} \\log_2 q_j^{(\\ell)} = 2^{1-n} f_j$."
-   :dependencies #{:L3-step5c1 :L3-step5c2a}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step5c
-   :display-order 1}
-
-  :L3-step5c2a
-  {:id :L3-step5c2a
-   :type :claim
-   :statement "The constant $2^{1-n}$ factors out of the sum, then matches D3 definition of $f_j$."
-   :dependencies #{:L3-step5c1}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L3-step5c2
-   :display-order 0}
-
-  ;; ===============================================================
-  ;; L3-step6: Sum Over All Qubits (Depth 1, expanded to Depth 3)
-  ;; ===============================================================
-
-  :L3-step6
-  {:id :L3-step6
-   :type :claim
-   :statement "Summing: $-\\sum_{\\alpha \\neq 0} p_\\alpha \\sum_k \\log_2 q_k^{(\\alpha_k)} = 2^{1-n} \\sum_k f_k$"
-   :dependencies #{:L3-step5 :L3-step6a :L3-step6b :L3-step6c}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 1
-   :parent nil
-   :display-order 6}
-
-  :L3-step6a
-  {:id :L3-step6a
-   :type :claim
-   :statement "Exchange order of summation: $\\sum_{\\alpha} \\sum_k = \\sum_k \\sum_\\alpha$."
-   :dependencies #{:L3-step6a1}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step6
-   :display-order 0}
-
-  :L3-step6a1
-  {:id :L3-step6a1
-   :type :claim
-   :statement "Fubini's theorem for finite sums: summation order can be exchanged."
-   :dependencies #{}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step6a
-   :display-order 0}
-
-  :L3-step6b
-  {:id :L3-step6b
-   :type :claim
-   :statement "For each $k$: $-\\sum_{\\alpha \\neq 0} p_\\alpha \\log_2 q_k^{(\\alpha_k)}$. Need to relate to $-\\sum_{\\alpha: \\alpha_k \\neq 0}$."
-   :dependencies #{:L3-step3 :L3-step6b1 :L3-step6b2}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step6
-   :display-order 1}
-
-  :L3-step6b1
-  {:id :L3-step6b1
-   :type :claim
-   :statement "Split: $\\sum_{\\alpha \\neq 0} = \\sum_{\\alpha: \\alpha_k = 0, \\alpha \\neq 0} + \\sum_{\\alpha: \\alpha_k \\neq 0}$."
-   :dependencies #{}
-   :scope #{}
-   :justification :case-split
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step6b
-   :display-order 0}
-
+  {:statement
+   "For $\\alpha_j = 0$: $\\log_2 q_j^{(0)} = 0$, so only $\\alpha_j \\neq 0$ contributes.",
+   :taint :clean,
+   :parent nil,
+   :content-hash "5a6a438cfea0102b",
+   :display-order 3,
+   :type :claim,
+   :scope #{},
+   :justification :case-split,
+   :status :verified,
+   :id :L3-step3,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 1,
+   :dependencies #{:L3-step3c :L3-step3a :L3-step3b}},
   :L3-step6b2
-  {:id :L3-step6b2
-   :type :claim
-   :statement "When $\\alpha_k = 0$: $\\log_2 q_k^{(0)} = 0$ (by L3-step3), so these terms contribute zero."
-   :dependencies #{:L3-step3}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step6b
-   :display-order 1}
-
-  :L3-step6c
-  {:id :L3-step6c
-   :type :claim
-   :statement "Applying L3-step5 for each $k$: $-\\sum_{\\alpha: \\alpha_k \\neq 0} p_\\alpha \\log_2 q_k^{(\\alpha_k)} = 2^{1-n} f_k$."
-   :dependencies #{:L3-step5 :L3-step6b :L3-step6c1 :L3-step6c2}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-step6
-   :display-order 2}
-
-  :L3-step6c1
-  {:id :L3-step6c1
-   :type :claim
-   :statement "L3-step5 applies with $j$ replaced by $k$: same structure, different index name."
-   :dependencies #{:L3-step5}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step6c
-   :display-order 0}
-
-  :L3-step6c2
-  {:id :L3-step6c2
-   :type :claim
-   :statement "Summing over $k$: $\\sum_{k=1}^n 2^{1-n} f_k = 2^{1-n} \\sum_{k=1}^n f_k$."
-   :dependencies #{:L3-step6c1}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-step6c
-   :display-order 1}
-
-  ;; ===============================================================
-  ;; L3-qed: Final Combination (Depth 1, expanded to Depth 3)
-  ;; ===============================================================
-
-  :L3-qed
-  {:id :L3-qed
-   :type :qed
-   :statement "Combining: $S = -p_0 \\log_2 p_0 + (2n-2)(1-p_0) + 2^{1-n} \\sum_k f_k$"
-   :dependencies #{:L3-lem4 :L3-step2 :L3-step6 :L3-qeda :L3-qedb :L3-qedc}
-   :scope #{}
-   :justification :qed
-   :status :verified
-   :taint :clean
-   :depth 1
-   :parent nil
-   :display-order 7}
-
-  :L3-qeda
-  {:id :L3-qeda
-   :type :claim
-   :statement "From L3-lem4: $S = -p_0 \\log_2 p_0 - \\sum_{\\alpha \\neq 0} p_\\alpha \\log_2 p_\\alpha$."
-   :dependencies #{:L3-lem4 :L3-qeda1}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-qed
-   :display-order 0}
-
-  :L3-qeda1
-  {:id :L3-qeda1
-   :type :claim
-   :statement "Citing the established result from L3-lem4."
-   :dependencies #{:L3-lem4}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-qeda
-   :display-order 0}
-
+  {:statement
+   "When $\\alpha_k = 0$: $\\log_2 q_k^{(0)} = 0$ (by L3-step3), so these terms contribute zero.",
+   :taint :clean,
+   :parent :L3-step6b,
+   :content-hash "d6ade11c221967ab",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-step6b2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-step3}},
   :L3-qedb
-  {:id :L3-qedb
-   :type :claim
-   :statement "From L3-step1: $-\\sum_{\\alpha \\neq 0} p_\\alpha \\log_2 p_\\alpha = \\sum_{\\alpha \\neq 0} [p_\\alpha(2n-2) - p_\\alpha \\sum_k \\log_2 q_k]$."
-   :dependencies #{:L3-step1 :L3-qedb1}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-qed
-   :display-order 1}
-
-  :L3-qedb1
-  {:id :L3-qedb1
-   :type :claim
-   :statement "Sum the L3-step1 identity over all $\\alpha \\neq 0$."
-   :dependencies #{:L3-step1}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-qedb
-   :display-order 0}
-
-  :L3-qedc
-  {:id :L3-qedc
-   :type :claim
-   :statement "Substitute L3-step2 and L3-step6: $S = -p_0 \\log_2 p_0 + (2n-2)(1-p_0) + 2^{1-n} \\sum_k f_k$."
-   :dependencies #{:L3-step2 :L3-step6 :L3-qedb :L3-qedc1 :L3-qedc2}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L3-qed
-   :display-order 2}
-
+  {:statement
+   "From L3-step1: $-\\sum_{\\alpha \\neq 0} p_\\alpha \\log_2 p_\\alpha = \\sum_{\\alpha \\neq 0} [p_\\alpha(2n-2) - p_\\alpha \\sum_k \\log_2 q_k]$.",
+   :taint :clean,
+   :parent :L3-qed,
+   :content-hash "cdbca089df51ef50",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-qedb,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-qedb1 :L3-step1}},
+  :L3-step6b1
+  {:statement
+   "Split: $\\sum_{\\alpha \\neq 0} = \\sum_{\\alpha: \\alpha_k = 0, \\alpha \\neq 0} + \\sum_{\\alpha: \\alpha_k \\neq 0}$.",
+   :taint :clean,
+   :parent :L3-step6b,
+   :content-hash "d703f10170043edb",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :case-split,
+   :status :verified,
+   :id :L3-step6b1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :L3-step6
+  {:statement
+   "Summing: $-\\sum_{\\alpha \\neq 0} p_\\alpha \\sum_k \\log_2 q_k^{(\\alpha_k)} = 2^{1-n} \\sum_k f_k$",
+   :taint :clean,
+   :parent nil,
+   :content-hash "68aae2de1b6475c6",
+   :display-order 6,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step6,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 1,
+   :dependencies #{:L3-step6b :L3-step5 :L3-step6a :L3-step6c}},
+  :L3-step5a2
+  {:statement
+   "This partitions the sum into three disjoint cases: $\\alpha_j = 1$, $\\alpha_j = 2$, $\\alpha_j = 3$.",
+   :taint :clean,
+   :parent :L3-step5a,
+   :content-hash "85458c2d9d56ec25",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :case-split,
+   :status :verified,
+   :id :L3-step5a2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-step5a1}},
+  :L3-step1b
+  {:statement
+   "By log rules: $\\log_2(2^{2-2n} \\prod_k q_k) = (2-2n) + \\sum_k \\log_2 q_k^{(\\alpha_k)}$.",
+   :taint :clean,
+   :parent :L3-step1,
+   :content-hash "2ee818bc0d4a6d6b",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step1b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-step1b1 :L3-step1a :L3-step1b3 :L3-step1b2}},
+  :L3-step6c2
+  {:statement
+   "Summing over $k$: $\\sum_{k=1}^n 2^{1-n} f_k = 2^{1-n} \\sum_{k=1}^n f_k$.",
+   :taint :clean,
+   :parent :L3-step6c,
+   :content-hash "296c29b1ff922d30",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step6c2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-step6c1}},
+  :L3-lem4a1
+  {:statement
+   "The Shannon entropy $H(X)$ of a discrete probability distribution $\\{p_i\\}$ is $H(X) = -\\sum_i p_i \\log_2 p_i$.",
+   :taint :clean,
+   :parent :L3-lem4a,
+   :content-hash "19278c3a35086206",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L3-lem4a1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
   :L3-qedc1
-  {:id :L3-qedc1
-   :type :claim
-   :statement "The first sum $\\sum_{\\alpha \\neq 0} p_\\alpha(2n-2) = (2n-2)(1-p_0)$ by L3-step2."
-   :dependencies #{:L3-step2}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-qedc
-   :display-order 0}
-
+  {:statement
+   "The first sum $\\sum_{\\alpha \\neq 0} p_\\alpha(2n-2) = (2n-2)(1-p_0)$ by L3-step2.",
+   :taint :clean,
+   :parent :L3-qedc,
+   :content-hash "afa9c970e891ac78",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-qedc1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-step2}},
+  :L3-step6a1
+  {:statement
+   "Fubini's theorem for finite sums: summation order can be exchanged.",
+   :taint :clean,
+   :parent :L3-step6a,
+   :content-hash "81a77cf0c4d55091",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step6a1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :0-D1
+  {:statement
+   "Each qubit $k$ has Bloch vector $\\vec{r}_k = (x_k, y_k, z_k)$ with $x_k^2 + y_k^2 + z_k^2 = 1$.",
+   :taint :clean,
+   :parent nil,
+   :content-hash "8790be5a08afc008",
+   :display-order 1,
+   :type :definition,
+   :scope #{},
+   :justification :assumption,
+   :status :verified,
+   :id :0-D1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 0,
+   :dependencies #{}},
+  :L3-step3c
+  {:statement
+   "Therefore $-p_\\alpha \\log_2 q_j^{(0)} = -p_\\alpha \\cdot 0 = 0$, contributing nothing.",
+   :taint :clean,
+   :parent :L3-step3,
+   :content-hash "bd9fd4d449a49a53",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step3c,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-step3a :L3-step3b :L3-step3c1}},
+  :L3-qedc
+  {:statement
+   "Substitute L3-step2 and L3-step6: $S = -p_0 \\log_2 p_0 + (2n-2)(1-p_0) + 2^{1-n} \\sum_k f_k$.",
+   :taint :clean,
+   :parent :L3-qed,
+   :content-hash "45b4bdff989ba102",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-qedc,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-qedb :L3-step6 :L3-qedc1 :L3-qedc2 :L3-step2}},
+  :L3-step6b
+  {:statement
+   "For each $k$: $-\\sum_{\\alpha \\neq 0} p_\\alpha \\log_2 q_k^{(\\alpha_k)}$. Need to relate to $-\\sum_{\\alpha: \\alpha_k \\neq 0}$.",
+   :taint :clean,
+   :parent :L3-step6,
+   :content-hash "b48f846ae64950c9",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step6b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-step3 :L3-step6b2 :L3-step6b1}},
+  :L3-step2c1
+  {:statement
+   "Rearranging: $\\sum_{\\alpha \\neq 0} p_\\alpha = \\sum_\\alpha p_\\alpha - p_0 = 1 - p_0$.",
+   :taint :clean,
+   :parent :L3-step2c,
+   :content-hash "edfb3131b0439833",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step2c1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-step2b}},
+  :L3-step2c
+  {:statement
+   "Therefore $\\sum_{\\alpha \\neq 0} p_\\alpha = 1 - p_0$.",
+   :taint :clean,
+   :parent :L3-step2,
+   :content-hash "43b6befc53cb617a",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step2c,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-step2c1 :L3-step2b}},
+  :L3-step3a
+  {:statement "From D2: $q_j^{(0)} = 1$.",
+   :taint :clean,
+   :parent :L3-step3,
+   :content-hash "8aeb7288555040bd",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L3-step3a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:0-D2 :L3-step3a1}},
+  :0-D2
+  {:statement
+   "Define $q_k^{(0)} = 1$ and $(q_k^{(1)}, q_k^{(2)}, q_k^{(3)}) = (x_k^2, y_k^2, z_k^2)$.",
+   :taint :clean,
+   :parent nil,
+   :content-hash "3e668dbe46c7b375",
+   :display-order 2,
+   :type :definition,
+   :scope #{},
+   :justification :assumption,
+   :status :verified,
+   :id :0-D2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 0,
+   :dependencies #{}},
+  :L3-lem4a
+  {:statement
+   "Shannon entropy is defined as $S = -\\sum_{\\alpha \\in \\{0,1,2,3\\}^n} p_\\alpha \\log_2 p_\\alpha$.",
+   :taint :clean,
+   :parent :L3-lem4,
+   :content-hash "2619496390c7079a",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L3-lem4a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-lem4a1}},
+  :L3-qedb1
+  {:statement "Sum the L3-step1 identity over all $\\alpha \\neq 0$.",
+   :taint :clean,
+   :parent :L3-qedb,
+   :content-hash "859779a392b236d6",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-qedb1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-step1}},
+  :L3-step1c
+  {:statement
+   "Therefore: $-p_\\alpha \\log_2 p_\\alpha = -p_\\alpha(2-2n) - p_\\alpha \\sum_k \\log_2 q_k = p_\\alpha(2n-2) - p_\\alpha \\sum_k \\log_2 q_k$.",
+   :taint :clean,
+   :parent :L3-step1,
+   :content-hash "000f44b51d497a1a",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step1c,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-step1b :L3-step1c2 :L3-step1c1}},
+  :L3-step4b1
+  {:statement
+   "L2 requires: rank-1 QBF from product state with Bloch vector normalization. These hold by A1, D1.",
+   :taint :clean,
+   :parent :L3-step4b,
+   :content-hash "458f4597c08dfb12",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L3-step4b1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:0-A1 :0-D1}},
+  :L3-step4b
+  {:statement
+   "The current context (product state QBF) satisfies all L2 preconditions.",
+   :taint :clean,
+   :parent :L3-step4,
+   :content-hash "6a0498cb9d3a1af2",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L3-step4b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:0-A1 :L3-step4b1}},
+  :L3-qeda
+  {:statement
+   "From L3-lem4: $S = -p_0 \\log_2 p_0 - \\sum_{\\alpha \\neq 0} p_\\alpha \\log_2 p_\\alpha$.",
+   :taint :clean,
+   :parent :L3-qed,
+   :content-hash "72a73082137f6f8f",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-qeda,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-qeda1 :L3-lem4}},
+  :L3-step5c
+  {:statement
+   "By D3: $-\\sum_{\\ell=1}^3 q_j^{(\\ell)} \\log_2 q_j^{(\\ell)} = f_j$, hence result is $2^{1-n} f_j$.",
+   :taint :clean,
+   :parent :L3-step5,
+   :content-hash "a2614dc68b43752b",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-step5c,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:0-D3 :L3-step5c2 :L3-step5c1 :L3-step5b}},
+  :L3-step1b3a
+  {:statement
+   "By induction on $n$: $\\log(\\prod_{k=1}^n a_k) = \\sum_{k=1}^n \\log a_k$.",
+   :taint :clean,
+   :parent :L3-step1b3,
+   :content-hash "d214e52469856098",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :induction-step,
+   :status :verified,
+   :id :L3-step1b3a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{:L3-step1b1}},
+  :L3-step1c2
+  {:statement "Sign simplification: $-(2-2n) = 2n-2$.",
+   :taint :clean,
+   :parent :L3-step1c,
+   :content-hash "647e042079a6d34c",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step1c2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :L3-qeda1
+  {:statement "Citing the established result from L3-lem4.",
+   :taint :clean,
+   :parent :L3-qeda,
+   :content-hash "8da5068657347b7d",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-qeda1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-lem4}},
+  :L3-step1a1
+  {:statement
+   "Substituting the explicit formula for $p_\\alpha$ from L1-corollary into $\\log_2$.",
+   :taint :clean,
+   :parent :L3-step1a,
+   :content-hash "9a8c4ec2b6f42486",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-step1a1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:0-L1cor}},
+  :0-D3
+  {:statement
+   "Bloch entropy: $f_k = H(x_k^2, y_k^2, z_k^2) = -\\sum_{\\ell=1}^3 q_k^{(\\ell)} \\log_2 q_k^{(\\ell)}$.",
+   :taint :clean,
+   :parent nil,
+   :content-hash "d81a4045a4ae44ba",
+   :display-order 3,
+   :type :definition,
+   :scope #{},
+   :justification :assumption,
+   :status :verified,
+   :id :0-D3,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 0,
+   :dependencies #{:0-D2}},
+  :L3-step2b1
+  {:statement
+   "The $\\{p_\\alpha\\}$ form a probability distribution by construction: $\\sum_\\alpha |\\hat{U}(\\alpha)|^2 = 1$.",
+   :taint :clean,
+   :parent :L3-step2b,
+   :content-hash "684b98528b70a21e",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L3-step2b1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :L3-step5
+  {:statement
+   "$-\\sum_{\\alpha: \\alpha_j \\neq 0} p_\\alpha \\log_2 q_j^{(\\alpha_j)} = 2^{1-n} f_j$",
+   :taint :clean,
+   :parent nil,
+   :content-hash "194f5e8be4ada753",
+   :display-order 5,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-step5,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 1,
+   :dependencies #{:L3-step5c :0-D3 :L3-step5a :L3-step4 :L3-step5b}},
+  :L3-step5a
+  {:statement
+   "Partition: $\\sum_{\\alpha: \\alpha_j \\neq 0} = \\sum_{\\ell=1}^3 \\sum_{\\alpha: \\alpha_j = \\ell}$.",
+   :taint :clean,
+   :parent :L3-step5,
+   :content-hash "63a7e28dab9cead7",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :case-split,
+   :status :verified,
+   :id :L3-step5a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-step5a2 :L3-step5a1}},
+  :L3-step6c1
+  {:statement
+   "L3-step5 applies with $j$ replaced by $k$: same structure, different index name.",
+   :taint :clean,
+   :parent :L3-step6c,
+   :content-hash "dabc205df21d3f4c",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-step6c1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-step5}},
+  :L3-lem4b2
+  {:statement
+   "All other $4^n - 1$ multi-indices satisfy $\\alpha \\neq 0$ (at least one component nonzero).",
+   :taint :clean,
+   :parent :L3-lem4b,
+   :content-hash "8a90f6f14230faf1",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-lem4b2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-lem4b1}},
+  :L3-step5b2
+  {:statement
+   "Thus: $\\sum_{\\alpha: \\alpha_j=\\ell} p_\\alpha \\log_2 q_j^{(\\ell)} = (\\sum_{\\alpha: \\alpha_j=\\ell} p_\\alpha) \\log_2 q_j^{(\\ell)} = 2^{1-n} q_j^{(\\ell)} \\log_2 q_j^{(\\ell)}$.",
+   :taint :clean,
+   :parent :L3-step5b,
+   :content-hash "08aa6f55cff247d1",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-step5b2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-step5b1 :L3-step5b2a :L3-step4}},
+  :L3-step6a
+  {:statement
+   "Exchange order of summation: $\\sum_{\\alpha} \\sum_k = \\sum_k \\sum_\\alpha$.",
+   :taint :clean,
+   :parent :L3-step6,
+   :content-hash "63d7287f39386b4c",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step6a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-step6a1}},
+  :L3-step5b1
+  {:statement
+   "For fixed $\\ell$, $\\log_2 q_j^{(\\ell)}$ is constant across the inner sum over $\\alpha$.",
+   :taint :clean,
+   :parent :L3-step5b,
+   :content-hash "152e6ad847a6355e",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L3-step5b1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :0-L1cor
+  {:statement
+   "For $\\alpha \\neq 0$: $p_\\alpha = 2^{2-2n} \\prod_{k=1}^n q_k^{(\\alpha_k)}$",
+   :taint :clean,
+   :parent nil,
+   :content-hash "a59a4770e68bca23",
+   :display-order 4,
+   :type :lemma-ref,
+   :scope #{},
+   :lemma-id "L1-corollary",
+   :justification :lemma-application,
+   :status :verified,
+   :id :0-L1cor,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 0,
+   :dependencies #{}},
+  :L3-step5c2
+  {:statement
+   "Factor out $2^{1-n}$: $-2^{1-n} \\sum_{\\ell=1}^3 q_j^{(\\ell)} \\log_2 q_j^{(\\ell)} = 2^{1-n} f_j$.",
+   :taint :clean,
+   :parent :L3-step5c,
+   :content-hash "59a2d43b97c8a32c",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step5c2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-step5c1 :L3-step5c2a}},
   :L3-qedc2
-  {:id :L3-qedc2
-   :type :claim
-   :statement "The second sum $-\\sum_{\\alpha \\neq 0} p_\\alpha \\sum_k \\log_2 q_k = 2^{1-n} \\sum_k f_k$ by L3-step6."
-   :dependencies #{:L3-step6}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L3-qedc
-   :display-order 1}}
-
- :symbols
- {:sym-S {:id :sym-S :name "S" :type "R" :tex "S(U)" :scope :global}
-  :sym-p0 {:id :sym-p0 :name "p_0" :type "R" :tex "p_0 = (1-2^{1-n})^2" :scope :global}
-  :sym-palpha {:id :sym-palpha :name "p_alpha" :type "R" :tex "p_\\alpha" :scope :global}
-  :sym-fk {:id :sym-fk :name "f_k" :type "R" :tex "f_k" :scope :global}
-  :sym-q {:id :sym-q :name "q_k^(m)" :type "R" :tex "q_k^{(m)}" :scope :global}
-  :sym-n {:id :sym-n :name "n" :type "N" :tex "n" :scope :global}}
-
- :external-refs {}
-
+  {:statement
+   "The second sum $-\\sum_{\\alpha \\neq 0} p_\\alpha \\sum_k \\log_2 q_k = 2^{1-n} \\sum_k f_k$ by L3-step6.",
+   :taint :clean,
+   :parent :L3-qedc,
+   :content-hash "b6a8e84b0db92582",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-qedc2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-step6}},
+  :L3-step4a
+  {:statement
+   "L2-influence states: for any $j \\in \\{1,\\ldots,n\\}$ and $\\ell \\in \\{1,2,3\\}$, the marginal sum equals $2^{1-n} q_j^{(\\ell)}$.",
+   :taint :clean,
+   :parent :L3-step4,
+   :content-hash "166fd71289192a41",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :lemma-application,
+   :status :verified,
+   :id :L3-step4a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:0-L2 :L3-step4a1}},
+  :L3-lem4c
+  {:statement
+   "Therefore $S = -p_0 \\log_2 p_0 - \\sum_{\\alpha \\neq 0} p_\\alpha \\log_2 p_\\alpha$.",
+   :taint :clean,
+   :parent :L3-lem4,
+   :content-hash "01fcec39d86b56ed",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-lem4c,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-lem4a :L3-lem4b :L3-lem4c1}},
+  :0-L2
+  {:statement
+   "For $\\ell \\in \\{1,2,3\\}$: $\\sum_{\\alpha: \\alpha_j = \\ell} p_\\alpha = 2^{1-n} q_j^{(\\ell)}$",
+   :taint :clean,
+   :parent nil,
+   :content-hash "81a1678b27750db0",
+   :display-order 5,
+   :type :lemma-ref,
+   :scope #{},
+   :lemma-id "L2-influence",
+   :justification :lemma-application,
+   :status :verified,
+   :id :0-L2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 0,
+   :dependencies #{:0-L1cor}},
+  :L3-step2a1
+  {:statement
+   "Linearity of summation: $\\sum_i c \\cdot a_i = c \\cdot \\sum_i a_i$ for constant $c$.",
+   :taint :clean,
+   :parent :L3-step2a,
+   :content-hash "51894f67425db41e",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step2a1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :L3-step4c1
+  {:statement
+   "L3-step3 established that $\\ell = 0$ contributes zero; thus we need only $\\ell \\in \\{1,2,3\\}$.",
+   :taint :clean,
+   :parent :L3-step4c,
+   :content-hash "849fc5536d65b433",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-step4c1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-step3}},
+  :L3-step4a1
+  {:statement
+   "This is the key result from L2: marginalizing the probability distribution over all indices except $j$ gives $2^{1-n} q_j^{(\\ell)}$.",
+   :taint :clean,
+   :parent :L3-step4a,
+   :content-hash "210401bfd3f49404",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :lemma-application,
+   :status :verified,
+   :id :L3-step4a1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:0-L2}},
+  :L3-step3b
+  {:statement "$\\log_2(1) = 0$ by definition of logarithm.",
+   :taint :clean,
+   :parent :L3-step3,
+   :content-hash "8623340b9312b854",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L3-step3b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-step3b1}},
+  :L3-step2
+  {:statement
+   "$\\sum_{\\alpha \\neq 0} p_\\alpha(2n-2) = (2n-2)(1 - p_0)$",
+   :taint :clean,
+   :parent nil,
+   :content-hash "d3ea357947f4c856",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 1,
+   :dependencies #{:L3-step2c :L3-step2a :L3-step1 :L3-step2b}},
+  :L3-step4c
+  {:statement
+   "Index range: $\\ell \\in \\{1,2,3\\}$ (not $\\ell = 0$, handled in L3-step3).",
+   :taint :clean,
+   :parent :L3-step4,
+   :content-hash "1f42ecc37c502fde",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :case-split,
+   :status :verified,
+   :id :L3-step4c,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-step3 :L3-step4c1}},
+  :L3-step1a
+  {:statement
+   "From L1-corollary: $\\log_2 p_\\alpha = \\log_2(2^{2-2n} \\prod_{k=1}^n q_k^{(\\alpha_k)})$.",
+   :taint :clean,
+   :parent :L3-step1,
+   :content-hash "02fde3758d251f4e",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-step1a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-step1a1 :0-L1cor}},
+  :L3-step5c1
+  {:statement
+   "Definition D3: $f_k = H(x_k^2, y_k^2, z_k^2) = -\\sum_{\\ell=1}^3 q_k^{(\\ell)} \\log_2 q_k^{(\\ell)}$.",
+   :taint :clean,
+   :parent :L3-step5c,
+   :content-hash "a0c8e0b1aa90c091",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L3-step5c1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:0-D3}},
+  :L3-qed
+  {:statement
+   "Combining: $S = -p_0 \\log_2 p_0 + (2n-2)(1-p_0) + 2^{1-n} \\sum_k f_k$",
+   :taint :clean,
+   :parent nil,
+   :content-hash "f3599c0f46169848",
+   :display-order 7,
+   :type :qed,
+   :scope #{},
+   :justification :qed,
+   :status :verified,
+   :id :L3-qed,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 1,
+   :dependencies
+   #{:L3-qedb :L3-step6 :L3-qedc :L3-qeda :L3-step2 :L3-lem4}},
+  :L3-step2a
+  {:statement
+   "The constant $(2n-2)$ factors out: $\\sum_{\\alpha \\neq 0} p_\\alpha(2n-2) = (2n-2) \\sum_{\\alpha \\neq 0} p_\\alpha$.",
+   :taint :clean,
+   :parent :L3-step2,
+   :content-hash "b27cad7065b78058",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step2a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-step2a1}},
+  :L3-step3c1
+  {:statement
+   "Any term multiplied by zero equals zero: $a \\cdot 0 = 0$.",
+   :taint :clean,
+   :parent :L3-step3c,
+   :content-hash "30719e25047ca3ef",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step3c1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :L3-step1b3
+  {:statement
+   "Logarithm of product extends: $\\log_2(\\prod_k q_k) = \\sum_k \\log_2 q_k$.",
+   :taint :clean,
+   :parent :L3-step1b,
+   :content-hash "ae2a4bb1ebc83212",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step1b3,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-step1b1 :L3-step1b3a}},
+  :L3-lem4
+  {:statement
+   "$S = -p_0 \\log_2 p_0 - \\sum_{\\alpha \\neq 0} p_\\alpha \\log_2 p_\\alpha$",
+   :taint :clean,
+   :parent nil,
+   :content-hash "e7a2307afb6570c1",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L3-lem4,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 1,
+   :dependencies #{:L3-lem4a :L3-lem4c :L3-lem4b}},
+  :L3-step1b2
+  {:statement "Logarithm of power: $\\log_2(2^{2-2n}) = 2-2n$.",
+   :taint :clean,
+   :parent :L3-step1b,
+   :content-hash "f9b82325e1055278",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step1b2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :L3-step1
+  {:statement
+   "For $\\alpha \\neq 0$: $-p_\\alpha \\log_2 p_\\alpha = p_\\alpha(2n-2) - p_\\alpha \\sum_k \\log_2 q_k^{(\\alpha_k)}$",
+   :taint :clean,
+   :parent nil,
+   :content-hash "7cfcf0d5c09ea912",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 1,
+   :dependencies #{:L3-step1b :L3-step1c :0-L1cor :L3-step1a}},
+  :L3-step5b2a
+  {:statement "Substituting the L3-step4 result for the marginal sum.",
+   :taint :clean,
+   :parent :L3-step5b2,
+   :content-hash "e99af6697a3302ba",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-step5b2a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{:L3-step4}},
+  :L3-step6c
+  {:statement
+   "Applying L3-step5 for each $k$: $-\\sum_{\\alpha: \\alpha_k \\neq 0} p_\\alpha \\log_2 q_k^{(\\alpha_k)} = 2^{1-n} f_k$.",
+   :taint :clean,
+   :parent :L3-step6,
+   :content-hash "d7163f62bbcc1924",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-step6c,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-step6c2 :L3-step6b :L3-step5 :L3-step6c1}},
+  :L3-lem4b
+  {:statement
+   "The index set $\\{0,1,2,3\\}^n$ partitions as $\\{\\vec{0}\\} \\cup \\{\\alpha : \\alpha \\neq 0\\}$.",
+   :taint :clean,
+   :parent :L3-lem4,
+   :content-hash "d9ea38345b6aee97",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :case-split,
+   :status :verified,
+   :id :L3-lem4b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-lem4b2 :L3-lem4b1}},
+  :L3-step5c2a
+  {:statement
+   "The constant $2^{1-n}$ factors out of the sum, then matches D3 definition of $f_j$.",
+   :taint :clean,
+   :parent :L3-step5c2,
+   :content-hash "e76b3d3f46e4f3e6",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step5c2a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{:L3-step5c1}},
+  :L3-step2b
+  {:statement
+   "Probability normalization: $\\sum_{\\alpha} p_\\alpha = 1$.",
+   :taint :clean,
+   :parent :L3-step2,
+   :content-hash "1454c150e770793d",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L3-step2b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-step2b1}},
+  :L3-lem4b1
+  {:statement
+   "The zero multi-index $\\vec{0} = (0,0,\\ldots,0)$ corresponds to $\\alpha = 0$.",
+   :taint :clean,
+   :parent :L3-lem4b,
+   :content-hash "9753c4dd875227af",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L3-lem4b1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :L3-step4
+  {:statement
+   "From L2: $\\sum_{\\alpha: \\alpha_j = \\ell} p_\\alpha = 2^{1-n} q_j^{(\\ell)}$ for $\\ell \\in \\{1,2,3\\}$.",
+   :taint :clean,
+   :parent nil,
+   :content-hash "68aad2e76a02b441",
+   :display-order 4,
+   :type :claim,
+   :scope #{},
+   :justification :lemma-application,
+   :status :verified,
+   :id :L3-step4,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 1,
+   :dependencies #{:L3-step4b :L3-step4a :0-L2 :L3-step4c}},
+  :L3-step1c1
+  {:statement
+   "Multiplying by $-p_\\alpha$: $-p_\\alpha \\log_2 p_\\alpha = -p_\\alpha[(2-2n) + \\sum_k \\log_2 q_k]$.",
+   :taint :clean,
+   :parent :L3-step1c,
+   :content-hash "8c21b57db4330635",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-step1c1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-step1b}},
+  :L3-step5b
+  {:statement
+   "Apply L3-step4: $-\\sum_{\\ell=1}^3 (\\sum_{\\alpha: \\alpha_j=\\ell} p_\\alpha) \\log_2 q_j^{(\\ell)} = -\\sum_{\\ell=1}^3 2^{1-n} q_j^{(\\ell)} \\log_2 q_j^{(\\ell)}$.",
+   :taint :clean,
+   :parent :L3-step5,
+   :content-hash "c76e01af8748185c",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L3-step5b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3-step5a :L3-step5b2 :L3-step5b1 :L3-step4}},
+  :L3-step3b1
+  {:statement "Since $2^0 = 1$, we have $\\log_2(1) = 0$.",
+   :taint :clean,
+   :parent :L3-step3b,
+   :content-hash "75276fcef6ce9f23",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L3-step3b1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :L3-step5a1
+  {:statement
+   "The condition $\\alpha_j \\neq 0$ is equivalent to $\\alpha_j \\in \\{1,2,3\\}$.",
+   :taint :clean,
+   :parent :L3-step5a,
+   :content-hash "f0364cf6b0efde48",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L3-step5a1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :L3-lem4c1
+  {:statement
+   "Splitting the sum: $-\\sum_{\\alpha} = -p_0 \\log p_0 - \\sum_{\\alpha \\neq 0}$ by disjoint union.",
+   :taint :clean,
+   :parent :L3-lem4c,
+   :content-hash "a03912e80a441009",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L3-lem4c1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L3-lem4b}},
+  :L3-step3a1
+  {:statement
+   "Definition D2 explicitly states $q_k^{(0)} = 1$ for all $k$.",
+   :taint :clean,
+   :parent :L3-step3a,
+   :content-hash "e44a67364aa7f98d",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L3-step3a1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:0-D2}}},
+ :graph-id "L3-entropy-verify-2024",
+ :version 58,
  :lemmas
- {:L1-corollary {:id :L1-corollary :status :proven :taint :clean}
-  :L2-influence {:id :L2-influence :status :proven :taint :clean}}
-
- :obligations []
- :archived-nodes {}
-
+ {"L1-corollary"
+  {:root-node :unknown,
+   :status :proven,
+   :taint :clean,
+   :extracted-nodes #{},
+   :id "L1-corollary",
+   :name "L1-corollary",
+   :statement "See lemma L1-corollary",
+   :content-hash "aef0db2dec925d39"},
+  "L2-influence"
+  {:root-node :unknown,
+   :status :proven,
+   :taint :clean,
+   :extracted-nodes #{},
+   :id "L2-influence",
+   :name "L2-influence",
+   :statement "See lemma L2-influence",
+   :content-hash "5ea1c93efefd270a"}},
  :metadata
- {:created-at "2024-12-28T00:00:00"
-  :last-modified "2024-12-28T14:00:00"
-  :proof-mode :strict-mathematics
-  :iteration-counts {:verification {:total 64} :expansion {:total 50} :strategy 1}
-  :context-budget {:max-tokens 100000 :current-estimate 12500}}}
+ {:created-at "2024-12-28T00:00:00",
+  :last-modified "2024-12-28T14:00:00",
+  :proof-mode :strict-mathematics,
+  :iteration-counts
+  {:verification {:total 64}, :expansion {:total 50}, :strategy 1},
+  :context-budget {:max-tokens 100000, :current-estimate 12500}},
+ :symbols
+ {:sym-S
+  {:id :sym-S,
+   :name "S",
+   :type "R",
+   :tex "S(U)",
+   :scope :global,
+   :introduced-at :unknown},
+  :sym-p0
+  {:id :sym-p0,
+   :name "p_0",
+   :type "R",
+   :tex "p_0 = (1-2^{1-n})^2",
+   :scope :global,
+   :introduced-at :unknown},
+  :sym-palpha
+  {:id :sym-palpha,
+   :name "p_alpha",
+   :type "R",
+   :tex "p_\\alpha",
+   :scope :global,
+   :introduced-at :unknown},
+  :sym-fk
+  {:id :sym-fk,
+   :name "f_k",
+   :type "R",
+   :tex "f_k",
+   :scope :global,
+   :introduced-at :unknown},
+  :sym-q
+  {:id :sym-q,
+   :name "q_k^(m)",
+   :type "R",
+   :tex "q_k^{(m)}",
+   :scope :global,
+   :introduced-at :unknown},
+  :sym-n
+  {:id :sym-n,
+   :name "n",
+   :type "N",
+   :tex "n",
+   :scope :global,
+   :introduced-at :unknown}}}

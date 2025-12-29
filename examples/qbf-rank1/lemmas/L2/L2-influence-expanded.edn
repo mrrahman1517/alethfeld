@@ -1,618 +1,895 @@
-{:graph-id "L2-influence-verify-2024"
- :version 47
- :phase :verified
-
- :theorem
- {:id :theorem
-  :statement "For any rank-1 product state QBF: $I(U) = n \\cdot 2^{1-n}$. This is independent of the choice of Bloch vectors."
-  :content-hash "d4e5f6a7"}
-
- ;; ═══════════════════════════════════════════════════════════════
- ;; ASSUMPTIONS AND DEPENDENCIES (Depth 0)
- ;; ═══════════════════════════════════════════════════════════════
-
+{:theorem
+ {:id :theorem,
+  :statement
+  "For any rank-1 product state QBF: $I(U) = n \\cdot 2^{1-n}$. This is independent of the choice of Bloch vectors.",
+  :content-hash "e94511019ead3ef6"},
+ :obligations [],
+ :archived-nodes {},
+ :phase :verified,
+ :external-refs {},
  :nodes
- {;; --- Assumptions ---
-  :0-A1
-  {:id :0-A1
-   :type :assumption
-   :statement "Let $U = I - 2\\ket{\\psi}\\bra{\\psi}$ be a rank-1 QBF with $\\ket{\\psi} = \\bigotimes_{k=1}^n \\ket{\\phi_k}$ a product state."
-   :dependencies #{}
-   :scope #{}
-   :justification :assumption
-   :status :verified
-   :taint :clean
-   :depth 0
-   :parent nil
-   :display-order 0}
-
-  :0-D1
-  {:id :0-D1
-   :type :definition
-   :statement "Each qubit $k$ has Bloch vector $\\vec{r}_k = (x_k, y_k, z_k)$ with $x_k^2 + y_k^2 + z_k^2 = 1$."
-   :dependencies #{}
-   :scope #{}
-   :justification :assumption
-   :status :verified
-   :taint :clean
-   :depth 0
-   :parent nil
-   :display-order 1}
-
-  :0-D2
-  {:id :0-D2
-   :type :definition
-   :statement "Define $q_k^{(0)} = 1$ and $(q_k^{(1)}, q_k^{(2)}, q_k^{(3)}) = (x_k^2, y_k^2, z_k^2)$."
-   :dependencies #{}
-   :scope #{}
-   :justification :assumption
-   :status :verified
-   :taint :clean
-   :depth 0
-   :parent nil
-   :display-order 2}
-
-  :0-L1
-  {:id :0-L1
-   :type :lemma-ref
-   :statement "Fourier coefficient: $\\hat{U}(\\alpha) = \\delta_{\\alpha,0} - 2^{1-n} \\prod_k r_k^{(\\alpha_k)}$"
-   :dependencies #{}
-   :scope #{}
-   :lemma-id "L1-fourier"
-   :justification :lemma-application
-   :status :verified
-   :taint :clean
-   :depth 0
-   :parent nil
-   :display-order 3}
-
-  :0-L1cor
-  {:id :0-L1cor
-   :type :lemma-ref
-   :statement "For $\\alpha \\neq 0$: $p_\\alpha = |\\hat{U}(\\alpha)|^2 = 2^{2-2n} \\prod_{k=1}^n q_k^{(\\alpha_k)}$"
-   :dependencies #{:0-L1}
-   :scope #{}
-   :lemma-id "L1-corollary"
-   :justification :lemma-application
-   :status :verified
-   :taint :clean
-   :depth 0
-   :parent nil
-   :display-order 4}
-
-  ;; ═══════════════════════════════════════════════════════════════
-  ;; STEP 1: Definition of Influence (Depth 1, expanded to Depth 3)
-  ;; ═══════════════════════════════════════════════════════════════
-
-  :1-step1
-  {:id :1-step1
-   :type :claim
-   :statement "The influence of qubit $j$ is $I_j = \\sum_{\\alpha: \\alpha_j \\neq 0} p_\\alpha$."
-   :dependencies #{:1-step1a :1-step1b :1-step1c}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 1
-   :parent nil
-   :display-order 0}
-
-  :1-step1a
-  {:id :1-step1a
-   :type :claim
-   :statement "By definition, the influence $I_j$ measures how much the output depends on qubit $j$."
-   :dependencies #{}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :1-step1
-   :display-order 0}
-
-  :1-step1b
-  {:id :1-step1b
-   :type :claim
-   :statement "For a Boolean function $f$, $I_j(f) = \\Pr_{x}[f(x) \\neq f(x^{\\oplus j})]$ where $x^{\\oplus j}$ flips bit $j$."
-   :dependencies #{:1-step1a}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :1-step1
-   :display-order 1}
-
-  :1-step1c
-  {:id :1-step1c
-   :type :claim
-   :statement "For QBFs, this generalizes to: $I_j = \\sum_{\\alpha: \\alpha_j \\neq 0} |\\hat{U}(\\alpha)|^2 = \\sum_{\\alpha: \\alpha_j \\neq 0} p_\\alpha$."
-   :dependencies #{:1-step1b :1-step1c1 :1-step1c2}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :1-step1
-   :display-order 2}
-
-  :1-step1c1
-  {:id :1-step1c1
-   :type :claim
-   :statement "The Pauli-Fourier expansion is $U = \\sum_\\alpha \\hat{U}(\\alpha) \\sigma^\\alpha$."
-   :dependencies #{}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-step1c
-   :display-order 0}
-
-  :1-step1c2
-  {:id :1-step1c2
-   :type :claim
-   :statement "The index $\\alpha_j \\neq 0$ captures when qubit $j$ is acted on non-trivially by $\\sigma^{\\alpha_j} \\in \\{\\sigma_x, \\sigma_y, \\sigma_z\\}$."
-   :dependencies #{:1-step1c1}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-step1c
-   :display-order 1}
-
-  ;; ═══════════════════════════════════════════════════════════════
-  ;; STEP 2: Factorization (Depth 1, expanded to Depth 3)
-  ;; ═══════════════════════════════════════════════════════════════
-
-  :1-step2
-  {:id :1-step2
-   :type :claim
-   :statement "For $\\ell \\in \\{1,2,3\\}$: $\\sum_{\\alpha: \\alpha_j = \\ell} p_\\alpha = 2^{2-2n} \\cdot q_j^{(\\ell)} \\cdot \\prod_{k \\neq j} \\sum_{m=0}^3 q_k^{(m)}$."
-   :dependencies #{:0-L1cor :1-step2a :1-step2b :1-step2c}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 1
-   :parent nil
-   :display-order 1}
-
-  :1-step2a
-  {:id :1-step2a
-   :type :claim
-   :statement "From L1-corollary, for $\\alpha \\neq 0$: $p_\\alpha = 2^{2-2n} \\prod_{k=1}^n q_k^{(\\alpha_k)}$."
-   :dependencies #{:0-L1cor}
-   :scope #{}
-   :justification :lemma-application
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :1-step2
-   :display-order 0}
-
-  :1-step2b
-  {:id :1-step2b
-   :type :claim
-   :statement "Fixing $\\alpha_j = \\ell$, the product splits: $\\prod_{k=1}^n q_k^{(\\alpha_k)} = q_j^{(\\ell)} \\cdot \\prod_{k \\neq j} q_k^{(\\alpha_k)}$."
-   :dependencies #{:1-step2a :1-step2b1 :1-step2b2}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :1-step2
-   :display-order 1}
-
-  :1-step2b1
-  {:id :1-step2b1
-   :type :claim
-   :statement "Products over disjoint index sets factor: $\\prod_{k \\in A \\cup B} f_k = \\prod_{k \\in A} f_k \\cdot \\prod_{k \\in B} f_k$ when $A \\cap B = \\emptyset$."
-   :dependencies #{}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-step2b
-   :display-order 0}
-
-  :1-step2b2
-  {:id :1-step2b2
-   :type :claim
-   :statement "Here $A = \\{j\\}$ and $B = \\{1,\\ldots,n\\} \\setminus \\{j\\}$, so $\\prod_k q_k^{(\\alpha_k)} = q_j^{(\\ell)} \\cdot \\prod_{k \\neq j} q_k^{(\\alpha_k)}$."
-   :dependencies #{:1-step2b1}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-step2b
-   :display-order 1}
-
-  :1-step2c
-  {:id :1-step2c
-   :type :claim
-   :statement "Summing over all $\\alpha$ with $\\alpha_j = \\ell$: $\\sum_{\\alpha: \\alpha_j=\\ell} \\prod_{k \\neq j} q_k^{(\\alpha_k)} = \\prod_{k \\neq j} \\sum_{m=0}^3 q_k^{(m)}$."
-   :dependencies #{:1-step2b :1-step2c1 :1-step2c2}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :1-step2
-   :display-order 2}
-
-  :1-step2c1
-  {:id :1-step2c1
-   :type :claim
-   :statement "Each index $\\alpha_k$ for $k \\neq j$ ranges independently over $\\{0,1,2,3\\}$."
-   :dependencies #{}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-step2c
-   :display-order 0}
-
-  :1-step2c2
-  {:id :1-step2c2
-   :type :claim
-   :statement "Products distribute over sums: $\\sum_{\\alpha_1,\\ldots,\\alpha_{n-1}} \\prod_{k} f_k(\\alpha_k) = \\prod_k \\sum_{\\alpha_k} f_k(\\alpha_k)$."
-   :dependencies #{:1-step2c1}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-step2c
-   :display-order 1}
-
-  ;; ═══════════════════════════════════════════════════════════════
-  ;; STEP 3: Unit Sphere Simplification (Depth 1, expanded to Depth 3)
-  ;; ═══════════════════════════════════════════════════════════════
-
-  :1-step3
-  {:id :1-step3
-   :type :claim
-   :statement "Since $\\sum_{m=0}^3 q_k^{(m)} = 2$, we have $\\sum_{\\alpha: \\alpha_j = \\ell} p_\\alpha = 2^{1-n} q_j^{(\\ell)}$."
-   :dependencies #{:1-step2 :0-D1 :0-D2 :1-step3a :1-step3b :1-step3c}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 1
-   :parent nil
-   :display-order 2}
-
-  :1-step3a
-  {:id :1-step3a
-   :type :claim
-   :statement "By D2: $\\sum_{m=0}^3 q_k^{(m)} = q_k^{(0)} + q_k^{(1)} + q_k^{(2)} + q_k^{(3)} = 1 + x_k^2 + y_k^2 + z_k^2$."
-   :dependencies #{:0-D2 :1-step3a1}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :1-step3
-   :display-order 0}
-
-  :1-step3a1
-  {:id :1-step3a1
-   :type :claim
-   :statement "Substituting $q_k^{(0)}=1$, $q_k^{(1)}=x_k^2$, $q_k^{(2)}=y_k^2$, $q_k^{(3)}=z_k^2$ from D2."
-   :dependencies #{:0-D2}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-step3a
-   :display-order 0}
-
-  :1-step3b
-  {:id :1-step3b
-   :type :claim
-   :statement "By D1 (unit sphere): $x_k^2 + y_k^2 + z_k^2 = 1$, hence $\\sum_{m=0}^3 q_k^{(m)} = 1 + 1 = 2$."
-   :dependencies #{:0-D1 :1-step3a :1-step3b1}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :1-step3
-   :display-order 1}
-
-  :1-step3b1
-  {:id :1-step3b1
-   :type :claim
-   :statement "The Bloch vector constraint $|\\vec{r}_k|^2 = 1$ means $x_k^2 + y_k^2 + z_k^2 = 1$."
-   :dependencies #{:0-D1}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-step3b
-   :display-order 0}
-
-  :1-step3c
-  {:id :1-step3c
-   :type :claim
-   :statement "Substituting into Step 2: $2^{2-2n} \\cdot q_j^{(\\ell)} \\cdot 2^{n-1} = 2^{2-2n+n-1} q_j^{(\\ell)} = 2^{1-n} q_j^{(\\ell)}$."
-   :dependencies #{:1-step2 :1-step3b :1-step3c1 :1-step3c2}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :1-step3
-   :display-order 2}
-
-  :1-step3c1
-  {:id :1-step3c1
-   :type :claim
-   :statement "The product $\\prod_{k \\neq j} 2 = 2^{n-1}$ since there are $n-1$ factors."
-   :dependencies #{:1-step3b}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-step3c
-   :display-order 0}
-
-  :1-step3c2
-  {:id :1-step3c2
-   :type :claim
-   :statement "Exponent arithmetic: $(2-2n) + (n-1) = 2 - 2n + n - 1 = 1 - n$."
-   :dependencies #{}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-step3c
-   :display-order 1}
-
-  ;; ═══════════════════════════════════════════════════════════════
-  ;; STEP 4: Single-Qubit Influence (Depth 1, expanded to Depth 3)
-  ;; ═══════════════════════════════════════════════════════════════
-
-  :1-step4
-  {:id :1-step4
-   :type :claim
-   :statement "$I_j = 2^{1-n} \\sum_{\\ell=1}^3 q_j^{(\\ell)} = 2^{1-n}$ (independent of $j$ and Bloch vector)."
-   :dependencies #{:1-step1 :1-step3 :0-D1 :1-step4a :1-step4b :1-step4c}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 1
-   :parent nil
-   :display-order 3}
-
+ {:0-A1
+  {:statement
+   "Let $U = I - 2\\ket{\\psi}\\bra{\\psi}$ be a rank-1 QBF with $\\ket{\\psi} = \\bigotimes_{k=1}^n \\ket{\\phi_k}$ a product state.",
+   :taint :clean,
+   :parent nil,
+   :content-hash "07f3e5947ad03e73",
+   :display-order 0,
+   :type :assumption,
+   :scope #{},
+   :justification :assumption,
+   :status :verified,
+   :id :0-A1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 0,
+   :dependencies #{}},
   :1-step4a
-  {:id :1-step4a
-   :type :claim
-   :statement "From Step 1: $I_j = \\sum_{\\alpha: \\alpha_j \\neq 0} p_\\alpha = \\sum_{\\ell=1}^3 \\sum_{\\alpha: \\alpha_j = \\ell} p_\\alpha$."
-   :dependencies #{:1-step1 :1-step4a1}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :1-step4
-   :display-order 0}
-
-  :1-step4a1
-  {:id :1-step4a1
-   :type :claim
-   :statement "The condition $\\alpha_j \\neq 0$ is equivalent to $\\alpha_j \\in \\{1,2,3\\}$, partitioning the sum."
-   :dependencies #{}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-step4a
-   :display-order 0}
-
-  :1-step4b
-  {:id :1-step4b
-   :type :claim
-   :statement "Applying Step 3 to each term: $I_j = \\sum_{\\ell=1}^3 2^{1-n} q_j^{(\\ell)} = 2^{1-n} \\sum_{\\ell=1}^3 q_j^{(\\ell)}$."
-   :dependencies #{:1-step3 :1-step4a :1-step4b1}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :1-step4
-   :display-order 1}
-
-  :1-step4b1
-  {:id :1-step4b1
-   :type :claim
-   :statement "The constant $2^{1-n}$ factors out of the sum over $\\ell$."
-   :dependencies #{}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-step4b
-   :display-order 0}
-
-  :1-step4c
-  {:id :1-step4c
-   :type :claim
-   :statement "By D2 and D1: $\\sum_{\\ell=1}^3 q_j^{(\\ell)} = x_j^2 + y_j^2 + z_j^2 = 1$, hence $I_j = 2^{1-n}$."
-   :dependencies #{:0-D1 :0-D2 :1-step4b :1-step4c1 :1-step4c2}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :1-step4
-   :display-order 2}
-
-  :1-step4c1
-  {:id :1-step4c1
-   :type :claim
-   :statement "From D2: $q_j^{(1)} + q_j^{(2)} + q_j^{(3)} = x_j^2 + y_j^2 + z_j^2$."
-   :dependencies #{:0-D2}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-step4c
-   :display-order 0}
-
-  :1-step4c2
-  {:id :1-step4c2
-   :type :claim
-   :statement "From D1: $x_j^2 + y_j^2 + z_j^2 = 1$ (unit sphere constraint)."
-   :dependencies #{:0-D1}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-step4c
-   :display-order 1}
-
-  ;; ═══════════════════════════════════════════════════════════════
-  ;; STEP 5: QED - Total Influence (Depth 1, expanded to Depth 3)
-  ;; ═══════════════════════════════════════════════════════════════
-
-  :1-qed
-  {:id :1-qed
-   :type :qed
-   :statement "Total influence: $I(U) = \\sum_{j=1}^n I_j = n \\cdot 2^{1-n}$."
-   :dependencies #{:1-step4 :1-qed-a :1-qed-b :1-qed-c}
-   :scope #{}
-   :justification :qed
-   :status :verified
-   :taint :clean
-   :depth 1
-   :parent nil
-   :display-order 4}
-
-  :1-qed-a
-  {:id :1-qed-a
-   :type :claim
-   :statement "By definition, total influence is $I(U) = \\sum_{j=1}^n I_j$."
-   :dependencies #{:1-qed-a1}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :1-qed
-   :display-order 0}
-
-  :1-qed-a1
-  {:id :1-qed-a1
-   :type :claim
-   :statement "Total influence sums the individual qubit influences over all $n$ qubits."
-   :dependencies #{}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-qed-a
-   :display-order 0}
-
-  :1-qed-b
-  {:id :1-qed-b
-   :type :claim
-   :statement "From Step 4: each $I_j = 2^{1-n}$, independent of $j$ and the Bloch vectors."
-   :dependencies #{:1-step4 :1-qed-b1}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :1-qed
-   :display-order 1}
-
+  {:statement
+   "From Step 1: $I_j = \\sum_{\\alpha: \\alpha_j \\neq 0} p_\\alpha = \\sum_{\\ell=1}^3 \\sum_{\\alpha: \\alpha_j = \\ell} p_\\alpha$.",
+   :taint :clean,
+   :parent :1-step4,
+   :content-hash "26a63083a3ba6394",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :1-step4a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:1-step4a1 :1-step1}},
+  :1-step3
+  {:statement
+   "Since $\\sum_{m=0}^3 q_k^{(m)} = 2$, we have $\\sum_{\\alpha: \\alpha_j = \\ell} p_\\alpha = 2^{1-n} q_j^{(\\ell)}$.",
+   :taint :clean,
+   :parent nil,
+   :content-hash "a375ae63fa9ba2b3",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :1-step3,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 1,
+   :dependencies
+   #{:1-step2 :0-D1 :0-D2 :1-step3b :1-step3c :1-step3a}},
+  :1-step2c
+  {:statement
+   "Summing over all $\\alpha$ with $\\alpha_j = \\ell$: $\\sum_{\\alpha: \\alpha_j=\\ell} \\prod_{k \\neq j} q_k^{(\\alpha_k)} = \\prod_{k \\neq j} \\sum_{m=0}^3 q_k^{(m)}$.",
+   :taint :clean,
+   :parent :1-step2,
+   :content-hash "32da539c26f4d23e",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :1-step2c,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:1-step2c1 :1-step2b :1-step2c2}},
+  :1-step2
+  {:statement
+   "For $\\ell \\in \\{1,2,3\\}$: $\\sum_{\\alpha: \\alpha_j = \\ell} p_\\alpha = 2^{2-2n} \\cdot q_j^{(\\ell)} \\cdot \\prod_{k \\neq j} \\sum_{m=0}^3 q_k^{(m)}$.",
+   :taint :clean,
+   :parent nil,
+   :content-hash "10314cca7501ccce",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :1-step2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 1,
+   :dependencies #{:1-step2c :1-step2a :0-L1cor :1-step2b}},
+  :0-D1
+  {:statement
+   "Each qubit $k$ has Bloch vector $\\vec{r}_k = (x_k, y_k, z_k)$ with $x_k^2 + y_k^2 + z_k^2 = 1$.",
+   :taint :clean,
+   :parent nil,
+   :content-hash "8790be5a08afc008",
+   :display-order 1,
+   :type :definition,
+   :scope #{},
+   :justification :assumption,
+   :status :verified,
+   :id :0-D1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 0,
+   :dependencies #{}},
   :1-qed-b1
-  {:id :1-qed-b1
-   :type :claim
-   :statement "The value $2^{1-n}$ depends only on $n$, not on the choice of single-qubit states."
-   :dependencies #{:1-step4}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-qed-b
-   :display-order 0}
-
-  :1-qed-c
-  {:id :1-qed-c
-   :type :claim
-   :statement "Therefore $I(U) = \\sum_{j=1}^n 2^{1-n} = n \\cdot 2^{1-n}$."
-   :dependencies #{:1-qed-a :1-qed-b :1-qed-c1 :1-qed-c2}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :1-qed
-   :display-order 2}
-
+  {:statement
+   "The value $2^{1-n}$ depends only on $n$, not on the choice of single-qubit states.",
+   :taint :clean,
+   :parent :1-qed-b,
+   :content-hash "1f69123336926fab",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :1-qed-b1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:1-step4}},
   :1-qed-c1
-  {:id :1-qed-c1
-   :type :claim
-   :statement "Summing the constant $2^{1-n}$ over $j \\in \\{1,\\ldots,n\\}$ gives $n \\cdot 2^{1-n}$."
-   :dependencies #{}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-qed-c
-   :display-order 0}
-
+  {:statement
+   "Summing the constant $2^{1-n}$ over $j \\in \\{1,\\ldots,n\\}$ gives $n \\cdot 2^{1-n}$.",
+   :taint :clean,
+   :parent :1-qed-c,
+   :content-hash "6408e580378c09c1",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :1-qed-c1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :1-step4b1
+  {:statement
+   "The constant $2^{1-n}$ factors out of the sum over $\\ell$.",
+   :taint :clean,
+   :parent :1-step4b,
+   :content-hash "0e2e2af1f3b658ee",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :1-step4b1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :1-step2c1
+  {:statement
+   "Each index $\\alpha_k$ for $k \\neq j$ ranges independently over $\\{0,1,2,3\\}$.",
+   :taint :clean,
+   :parent :1-step2c,
+   :content-hash "e594e308ba11e1dd",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :1-step2c1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :0-D2
+  {:statement
+   "Define $q_k^{(0)} = 1$ and $(q_k^{(1)}, q_k^{(2)}, q_k^{(3)}) = (x_k^2, y_k^2, z_k^2)$.",
+   :taint :clean,
+   :parent nil,
+   :content-hash "3e668dbe46c7b375",
+   :display-order 2,
+   :type :definition,
+   :scope #{},
+   :justification :assumption,
+   :status :verified,
+   :id :0-D2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 0,
+   :dependencies #{}},
+  :1-step4a1
+  {:statement
+   "The condition $\\alpha_j \\neq 0$ is equivalent to $\\alpha_j \\in \\{1,2,3\\}$, partitioning the sum.",
+   :taint :clean,
+   :parent :1-step4a,
+   :content-hash "90ac913252b0b704",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :1-step4a1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :1-step4c1
+  {:statement
+   "From D2: $q_j^{(1)} + q_j^{(2)} + q_j^{(3)} = x_j^2 + y_j^2 + z_j^2$.",
+   :taint :clean,
+   :parent :1-step4c,
+   :content-hash "8e81dbfce82a4001",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :1-step4c1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:0-D2}},
+  :1-step3c1
+  {:statement
+   "The product $\\prod_{k \\neq j} 2 = 2^{n-1}$ since there are $n-1$ factors.",
+   :taint :clean,
+   :parent :1-step3c,
+   :content-hash "ae1db8a3afaaa43b",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :1-step3c1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:1-step3b}},
+  :1-qed-b
+  {:statement
+   "From Step 4: each $I_j = 2^{1-n}$, independent of $j$ and the Bloch vectors.",
+   :taint :clean,
+   :parent :1-qed,
+   :content-hash "cc70283b0cc2626b",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :1-qed-b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:1-qed-b1 :1-step4}},
+  :1-step4
+  {:statement
+   "$I_j = 2^{1-n} \\sum_{\\ell=1}^3 q_j^{(\\ell)} = 2^{1-n}$ (independent of $j$ and Bloch vector).",
+   :taint :clean,
+   :parent nil,
+   :content-hash "20906de47e7f920e",
+   :display-order 3,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :1-step4,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 1,
+   :dependencies
+   #{:1-step4a :1-step3 :0-D1 :1-step1 :1-step4b :1-step4c}},
+  :1-step3b1
+  {:statement
+   "The Bloch vector constraint $|\\vec{r}_k|^2 = 1$ means $x_k^2 + y_k^2 + z_k^2 = 1$.",
+   :taint :clean,
+   :parent :1-step3b,
+   :content-hash "bf6643b31966174e",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :1-step3b1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:0-D1}},
+  :1-qed-a1
+  {:statement
+   "Total influence sums the individual qubit influences over all $n$ qubits.",
+   :taint :clean,
+   :parent :1-qed-a,
+   :content-hash "e31eb14bd763b7f0",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :1-qed-a1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :1-step1c2
+  {:statement
+   "The index $\\alpha_j \\neq 0$ captures when qubit $j$ is acted on non-trivially by $\\sigma^{\\alpha_j} \\in \\{\\sigma_x, \\sigma_y, \\sigma_z\\}$.",
+   :taint :clean,
+   :parent :1-step1c,
+   :content-hash "d9ea28417f18013a",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :1-step1c2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:1-step1c1}},
+  :1-step2b2
+  {:statement
+   "Here $A = \\{j\\}$ and $B = \\{1,\\ldots,n\\} \\setminus \\{j\\}$, so $\\prod_k q_k^{(\\alpha_k)} = q_j^{(\\ell)} \\cdot \\prod_{k \\neq j} q_k^{(\\alpha_k)}$.",
+   :taint :clean,
+   :parent :1-step2b,
+   :content-hash "6bbd63e818a82b3a",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :1-step2b2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:1-step2b1}},
+  :1-step2a
+  {:statement
+   "From L1-corollary, for $\\alpha \\neq 0$: $p_\\alpha = 2^{2-2n} \\prod_{k=1}^n q_k^{(\\alpha_k)}$.",
+   :taint :clean,
+   :parent :1-step2,
+   :content-hash "ab7a494a248a4569",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :lemma-application,
+   :status :verified,
+   :id :1-step2a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:0-L1cor}},
+  :1-step1c1
+  {:statement
+   "The Pauli-Fourier expansion is $U = \\sum_\\alpha \\hat{U}(\\alpha) \\sigma^\\alpha$.",
+   :taint :clean,
+   :parent :1-step1c,
+   :content-hash "50b18d48ea97a1a8",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :1-step1c1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :1-step3c2
+  {:statement
+   "Exponent arithmetic: $(2-2n) + (n-1) = 2 - 2n + n - 1 = 1 - n$.",
+   :taint :clean,
+   :parent :1-step3c,
+   :content-hash "b2cf7d64f1756b54",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :1-step3c2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :1-step3b
+  {:statement
+   "By D1 (unit sphere): $x_k^2 + y_k^2 + z_k^2 = 1$, hence $\\sum_{m=0}^3 q_k^{(m)} = 1 + 1 = 2$.",
+   :taint :clean,
+   :parent :1-step3,
+   :content-hash "6fd411460f60d03b",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :1-step3b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:0-D1 :1-step3b1 :1-step3a}},
+  :1-qed
+  {:statement
+   "Total influence: $I(U) = \\sum_{j=1}^n I_j = n \\cdot 2^{1-n}$.",
+   :taint :clean,
+   :parent nil,
+   :content-hash "05dd0b3785f0dbd6",
+   :display-order 4,
+   :type :qed,
+   :scope #{},
+   :justification :qed,
+   :status :verified,
+   :id :1-qed,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 1,
+   :dependencies #{:1-qed-b :1-step4 :1-qed-c :1-qed-a}},
+  :1-step1b
+  {:statement
+   "For a Boolean function $f$, $I_j(f) = \\Pr_{x}[f(x) \\neq f(x^{\\oplus j})]$ where $x^{\\oplus j}$ flips bit $j$.",
+   :taint :clean,
+   :parent :1-step1,
+   :content-hash "8352a389dcda6016",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :1-step1b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:1-step1a}},
+  :0-L1cor
+  {:statement
+   "For $\\alpha \\neq 0$: $p_\\alpha = |\\hat{U}(\\alpha)|^2 = 2^{2-2n} \\prod_{k=1}^n q_k^{(\\alpha_k)}$",
+   :taint :clean,
+   :parent nil,
+   :content-hash "f609d36e1e28b27a",
+   :display-order 4,
+   :type :lemma-ref,
+   :scope #{},
+   :lemma-id "L1-corollary",
+   :justification :lemma-application,
+   :status :verified,
+   :id :0-L1cor,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 0,
+   :dependencies #{:0-L1}},
+  :1-step2b1
+  {:statement
+   "Products over disjoint index sets factor: $\\prod_{k \\in A \\cup B} f_k = \\prod_{k \\in A} f_k \\cdot \\prod_{k \\in B} f_k$ when $A \\cap B = \\emptyset$.",
+   :taint :clean,
+   :parent :1-step2b,
+   :content-hash "7e4653b49e730507",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :1-step2b1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :1-qed-c
+  {:statement
+   "Therefore $I(U) = \\sum_{j=1}^n 2^{1-n} = n \\cdot 2^{1-n}$.",
+   :taint :clean,
+   :parent :1-qed,
+   :content-hash "9e57b5599deceb71",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :1-qed-c,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:1-qed-c1 :1-qed-b :1-qed-c2 :1-qed-a}},
+  :0-L1
+  {:statement
+   "Fourier coefficient: $\\hat{U}(\\alpha) = \\delta_{\\alpha,0} - 2^{1-n} \\prod_k r_k^{(\\alpha_k)}$",
+   :taint :clean,
+   :parent nil,
+   :content-hash "c3eb9eae8072f9c6",
+   :display-order 3,
+   :type :lemma-ref,
+   :scope #{},
+   :lemma-id "L1-fourier",
+   :justification :lemma-application,
+   :status :verified,
+   :id :0-L1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 0,
+   :dependencies #{}},
+  :1-step1
+  {:statement
+   "The influence of qubit $j$ is $I_j = \\sum_{\\alpha: \\alpha_j \\neq 0} p_\\alpha$.",
+   :taint :clean,
+   :parent nil,
+   :content-hash "c3841a247a1e6a33",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :1-step1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 1,
+   :dependencies #{:1-step1b :1-step1a :1-step1c}},
   :1-qed-c2
-  {:id :1-qed-c2
-   :type :claim
-   :statement "This is the unique total influence for all rank-1 product state QBFs on $n$ qubits."
-   :dependencies #{:1-qed-c1}
-   :scope #{}
-   :justification :conjunction-intro
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :1-qed-c
-   :display-order 1}}
-
- :symbols
- {:sym-I {:id :sym-I :name "I" :type "R" :tex "I(U)" :scope :global}
-  :sym-Ij {:id :sym-Ij :name "I_j" :type "R" :tex "I_j" :scope :global}
-  :sym-n {:id :sym-n :name "n" :type "N" :tex "n" :scope :global}
-  :sym-palpha {:id :sym-palpha :name "p_alpha" :type "R" :tex "p_\\alpha" :scope :global}
-  :sym-q {:id :sym-q :name "q_k^(m)" :type "R" :tex "q_k^{(m)}" :scope :global}}
-
- :external-refs {}
-
+  {:statement
+   "This is the unique total influence for all rank-1 product state QBFs on $n$ qubits.",
+   :taint :clean,
+   :parent :1-qed-c,
+   :content-hash "059924f482570780",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :conjunction-intro,
+   :status :verified,
+   :id :1-qed-c2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:1-qed-c1}},
+  :1-step1a
+  {:statement
+   "By definition, the influence $I_j$ measures how much the output depends on qubit $j$.",
+   :taint :clean,
+   :parent :1-step1,
+   :content-hash "471fc80f62ab7c24",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :1-step1a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{}},
+  :1-step1c
+  {:statement
+   "For QBFs, this generalizes to: $I_j = \\sum_{\\alpha: \\alpha_j \\neq 0} |\\hat{U}(\\alpha)|^2 = \\sum_{\\alpha: \\alpha_j \\neq 0} p_\\alpha$.",
+   :taint :clean,
+   :parent :1-step1,
+   :content-hash "6b6c59dbd46eec33",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :1-step1c,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:1-step1c2 :1-step1c1 :1-step1b}},
+  :1-step3c
+  {:statement
+   "Substituting into Step 2: $2^{2-2n} \\cdot q_j^{(\\ell)} \\cdot 2^{n-1} = 2^{2-2n+n-1} q_j^{(\\ell)} = 2^{1-n} q_j^{(\\ell)}$.",
+   :taint :clean,
+   :parent :1-step3,
+   :content-hash "f658a0eb0e6d369b",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :1-step3c,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:1-step2 :1-step3c1 :1-step3c2 :1-step3b}},
+  :1-step4b
+  {:statement
+   "Applying Step 3 to each term: $I_j = \\sum_{\\ell=1}^3 2^{1-n} q_j^{(\\ell)} = 2^{1-n} \\sum_{\\ell=1}^3 q_j^{(\\ell)}$.",
+   :taint :clean,
+   :parent :1-step4,
+   :content-hash "09dbb2699ac9ecfb",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :1-step4b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:1-step4a :1-step3 :1-step4b1}},
+  :1-step2b
+  {:statement
+   "Fixing $\\alpha_j = \\ell$, the product splits: $\\prod_{k=1}^n q_k^{(\\alpha_k)} = q_j^{(\\ell)} \\cdot \\prod_{k \\neq j} q_k^{(\\alpha_k)}$.",
+   :taint :clean,
+   :parent :1-step2,
+   :content-hash "b5d73aa1476e146e",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :1-step2b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:1-step2b2 :1-step2a :1-step2b1}},
+  :1-qed-a
+  {:statement
+   "By definition, total influence is $I(U) = \\sum_{j=1}^n I_j$.",
+   :taint :clean,
+   :parent :1-qed,
+   :content-hash "c9f6dc3809c3fdd0",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :1-qed-a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:1-qed-a1}},
+  :1-step2c2
+  {:statement
+   "Products distribute over sums: $\\sum_{\\alpha_1,\\ldots,\\alpha_{n-1}} \\prod_{k} f_k(\\alpha_k) = \\prod_k \\sum_{\\alpha_k} f_k(\\alpha_k)$.",
+   :taint :clean,
+   :parent :1-step2c,
+   :content-hash "bce989f58e95e64a",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :1-step2c2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:1-step2c1}},
+  :1-step4c2
+  {:statement
+   "From D1: $x_j^2 + y_j^2 + z_j^2 = 1$ (unit sphere constraint).",
+   :taint :clean,
+   :parent :1-step4c,
+   :content-hash "0968ea5f1c6f0a98",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :1-step4c2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:0-D1}},
+  :1-step3a
+  {:statement
+   "By D2: $\\sum_{m=0}^3 q_k^{(m)} = q_k^{(0)} + q_k^{(1)} + q_k^{(2)} + q_k^{(3)} = 1 + x_k^2 + y_k^2 + z_k^2$.",
+   :taint :clean,
+   :parent :1-step3,
+   :content-hash "fc3c39c0e81290c9",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :1-step3a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:0-D2 :1-step3a1}},
+  :1-step3a1
+  {:statement
+   "Substituting $q_k^{(0)}=1$, $q_k^{(1)}=x_k^2$, $q_k^{(2)}=y_k^2$, $q_k^{(3)}=z_k^2$ from D2.",
+   :taint :clean,
+   :parent :1-step3a,
+   :content-hash "231fb949481d5ab7",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :1-step3a1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:0-D2}},
+  :1-step4c
+  {:statement
+   "By D2 and D1: $\\sum_{\\ell=1}^3 q_j^{(\\ell)} = x_j^2 + y_j^2 + z_j^2 = 1$, hence $I_j = 2^{1-n}$.",
+   :taint :clean,
+   :parent :1-step4,
+   :content-hash "0a610e3d398d7695",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :1-step4c,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:0-D1 :0-D2 :1-step4c1 :1-step4b :1-step4c2}}},
+ :graph-id "L2-influence-verify-2024",
+ :version 47,
  :lemmas
- {:L1-fourier {:id :L1-fourier :status :proven :taint :clean}
-  :L1-corollary {:id :L1-corollary :status :proven :taint :clean}}
-
- :obligations []
- :archived-nodes {}
-
+ {"L1-fourier"
+  {:root-node :unknown,
+   :status :proven,
+   :taint :clean,
+   :extracted-nodes #{},
+   :id "L1-fourier",
+   :name "L1-fourier",
+   :statement "See lemma L1-fourier",
+   :content-hash "9e9de6c9b4988394"},
+  "L1-corollary"
+  {:root-node :unknown,
+   :status :proven,
+   :taint :clean,
+   :extracted-nodes #{},
+   :id "L1-corollary",
+   :name "L1-corollary",
+   :statement "See lemma L1-corollary",
+   :content-hash "aef0db2dec925d39"}},
  :metadata
- {:created-at "2024-12-28T00:00:00"
-  :last-modified "2024-12-28T12:00:00"
-  :proof-mode :strict-mathematics
-  :iteration-counts {:verification {:total 52} :expansion {:total 47} :strategy 1}
-  :context-budget {:max-tokens 100000 :current-estimate 8500}}}
+ {:created-at "2024-12-28T00:00:00",
+  :last-modified "2024-12-28T12:00:00",
+  :proof-mode :strict-mathematics,
+  :iteration-counts
+  {:verification {:total 52}, :expansion {:total 47}, :strategy 1},
+  :context-budget {:max-tokens 100000, :current-estimate 8500}},
+ :symbols
+ {:sym-I
+  {:id :sym-I,
+   :name "I",
+   :type "R",
+   :tex "I(U)",
+   :scope :global,
+   :introduced-at :unknown},
+  :sym-Ij
+  {:id :sym-Ij,
+   :name "I_j",
+   :type "R",
+   :tex "I_j",
+   :scope :global,
+   :introduced-at :unknown},
+  :sym-n
+  {:id :sym-n,
+   :name "n",
+   :type "N",
+   :tex "n",
+   :scope :global,
+   :introduced-at :unknown},
+  :sym-palpha
+  {:id :sym-palpha,
+   :name "p_alpha",
+   :type "R",
+   :tex "p_\\alpha",
+   :scope :global,
+   :introduced-at :unknown},
+  :sym-q
+  {:id :sym-q,
+   :name "q_k^(m)",
+   :type "R",
+   :tex "q_k^{(m)}",
+   :scope :global,
+   :introduced-at :unknown}}}

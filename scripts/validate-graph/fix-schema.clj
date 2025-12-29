@@ -41,12 +41,12 @@
    :revision-of nil})
 
 (defn fix-node [node]
-  "Fix node: add content-hash, scope, provenance if missing"
-  (let [base (cond-> node
-               (nil? (:content-hash node)) (assoc :content-hash (content-hash (:statement node "")))
-               (nil? (:scope node)) (assoc :scope #{})
-               (nil? (:provenance node)) (assoc :provenance default-provenance))]
-    base))
+  "Fix node: add content-hash, scope, provenance, display-order if missing"
+  (cond-> node
+    (nil? (:content-hash node)) (assoc :content-hash (content-hash (:statement node "")))
+    (nil? (:scope node)) (assoc :scope #{})
+    (nil? (:provenance node)) (assoc :provenance default-provenance)
+    (nil? (:display-order node)) (assoc :display-order 0)))
 
 (defn keyword->string-key [m]
   "Convert keyword keys to string keys in a map"
@@ -88,22 +88,31 @@
     (nil? (:id sym)) (assoc :id sym-id)
     (nil? (:introduced-at sym)) (assoc :introduced-at :unknown)))
 
+(def default-metadata
+  {:created-at "2025-01-01T00:00:00Z"
+   :last-modified "2025-01-01T00:00:00Z"
+   :proof-mode :strict-mathematics
+   :iteration-counts {:verification {} :expansion {} :strategy 0}
+   :context-budget {:max-tokens 100000 :current-estimate 0}})
+
+(defn fix-metadata [metadata]
+  "Fix metadata: ensure all required fields are present"
+  (merge default-metadata metadata))
+
 (defn ensure-required-keys [graph]
   "Ensure all top-level required keys exist"
-  (merge {:graph-id "unknown"
-          :version 1
-          :nodes {}
-          :symbols {}
-          :external-refs {}
-          :lemmas {}
-          :obligations []
-          :archived-nodes {}
-          :metadata {:created-at "2025-01-01T00:00:00Z"
-                     :last-modified "2025-01-01T00:00:00Z"
-                     :proof-mode :strict-mathematics
-                     :iteration-counts {:verification {} :expansion {} :strategy 0}
-                     :context-budget {:max-tokens 100000 :current-estimate 0}}}
-         graph))
+  (-> (merge {:graph-id "unknown"
+              :version 1
+              :nodes {}
+              :symbols {}
+              :external-refs {}
+              :lemmas {}
+              :obligations []
+              :archived-nodes {}
+              :metadata default-metadata}
+             graph)
+      ;; Ensure metadata has all required fields
+      (update :metadata fix-metadata)))
 
 (defn fix-graph [graph]
   "Fix all schema issues in a semantic graph"

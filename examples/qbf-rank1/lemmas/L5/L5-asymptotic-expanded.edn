@@ -1,970 +1,1448 @@
-{:graph-id "L5-asymptotic-expanded"
- :version 52
- :theorem
- {:id :theorem
-  :statement "$\\lim_{n \\to \\infty} \\frac{S_{\\max}}{I} = \\log_2 3 + 4 \\approx 5.585$"
-  :content-hash "b5c6d7e8"}
-
- :metadata
- {:created-at "2025-12-28T17:07:00Z"
-  :last-modified "2025-12-28T17:15:00Z"
-  :proof-mode :strict-mathematics
-  :rigor-level :strictest
-  :iteration-counts {:verification {:L5-assume 3 :L5-step1 5 :L5-step2 3
-                                    :L5-step3 4 :L5-step4 6 :L5-discharge 2 :L5-qed 3}
-                     :expansion {:L5-assume 2 :L5-step1 3 :L5-step2 2
-                                 :L5-step3 2 :L5-step4 3 :L5-discharge 1 :L5-qed 2}
-                     :strategy 1}
-  :context-budget {:max-tokens 100000 :current-estimate 18500}}
-
- ;; ============================================================
- ;; ASSUMPTION NODES (Depth 0)
- ;; ============================================================
+{:theorem
+ {:id :theorem,
+  :statement
+  "$\\lim_{n \\to \\infty} \\frac{S_{\\max}}{I} = \\log_2 3 + 4 \\approx 5.585$",
+  :content-hash "17a6e16fc86e367a"},
+ :obligations [],
+ :archived-nodes {},
+ :external-refs {},
  :nodes
- {:0-L4cor
-  {:id :0-L4cor
-   :type :assumption
-   :statement "$\\frac{S}{I} = \\log_2 3 + \\frac{2^{n-1}}{n}[-p_0 \\log_2 p_0 + (2n-2)(1-p_0)]$"
-   :dependencies #{}
-   :scope #{}
-   :justification :assumption
-   :status :verified
-   :taint :clean
-   :depth 0
-   :parent nil}
-
-  :0-D-eps
-  {:id :0-D-eps
-   :type :definition
-   :statement "Define $\\varepsilon = 2^{1-n}$ for $n \\geq 1$."
-   :dependencies #{}
-   :scope #{}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 0
-   :parent nil}
-
- ;; ============================================================
- ;; ROOT NODE (Depth 1)
- ;; ============================================================
-  :L5-root
-  {:id :L5-root
-   :type :claim
-   :statement "$\\lim_{n \\to \\infty} \\frac{S_{\\max}}{I} = \\log_2 3 + 4$"
-   :dependencies #{:0-L4cor}
-   :scope #{}
-   :justification :conjunction-intro
-   :status :verified
-   :taint :clean
-   :depth 1
-   :parent nil}
-
- ;; ============================================================
- ;; L5-assume EXPANSION (Depth 2 + substeps at Depth 3, 4)
- ;; ============================================================
-  :L5-assume
-  {:id :L5-assume
-   :type :local-assume
-   :statement "Let $\\varepsilon = 2^{1-n}$, so $p_0 = (1-\\varepsilon)^2$ and $1-p_0 = 2\\varepsilon - \\varepsilon^2$."
-   :introduces "$\\varepsilon = 2^{1-n}$"
-   :dependencies #{:0-D-eps}
-   :scope #{}
-   :justification :local-assumption
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L5-root}
-
-  ;; Substeps for L5-assume
-  :L5-assume-1
-  {:id :L5-assume-1
-   :type :claim
-   :statement "For $n \\geq 1$: $\\varepsilon = 2^{1-n} > 0$."
-   :dependencies #{:0-D-eps}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-assume}
-
-  :L5-assume-1a
-  {:id :L5-assume-1a
-   :type :claim
-   :statement "$2^{1-n} = 2/2^n$ where $2^n > 0$ for all $n \\in \\mathbb{N}$."
-   :dependencies #{:0-D-eps}
-   :scope #{:L5-assume}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-assume-1}
-
-  :L5-assume-1b
-  {:id :L5-assume-1b
-   :type :claim
-   :statement "Quotient of positive numbers is positive: $2/2^n > 0$."
-   :dependencies #{:L5-assume-1a}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-assume-1}
-
-  :L5-assume-2
-  {:id :L5-assume-2
-   :type :claim
-   :statement "For $n \\geq 2$: $\\varepsilon = 2^{1-n} \\leq 2^{-1} = 1/2 < 1$."
-   :dependencies #{:L5-assume-1}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-assume}
-
-  :L5-assume-2a
-  {:id :L5-assume-2a
-   :type :claim
-   :statement "For $n \\geq 2$: $1-n \\leq -1$, hence $2^{1-n} \\leq 2^{-1}$."
-   :dependencies #{:0-D-eps}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-assume-2}
-
-  :L5-assume-2b
-  {:id :L5-assume-2b
-   :type :claim
-   :statement "$2^{-1} = 1/2 < 1$ by arithmetic."
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-assume-2}
-
-  :L5-assume-3
-  {:id :L5-assume-3
-   :type :claim
-   :statement "From L4-cor: $p_0 = (1-2^{1-n})^2 = (1-\\varepsilon)^2$."
-   :dependencies #{:0-L4cor :L5-assume-1}
-   :scope #{:L5-assume}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-assume}
-
-  :L5-assume-4
-  {:id :L5-assume-4
-   :type :claim
-   :statement "Expanding: $1 - p_0 = 1 - (1-\\varepsilon)^2 = 1 - (1 - 2\\varepsilon + \\varepsilon^2) = 2\\varepsilon - \\varepsilon^2$."
-   :dependencies #{:L5-assume-3}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-assume}
-
-  :L5-assume-4a
-  {:id :L5-assume-4a
-   :type :claim
-   :statement "$(1-\\varepsilon)^2 = 1 - 2\\varepsilon + \\varepsilon^2$ by binomial expansion."
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-assume-4}
-
-  :L5-assume-4b
-  {:id :L5-assume-4b
-   :type :claim
-   :statement "$1 - (1 - 2\\varepsilon + \\varepsilon^2) = 2\\varepsilon - \\varepsilon^2$ by distribution."
-   :dependencies #{:L5-assume-4a}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-assume-4}
-
- ;; ============================================================
- ;; L5-step1 EXPANSION: Taylor expansion for entropy term
- ;; ============================================================
-  :L5-step1
-  {:id :L5-step1
-   :type :claim
-   :statement "Using Taylor: $-p_0 \\log_2 p_0 = \\frac{2\\varepsilon}{\\ln 2} + O(\\varepsilon^2)$"
-   :dependencies #{:L5-assume}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L5-root}
-
-  :L5-step1-1
-  {:id :L5-step1-1
-   :type :claim
-   :statement "Taylor series: $\\log(1-x) = -x - \\frac{x^2}{2} - \\frac{x^3}{3} - \\cdots$ for $|x| < 1$."
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :external-application
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step1}
-
-  :L5-step1-1a
-  {:id :L5-step1-1a
-   :type :claim
-   :statement "This is the Mercator series, valid for $|x| < 1$."
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :external-application
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step1-1}
-
-  :L5-step1-1b
-  {:id :L5-step1-1b
-   :type :claim
-   :statement "From L5-assume-2: $|\\varepsilon| < 1$ for $n \\geq 2$, so series applies."
-   :dependencies #{:L5-assume-2}
-   :scope #{:L5-assume}
-   :justification :modus-ponens
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step1-1}
-
-  :L5-step1-2
-  {:id :L5-step1-2
-   :type :claim
-   :statement "$\\log_2(1-\\varepsilon) = \\frac{\\ln(1-\\varepsilon)}{\\ln 2} = \\frac{-\\varepsilon - \\varepsilon^2/2 + O(\\varepsilon^3)}{\\ln 2}$"
-   :dependencies #{:L5-step1-1}
-   :scope #{:L5-assume}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step1}
-
-  :L5-step1-2a
-  {:id :L5-step1-2a
-   :type :claim
-   :statement "$\\log_2(x) = \\ln(x)/\\ln(2)$ by change of base formula."
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step1-2}
-
-  :L5-step1-3
-  {:id :L5-step1-3
-   :type :claim
-   :statement "$\\log_2(p_0) = \\log_2((1-\\varepsilon)^2) = 2\\log_2(1-\\varepsilon)$"
-   :dependencies #{:L5-assume-3}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step1}
-
-  :L5-step1-3a
-  {:id :L5-step1-3a
-   :type :claim
-   :statement "$\\log(a^n) = n \\log(a)$ for $a > 0$."
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step1-3}
-
-  :L5-step1-3b
-  {:id :L5-step1-3b
-   :type :claim
-   :statement "$p_0 = (1-\\varepsilon)^2 > 0$ since $0 < \\varepsilon < 1$, so log well-defined."
-   :dependencies #{:L5-assume-2 :L5-assume-3}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step1-3}
-
-  :L5-step1-4
-  {:id :L5-step1-4
-   :type :claim
-   :statement "$\\log_2(p_0) = 2 \\cdot \\frac{-\\varepsilon + O(\\varepsilon^2)}{\\ln 2} = \\frac{-2\\varepsilon}{\\ln 2} + O(\\varepsilon^2)$"
-   :dependencies #{:L5-step1-2 :L5-step1-3}
-   :scope #{:L5-assume}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step1}
-
-  :L5-step1-5
-  {:id :L5-step1-5
-   :type :claim
-   :statement "$-p_0 \\log_2(p_0) = -p_0 \\cdot \\frac{-2\\varepsilon}{\\ln 2} + O(\\varepsilon^2) = \\frac{2p_0\\varepsilon}{\\ln 2} + O(\\varepsilon^2)$"
-   :dependencies #{:L5-step1-4}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step1}
-
-  :L5-step1-6
-  {:id :L5-step1-6
-   :type :claim
-   :statement "$p_0 = 1 - 2\\varepsilon + \\varepsilon^2 = 1 + O(\\varepsilon)$, so $p_0\\varepsilon = \\varepsilon + O(\\varepsilon^2)$."
-   :dependencies #{:L5-assume-4a}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step1}
-
-  :L5-step1-7
-  {:id :L5-step1-7
-   :type :claim
-   :statement "Therefore: $-p_0 \\log_2(p_0) = \\frac{2\\varepsilon}{\\ln 2} + O(\\varepsilon^2)$."
-   :dependencies #{:L5-step1-5 :L5-step1-6}
-   :scope #{:L5-assume}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step1}
-
- ;; ============================================================
- ;; L5-step2 EXPANSION: Influence term
- ;; ============================================================
-  :L5-step2
-  {:id :L5-step2
-   :type :claim
-   :statement "$(2n-2)(1-p_0) = 4(n-1)\\varepsilon - (2n-2)\\varepsilon^2 = 4(n-1)\\varepsilon + O(n\\varepsilon^2)$"
-   :dependencies #{:L5-assume}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L5-root}
-
-  :L5-step2-1
-  {:id :L5-step2-1
-   :type :claim
-   :statement "From L5-assume-4: $1 - p_0 = 2\\varepsilon - \\varepsilon^2$."
-   :dependencies #{:L5-assume-4}
-   :scope #{:L5-assume}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step2}
-
-  :L5-step2-2
-  {:id :L5-step2-2
-   :type :claim
-   :statement "$(2n-2)(2\\varepsilon - \\varepsilon^2) = (2n-2) \\cdot 2\\varepsilon - (2n-2)\\varepsilon^2$"
-   :dependencies #{:L5-step2-1}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step2}
-
-  :L5-step2-2a
-  {:id :L5-step2-2a
-   :type :claim
-   :statement "Distributivity: $a(b-c) = ab - ac$."
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step2-2}
-
-  :L5-step2-3
-  {:id :L5-step2-3
-   :type :claim
-   :statement "$(2n-2) \\cdot 2\\varepsilon = 4(n-1)\\varepsilon$"
-   :dependencies #{:L5-step2-2}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step2}
-
-  :L5-step2-3a
-  {:id :L5-step2-3a
-   :type :claim
-   :statement "$2n-2 = 2(n-1)$, so $(2n-2) \\cdot 2 = 4(n-1)$."
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step2-3}
-
-  :L5-step2-4
-  {:id :L5-step2-4
-   :type :claim
-   :statement "Error bound: $|(2n-2)\\varepsilon^2| \\leq 2n \\cdot 4^{-n} = O(n \\cdot 4^{-n})$ for $n \\geq 2$."
-   :dependencies #{:L5-assume-2}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step2}
-
-  :L5-step2-4a
-  {:id :L5-step2-4a
-   :type :claim
-   :statement "$\\varepsilon^2 = 2^{2-2n} = 4^{1-n} = 4/4^n$."
-   :dependencies #{:0-D-eps}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step2-4}
-
-  :L5-step2-4b
-  {:id :L5-step2-4b
-   :type :claim
-   :statement "$(2n-2) \\cdot 4/4^n \\leq 2n \\cdot 4/4^n = 8n/4^n = O(n \\cdot 4^{-n})$."
-   :dependencies #{:L5-step2-4a}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step2-4}
-
- ;; ============================================================
- ;; L5-step3 EXPANSION: Substitution into g(n)
- ;; ============================================================
-  :L5-step3
-  {:id :L5-step3
-   :type :claim
-   :statement "$g(n) = \\frac{2^{n-1}}{n} \\cdot \\varepsilon \\cdot \\left[\\frac{2}{\\ln 2} + 4(n-1)\\right] + O(\\text{error})$"
-   :dependencies #{:L5-step1 :L5-step2 :0-L4cor}
-   :scope #{:L5-assume}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L5-root}
-
-  :L5-step3-1
-  {:id :L5-step3-1
-   :type :claim
-   :statement "Define $g(n) = \\frac{S}{I} - \\log_2 3 = \\frac{2^{n-1}}{n}[-p_0 \\log_2 p_0 + (2n-2)(1-p_0)]$"
-   :dependencies #{:0-L4cor}
-   :scope #{:L5-assume}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step3}
-
-  :L5-step3-2
-  {:id :L5-step3-2
-   :type :claim
-   :statement "Substitute: $-p_0 \\log_2 p_0 = \\frac{2\\varepsilon}{\\ln 2} + O(\\varepsilon^2)$ from L5-step1-7."
-   :dependencies #{:L5-step1-7}
-   :scope #{:L5-assume}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step3}
-
-  :L5-step3-3
-  {:id :L5-step3-3
-   :type :claim
-   :statement "Substitute: $(2n-2)(1-p_0) = 4(n-1)\\varepsilon + O(n\\varepsilon^2)$ from L5-step2."
-   :dependencies #{:L5-step2}
-   :scope #{:L5-assume}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step3}
-
-  :L5-step3-4
-  {:id :L5-step3-4
-   :type :claim
-   :statement "$g(n) = \\frac{2^{n-1}}{n}\\left[\\frac{2\\varepsilon}{\\ln 2} + 4(n-1)\\varepsilon + O((1+n)\\varepsilon^2)\\right]$"
-   :dependencies #{:L5-step3-1 :L5-step3-2 :L5-step3-3}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step3}
-
-  :L5-step3-5
-  {:id :L5-step3-5
-   :type :claim
-   :statement "Factor out $\\varepsilon$: $g(n) = \\frac{2^{n-1}}{n} \\cdot \\varepsilon \\cdot \\left[\\frac{2}{\\ln 2} + 4(n-1)\\right] + O(\\text{error})$"
-   :dependencies #{:L5-step3-4}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step3}
-
-  :L5-step3-5a
-  {:id :L5-step3-5a
-   :type :claim
-   :statement "Error term: $\\frac{2^{n-1}}{n} \\cdot O((1+n)\\varepsilon^2) = O(\\frac{2^{n-1}(1+n)}{n} \\cdot 4^{1-n})$"
-   :dependencies #{:L5-step2-4a}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step3-5}
-
-  :L5-step3-5b
-  {:id :L5-step3-5b
-   :type :claim
-   :statement "$= O(\\frac{(1+n)}{n} \\cdot 2^{n-1} \\cdot 4 \\cdot 4^{-n}) = O(\\frac{1+n}{n} \\cdot 2^{1-n}) = O(2^{1-n}) = O(\\varepsilon)$"
-   :dependencies #{:L5-step3-5a}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step3-5}
-
- ;; ============================================================
- ;; L5-step4 EXPANSION: Key cancellation and limit
- ;; ============================================================
+ {:L5-discharge
+  {:statement "Discharging $\\varepsilon = 2^{1-n}$ assumption.",
+   :taint :clean,
+   :parent :L5-root,
+   :content-hash "1f2b48756f263d23",
+   :display-order 0,
+   :type :local-discharge,
+   :scope #{:L5-assume},
+   :justification :discharge,
+   :status :verified,
+   :id :L5-discharge,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :discharges :L5-assume,
+   :dependencies #{:L5-step4}},
   :L5-step4
-  {:id :L5-step4
-   :type :claim
-   :statement "$g(n) = \\frac{2}{n \\ln 2} + 4 - \\frac{4}{n} + O(\\varepsilon) \\to 4$ as $n \\to \\infty$"
-   :dependencies #{:L5-step3}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L5-root}
-
-  :L5-step4-1
-  {:id :L5-step4-1
-   :type :claim
-   :statement "KEY: $2^{n-1} \\cdot \\varepsilon = 2^{n-1} \\cdot 2^{1-n} = 2^{(n-1)+(1-n)} = 2^0 = 1$"
-   :dependencies #{:0-D-eps}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step4}
-
-  :L5-step4-1a
-  {:id :L5-step4-1a
-   :type :claim
-   :statement "Exponent law: $2^a \\cdot 2^b = 2^{a+b}$."
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step4-1}
-
-  :L5-step4-1b
-  {:id :L5-step4-1b
-   :type :claim
-   :statement "$(n-1) + (1-n) = n - 1 + 1 - n = 0$."
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step4-1}
-
-  :L5-step4-2
-  {:id :L5-step4-2
-   :type :claim
-   :statement "$g(n) = \\frac{1}{n}\\left[\\frac{2}{\\ln 2} + 4(n-1)\\right] + O(\\varepsilon)$"
-   :dependencies #{:L5-step3-5 :L5-step4-1}
-   :scope #{:L5-assume}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step4}
-
-  :L5-step4-3
-  {:id :L5-step4-3
-   :type :claim
-   :statement "$g(n) = \\frac{2}{n \\ln 2} + \\frac{4(n-1)}{n} + O(\\varepsilon)$"
-   :dependencies #{:L5-step4-2}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step4}
-
+  {:statement
+   "$g(n) = \\frac{2}{n \\ln 2} + 4 - \\frac{4}{n} + O(\\varepsilon) \\to 4$ as $n \\to \\infty$",
+   :taint :clean,
+   :parent :L5-root,
+   :content-hash "b1d3c549e9ed87a1",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step4,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L5-step3}},
+  :0-D-eps
+  {:statement "Define $\\varepsilon = 2^{1-n}$ for $n \\geq 1$.",
+   :taint :clean,
+   :parent nil,
+   :content-hash "c4d168304f67d3a5",
+   :display-order 0,
+   :type :definition,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :0-D-eps,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 0,
+   :dependencies #{}},
+  :L5-assume-1b
+  {:statement "Quotient of positive numbers is positive: $2/2^n > 0$.",
+   :taint :clean,
+   :parent :L5-assume-1,
+   :content-hash "7af0f43e1dc4c889",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-assume-1b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{:L5-assume-1a}},
   :L5-step4-3a
-  {:id :L5-step4-3a
-   :type :claim
-   :statement "Distribute $1/n$: $(1/n)[a + b] = a/n + b/n$."
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step4-3}
-
-  :L5-step4-4
-  {:id :L5-step4-4
-   :type :claim
-   :statement "$\\frac{4(n-1)}{n} = \\frac{4n - 4}{n} = 4 - \\frac{4}{n}$"
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step4}
-
-  :L5-step4-4a
-  {:id :L5-step4-4a
-   :type :claim
-   :statement "$4(n-1) = 4n - 4$ by distribution."
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step4-4}
-
-  :L5-step4-4b
-  {:id :L5-step4-4b
-   :type :claim
-   :statement "$(4n - 4)/n = 4n/n - 4/n = 4 - 4/n$."
-   :dependencies #{:L5-step4-4a}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step4-4}
-
-  :L5-step4-5
-  {:id :L5-step4-5
-   :type :claim
-   :statement "Therefore: $g(n) = \\frac{2}{n \\ln 2} + 4 - \\frac{4}{n} + O(\\varepsilon)$"
-   :dependencies #{:L5-step4-3 :L5-step4-4}
-   :scope #{:L5-assume}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step4}
-
-  :L5-step4-6
-  {:id :L5-step4-6
-   :type :claim
-   :statement "As $n \\to \\infty$: $\\frac{2}{n \\ln 2} \\to 0$"
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step4}
-
-  :L5-step4-6a
-  {:id :L5-step4-6a
-   :type :claim
-   :statement "$\\lim_{n \\to \\infty} c/n = 0$ for any constant $c$."
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :external-application
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step4-6}
-
-  :L5-step4-7
-  {:id :L5-step4-7
-   :type :claim
-   :statement "As $n \\to \\infty$: $\\frac{4}{n} \\to 0$"
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step4}
-
-  :L5-step4-8
-  {:id :L5-step4-8
-   :type :claim
-   :statement "As $n \\to \\infty$: $\\varepsilon = 2^{1-n} \\to 0$"
-   :dependencies #{:0-D-eps}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step4}
-
-  :L5-step4-8a
-  {:id :L5-step4-8a
-   :type :claim
-   :statement "$2^{1-n} = 2/2^n$ and $2^n \\to \\infty$, so $2/2^n \\to 0$."
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step4-8}
-
-  :L5-step4-9
-  {:id :L5-step4-9
-   :type :claim
-   :statement "By limit arithmetic: $\\lim_{n \\to \\infty} g(n) = 0 + 4 - 0 + 0 = 4$"
-   :dependencies #{:L5-step4-5 :L5-step4-6 :L5-step4-7 :L5-step4-8}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-step4}
-
-  :L5-step4-9a
-  {:id :L5-step4-9a
-   :type :claim
-   :statement "$\\lim(a + b + c) = \\lim a + \\lim b + \\lim c$ when all limits exist."
-   :dependencies #{}
-   :scope #{:L5-assume}
-   :justification :external-application
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-step4-9}
-
- ;; ============================================================
- ;; L5-discharge EXPANSION
- ;; ============================================================
-  :L5-discharge
-  {:id :L5-discharge
-   :type :local-discharge
-   :statement "Discharging $\\varepsilon = 2^{1-n}$ assumption."
-   :discharges :L5-assume
-   :dependencies #{:L5-step4}
-   :scope #{:L5-assume}
-   :justification :discharge
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L5-root}
-
-  :L5-discharge-1
-  {:id :L5-discharge-1
-   :type :claim
-   :statement "The result $\\lim g(n) = 4$ is independent of the notation $\\varepsilon$."
-   :dependencies #{:L5-step4-9}
-   :scope #{:L5-assume}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-discharge}
-
-  :L5-discharge-2
-  {:id :L5-discharge-2
-   :type :claim
-   :statement "$\\varepsilon = 2^{1-n}$ is a definitional abbreviation, not a free variable."
-   :dependencies #{:0-D-eps}
-   :scope #{:L5-assume}
-   :justification :definition-expansion
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-discharge}
-
- ;; ============================================================
- ;; L5-qed EXPANSION
- ;; ============================================================
-  :L5-qed
-  {:id :L5-qed
-   :type :qed
-   :statement "$\\frac{S}{I} \\to \\log_2 3 + 4 \\approx 5.585$ as $n \\to \\infty$. QED."
-   :dependencies #{:L5-discharge :0-L4cor}
-   :scope #{}
-   :justification :qed
-   :status :verified
-   :taint :clean
-   :depth 2
-   :parent :L5-root}
-
-  :L5-qed-1
-  {:id :L5-qed-1
-   :type :claim
-   :statement "From L4-cor: $\\frac{S}{I} = \\log_2 3 + g(n)$"
-   :dependencies #{:0-L4cor :L5-step3-1}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-qed}
-
+  {:statement "Distribute $1/n$: $(1/n)[a + b] = a/n + b/n$.",
+   :taint :clean,
+   :parent :L5-step4-3,
+   :content-hash "a415d25a4b0c804e",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step4-3a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
+  :L5-assume-2b
+  {:statement "$2^{-1} = 1/2 < 1$ by arithmetic.",
+   :taint :clean,
+   :parent :L5-assume-2,
+   :content-hash "e8550ede4984ec66",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-assume-2b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
+  :L5-step1-3
+  {:statement
+   "$\\log_2(p_0) = \\log_2((1-\\varepsilon)^2) = 2\\log_2(1-\\varepsilon)$",
+   :taint :clean,
+   :parent :L5-step1,
+   :content-hash "6311bd90bab3cbd3",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step1-3,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-assume-3}},
   :L5-qed-2
-  {:id :L5-qed-2
-   :type :claim
-   :statement "From L5-step4-9: $\\lim_{n \\to \\infty} g(n) = 4$"
-   :dependencies #{:L5-step4-9 :L5-discharge}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-qed}
-
+  {:statement "From L5-step4-9: $\\lim_{n \\to \\infty} g(n) = 4$",
+   :taint :clean,
+   :parent :L5-qed,
+   :content-hash "a7113b04386724cb",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L5-qed-2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-discharge :L5-step4-9}},
+  :L5-step2-2a
+  {:statement "Distributivity: $a(b-c) = ab - ac$.",
+   :taint :clean,
+   :parent :L5-step2-2,
+   :content-hash "072242c11382f35e",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step2-2a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
+  :L5-step1-1a
+  {:statement "This is the Mercator series, valid for $|x| < 1$.",
+   :taint :clean,
+   :parent :L5-step1-1,
+   :content-hash "866cb0eb2d54c8df",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :external-application,
+   :status :verified,
+   :id :L5-step1-1a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
+  :L5-assume-2a
+  {:statement
+   "For $n \\geq 2$: $1-n \\leq -1$, hence $2^{1-n} \\leq 2^{-1}$.",
+   :taint :clean,
+   :parent :L5-assume-2,
+   :content-hash "cd9f78c7a8e9abfe",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-assume-2a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{:0-D-eps}},
+  :L5-step2-4
+  {:statement
+   "Error bound: $|(2n-2)\\varepsilon^2| \\leq 2n \\cdot 4^{-n} = O(n \\cdot 4^{-n})$ for $n \\geq 2$.",
+   :taint :clean,
+   :parent :L5-step2,
+   :content-hash "c1a4d91433acb89d",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step2-4,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-assume-2}},
+  :L5-step1-2
+  {:statement
+   "$\\log_2(1-\\varepsilon) = \\frac{\\ln(1-\\varepsilon)}{\\ln 2} = \\frac{-\\varepsilon - \\varepsilon^2/2 + O(\\varepsilon^3)}{\\ln 2}$",
+   :taint :clean,
+   :parent :L5-step1,
+   :content-hash "bc84cfc5b595e981",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :substitution,
+   :status :verified,
+   :id :L5-step1-2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step1-1}},
+  :L5-step3-1
+  {:statement
+   "Define $g(n) = \\frac{S}{I} - \\log_2 3 = \\frac{2^{n-1}}{n}[-p_0 \\log_2 p_0 + (2n-2)(1-p_0)]$",
+   :taint :clean,
+   :parent :L5-step3,
+   :content-hash "1f86f25576b9f1d9",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L5-step3-1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:0-L4cor}},
+  :L5-step4-7
+  {:statement "As $n \\to \\infty$: $\\frac{4}{n} \\to 0$",
+   :taint :clean,
+   :parent :L5-step4,
+   :content-hash "ec6faa6068ad99e4",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step4-7,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :L5-step4-9a
+  {:statement
+   "$\\lim(a + b + c) = \\lim a + \\lim b + \\lim c$ when all limits exist.",
+   :taint :clean,
+   :parent :L5-step4-9,
+   :content-hash "aa59b2f2f448534f",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :external-application,
+   :status :verified,
+   :id :L5-step4-9a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
+  :L5-step4-9
+  {:statement
+   "By limit arithmetic: $\\lim_{n \\to \\infty} g(n) = 0 + 4 - 0 + 0 = 4$",
+   :taint :clean,
+   :parent :L5-step4,
+   :content-hash "b59c80d1d27e7f9d",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step4-9,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step4-7 :L5-step4-6 :L5-step4-8 :L5-step4-5}},
+  :L5-step3-5a
+  {:statement
+   "Error term: $\\frac{2^{n-1}}{n} \\cdot O((1+n)\\varepsilon^2) = O(\\frac{2^{n-1}(1+n)}{n} \\cdot 4^{1-n})$",
+   :taint :clean,
+   :parent :L5-step3-5,
+   :content-hash "1eeba82983c613e6",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step3-5a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{:L5-step2-4a}},
+  :L5-step2
+  {:statement
+   "$(2n-2)(1-p_0) = 4(n-1)\\varepsilon - (2n-2)\\varepsilon^2 = 4(n-1)\\varepsilon + O(n\\varepsilon^2)$",
+   :taint :clean,
+   :parent :L5-root,
+   :content-hash "2b19c06c03c9f432",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L5-assume}},
+  :L5-assume
+  {:statement
+   "Let $\\varepsilon = 2^{1-n}$, so $p_0 = (1-\\varepsilon)^2$ and $1-p_0 = 2\\varepsilon - \\varepsilon^2$.",
+   :taint :clean,
+   :parent :L5-root,
+   :content-hash "add0de5c83b5dfa6",
+   :introduces "$\\varepsilon = 2^{1-n}$",
+   :display-order 0,
+   :type :local-assume,
+   :scope #{},
+   :justification :local-assumption,
+   :status :verified,
+   :id :L5-assume,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:0-D-eps}},
+  :L5-step3-2
+  {:statement
+   "Substitute: $-p_0 \\log_2 p_0 = \\frac{2\\varepsilon}{\\ln 2} + O(\\varepsilon^2)$ from L5-step1-7.",
+   :taint :clean,
+   :parent :L5-step3,
+   :content-hash "4b5e3023bed26363",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :substitution,
+   :status :verified,
+   :id :L5-step3-2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step1-7}},
+  :L5-step4-4a
+  {:statement "$4(n-1) = 4n - 4$ by distribution.",
+   :taint :clean,
+   :parent :L5-step4-4,
+   :content-hash "4825091389479ce6",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step4-4a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
+  :L5-step2-4a
+  {:statement "$\\varepsilon^2 = 2^{2-2n} = 4^{1-n} = 4/4^n$.",
+   :taint :clean,
+   :parent :L5-step2-4,
+   :content-hash "9ce3036e63e1de08",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step2-4a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{:0-D-eps}},
+  :L5-qed
+  {:statement
+   "$\\frac{S}{I} \\to \\log_2 3 + 4 \\approx 5.585$ as $n \\to \\infty$. QED.",
+   :taint :clean,
+   :parent :L5-root,
+   :content-hash "c1fd664995ca3aa2",
+   :display-order 0,
+   :type :qed,
+   :scope #{},
+   :justification :qed,
+   :status :verified,
+   :id :L5-qed,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L5-discharge :0-L4cor}},
+  :L5-step2-3
+  {:statement "$(2n-2) \\cdot 2\\varepsilon = 4(n-1)\\varepsilon$",
+   :taint :clean,
+   :parent :L5-step2,
+   :content-hash "ea13bc169cfba681",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step2-3,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step2-2}},
+  :0-L4cor
+  {:statement
+   "$\\frac{S}{I} = \\log_2 3 + \\frac{2^{n-1}}{n}[-p_0 \\log_2 p_0 + (2n-2)(1-p_0)]$",
+   :taint :clean,
+   :parent nil,
+   :content-hash "fd03c6ab6952b289",
+   :display-order 0,
+   :type :assumption,
+   :scope #{},
+   :justification :assumption,
+   :status :verified,
+   :id :0-L4cor,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 0,
+   :dependencies #{}},
+  :L5-step4-1a
+  {:statement "Exponent law: $2^a \\cdot 2^b = 2^{a+b}$.",
+   :taint :clean,
+   :parent :L5-step4-1,
+   :content-hash "2d2616115f8fc1d9",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step4-1a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
   :L5-qed-3
-  {:id :L5-qed-3
-   :type :claim
-   :statement "$\\lim_{n \\to \\infty} \\frac{S}{I} = \\lim_{n \\to \\infty} [\\log_2 3 + g(n)] = \\log_2 3 + \\lim g(n)$"
-   :dependencies #{:L5-qed-1}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-qed}
-
+  {:statement
+   "$\\lim_{n \\to \\infty} \\frac{S}{I} = \\lim_{n \\to \\infty} [\\log_2 3 + g(n)] = \\log_2 3 + \\lim g(n)$",
+   :taint :clean,
+   :parent :L5-qed,
+   :content-hash "a20338cc36d1d286",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-qed-3,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-qed-1}},
+  :L5-qed-1
+  {:statement "From L4-cor: $\\frac{S}{I} = \\log_2 3 + g(n)$",
+   :taint :clean,
+   :parent :L5-qed,
+   :content-hash "d647835337c9a258",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L5-qed-1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step3-1 :0-L4cor}},
+  :L5-step4-1
+  {:statement
+   "KEY: $2^{n-1} \\cdot \\varepsilon = 2^{n-1} \\cdot 2^{1-n} = 2^{(n-1)+(1-n)} = 2^0 = 1$",
+   :taint :clean,
+   :parent :L5-step4,
+   :content-hash "b580f620a19af16c",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step4-1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:0-D-eps}},
+  :L5-assume-4
+  {:statement
+   "Expanding: $1 - p_0 = 1 - (1-\\varepsilon)^2 = 1 - (1 - 2\\varepsilon + \\varepsilon^2) = 2\\varepsilon - \\varepsilon^2$.",
+   :taint :clean,
+   :parent :L5-assume,
+   :content-hash "fff30c4488ffe494",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-assume-4,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-assume-3}},
+  :L5-discharge-2
+  {:statement
+   "$\\varepsilon = 2^{1-n}$ is a definitional abbreviation, not a free variable.",
+   :taint :clean,
+   :parent :L5-discharge,
+   :content-hash "b7067830961eacd1",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L5-discharge-2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:0-D-eps}},
+  :L5-step1
+  {:statement
+   "Using Taylor: $-p_0 \\log_2 p_0 = \\frac{2\\varepsilon}{\\ln 2} + O(\\varepsilon^2)$",
+   :taint :clean,
+   :parent :L5-root,
+   :content-hash "074591a56b26b2bc",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L5-assume}},
+  :L5-step1-3b
+  {:statement
+   "$p_0 = (1-\\varepsilon)^2 > 0$ since $0 < \\varepsilon < 1$, so log well-defined.",
+   :taint :clean,
+   :parent :L5-step1-3,
+   :content-hash "ea70a7cc336f5ba4",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step1-3b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{:L5-assume-3 :L5-assume-2}},
+  :L5-assume-1a
+  {:statement
+   "$2^{1-n} = 2/2^n$ where $2^n > 0$ for all $n \\in \\mathbb{N}$.",
+   :taint :clean,
+   :parent :L5-assume-1,
+   :content-hash "489b9305911ad1a6",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L5-assume-1a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{:0-D-eps}},
+  :L5-assume-1
+  {:statement "For $n \\geq 1$: $\\varepsilon = 2^{1-n} > 0$.",
+   :taint :clean,
+   :parent :L5-assume,
+   :content-hash "04c08b870e23c217",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-assume-1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:0-D-eps}},
+  :L5-step3-5
+  {:statement
+   "Factor out $\\varepsilon$: $g(n) = \\frac{2^{n-1}}{n} \\cdot \\varepsilon \\cdot \\left[\\frac{2}{\\ln 2} + 4(n-1)\\right] + O(\\text{error})$",
+   :taint :clean,
+   :parent :L5-step3,
+   :content-hash "9dc5659a5e2807d5",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step3-5,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step3-4}},
   :L5-qed-3a
-  {:id :L5-qed-3a
-   :type :claim
-   :statement "Limit of constant plus sequence: $\\lim(c + a_n) = c + \\lim a_n$."
-   :dependencies #{}
-   :scope #{}
-   :justification :external-application
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-qed-3}
-
-  :L5-qed-4
-  {:id :L5-qed-4
-   :type :claim
-   :statement "Therefore: $\\lim_{n \\to \\infty} \\frac{S}{I} = \\log_2 3 + 4$"
-   :dependencies #{:L5-qed-2 :L5-qed-3}
-   :scope #{}
-   :justification :substitution
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-qed}
-
+  {:statement
+   "Limit of constant plus sequence: $\\lim(c + a_n) = c + \\lim a_n$.",
+   :taint :clean,
+   :parent :L5-qed-3,
+   :content-hash "aaa37cd6caf702a7",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :external-application,
+   :status :verified,
+   :id :L5-qed-3a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
+  :L5-step1-6
+  {:statement
+   "$p_0 = 1 - 2\\varepsilon + \\varepsilon^2 = 1 + O(\\varepsilon)$, so $p_0\\varepsilon = \\varepsilon + O(\\varepsilon^2)$.",
+   :taint :clean,
+   :parent :L5-step1,
+   :content-hash "68ab4263f204a1d4",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step1-6,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-assume-4a}},
+  :L5-step4-6
+  {:statement "As $n \\to \\infty$: $\\frac{2}{n \\ln 2} \\to 0$",
+   :taint :clean,
+   :parent :L5-step4,
+   :content-hash "9d9432117e79dd94",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step4-6,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :L5-assume-4a
+  {:statement
+   "$(1-\\varepsilon)^2 = 1 - 2\\varepsilon + \\varepsilon^2$ by binomial expansion.",
+   :taint :clean,
+   :parent :L5-assume-4,
+   :content-hash "f406ef93c9020948",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-assume-4a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
+  :L5-step3
+  {:statement
+   "$g(n) = \\frac{2^{n-1}}{n} \\cdot \\varepsilon \\cdot \\left[\\frac{2}{\\ln 2} + 4(n-1)\\right] + O(\\text{error})$",
+   :taint :clean,
+   :parent :L5-root,
+   :content-hash "0233ad9c2fdcdc57",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :substitution,
+   :status :verified,
+   :id :L5-step3,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L5-step2 :0-L4cor :L5-step1}},
+  :L5-assume-3
+  {:statement
+   "From L4-cor: $p_0 = (1-2^{1-n})^2 = (1-\\varepsilon)^2$.",
+   :taint :clean,
+   :parent :L5-assume,
+   :content-hash "dd54a38ed7277f35",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :substitution,
+   :status :verified,
+   :id :L5-assume-3,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:0-L4cor :L5-assume-1}},
+  :L5-step1-1
+  {:statement
+   "Taylor series: $\\log(1-x) = -x - \\frac{x^2}{2} - \\frac{x^3}{3} - \\cdots$ for $|x| < 1$.",
+   :taint :clean,
+   :parent :L5-step1,
+   :content-hash "f03dada7c73b0ece",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :external-application,
+   :status :verified,
+   :id :L5-step1-1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :L5-step1-5
+  {:statement
+   "$-p_0 \\log_2(p_0) = -p_0 \\cdot \\frac{-2\\varepsilon}{\\ln 2} + O(\\varepsilon^2) = \\frac{2p_0\\varepsilon}{\\ln 2} + O(\\varepsilon^2)$",
+   :taint :clean,
+   :parent :L5-step1,
+   :content-hash "99c74ce9840f5682",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step1-5,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step1-4}},
+  :L5-step4-8a
+  {:statement
+   "$2^{1-n} = 2/2^n$ and $2^n \\to \\infty$, so $2/2^n \\to 0$.",
+   :taint :clean,
+   :parent :L5-step4-8,
+   :content-hash "20d353d40416f174",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step4-8a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
+  :L5-step2-1
+  {:statement
+   "From L5-assume-4: $1 - p_0 = 2\\varepsilon - \\varepsilon^2$.",
+   :taint :clean,
+   :parent :L5-step2,
+   :content-hash "cf8f79dd497504c9",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :substitution,
+   :status :verified,
+   :id :L5-step2-1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-assume-4}},
+  :L5-step1-2a
+  {:statement
+   "$\\log_2(x) = \\ln(x)/\\ln(2)$ by change of base formula.",
+   :taint :clean,
+   :parent :L5-step1-2,
+   :content-hash "3106fb0e04823890",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L5-step1-2a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
+  :L5-step2-3a
+  {:statement "$2n-2 = 2(n-1)$, so $(2n-2) \\cdot 2 = 4(n-1)$.",
+   :taint :clean,
+   :parent :L5-step2-3,
+   :content-hash "d385d2f771b9e187",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step2-3a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
+  :L5-root
+  {:statement
+   "$\\lim_{n \\to \\infty} \\frac{S_{\\max}}{I} = \\log_2 3 + 4$",
+   :taint :clean,
+   :parent nil,
+   :content-hash "51faf2f48f65e909",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :conjunction-intro,
+   :status :verified,
+   :id :L5-root,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 1,
+   :dependencies #{:0-L4cor}},
+  :L5-step2-2
+  {:statement
+   "$(2n-2)(2\\varepsilon - \\varepsilon^2) = (2n-2) \\cdot 2\\varepsilon - (2n-2)\\varepsilon^2$",
+   :taint :clean,
+   :parent :L5-step2,
+   :content-hash "5812580620ecf840",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step2-2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step2-1}},
+  :L5-step1-1b
+  {:statement
+   "From L5-assume-2: $|\\varepsilon| < 1$ for $n \\geq 2$, so series applies.",
+   :taint :clean,
+   :parent :L5-step1-1,
+   :content-hash "82dab9b0182af03f",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :modus-ponens,
+   :status :verified,
+   :id :L5-step1-1b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{:L5-assume-2}},
+  :L5-assume-4b
+  {:statement
+   "$1 - (1 - 2\\varepsilon + \\varepsilon^2) = 2\\varepsilon - \\varepsilon^2$ by distribution.",
+   :taint :clean,
+   :parent :L5-assume-4,
+   :content-hash "4ff371ebbde222a6",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-assume-4b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{:L5-assume-4a}},
+  :L5-step4-8
+  {:statement "As $n \\to \\infty$: $\\varepsilon = 2^{1-n} \\to 0$",
+   :taint :clean,
+   :parent :L5-step4,
+   :content-hash "5e548cc1cc58c408",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step4-8,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:0-D-eps}},
   :L5-qed-5
-  {:id :L5-qed-5
-   :type :claim
-   :statement "Numerical: $\\log_2 3 = \\frac{\\ln 3}{\\ln 2} = \\frac{1.0986...}{0.6931...} = 1.58496...$"
-   :dependencies #{}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-qed}
-
-  :L5-qed-5a
-  {:id :L5-qed-5a
-   :type :claim
-   :statement "$\\ln 3 \\approx 1.0986$ and $\\ln 2 \\approx 0.6931$ (standard values)."
-   :dependencies #{}
-   :scope #{}
-   :justification :external-application
-   :status :verified
-   :taint :clean
-   :depth 4
-   :parent :L5-qed-5}
-
+  {:statement
+   "Numerical: $\\log_2 3 = \\frac{\\ln 3}{\\ln 2} = \\frac{1.0986...}{0.6931...} = 1.58496...$",
+   :taint :clean,
+   :parent :L5-qed,
+   :content-hash "e02417f39f8441af",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-qed-5,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :L5-step1-4
+  {:statement
+   "$\\log_2(p_0) = 2 \\cdot \\frac{-\\varepsilon + O(\\varepsilon^2)}{\\ln 2} = \\frac{-2\\varepsilon}{\\ln 2} + O(\\varepsilon^2)$",
+   :taint :clean,
+   :parent :L5-step1,
+   :content-hash "08b5817119e23c14",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :substitution,
+   :status :verified,
+   :id :L5-step1-4,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step1-3 :L5-step1-2}},
   :L5-qed-6
-  {:id :L5-qed-6
-   :type :claim
-   :statement "$\\log_2 3 + 4 = 1.58496... + 4 = 5.58496... \\approx 5.585$"
-   :dependencies #{:L5-qed-4 :L5-qed-5}
-   :scope #{}
-   :justification :algebraic-rewrite
-   :status :verified
-   :taint :clean
-   :depth 3
-   :parent :L5-qed}}
-
- ;; ============================================================
- ;; SYMBOLS
- ;; ============================================================
+  {:statement
+   "$\\log_2 3 + 4 = 1.58496... + 4 = 5.58496... \\approx 5.585$",
+   :taint :clean,
+   :parent :L5-qed,
+   :content-hash "6cea16ec486af65a",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-qed-6,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-qed-5 :L5-qed-4}},
+  :L5-step4-6a
+  {:statement "$\\lim_{n \\to \\infty} c/n = 0$ for any constant $c$.",
+   :taint :clean,
+   :parent :L5-step4-6,
+   :content-hash "d4a71ec9d735ab20",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :external-application,
+   :status :verified,
+   :id :L5-step4-6a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
+  :L5-step4-4b
+  {:statement "$(4n - 4)/n = 4n/n - 4/n = 4 - 4/n$.",
+   :taint :clean,
+   :parent :L5-step4-4,
+   :content-hash "cc402492918da76b",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step4-4b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{:L5-step4-4a}},
+  :L5-step1-3a
+  {:statement "$\\log(a^n) = n \\log(a)$ for $a > 0$.",
+   :taint :clean,
+   :parent :L5-step1-3,
+   :content-hash "f79d178a0b812d28",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step1-3a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
+  :L5-step2-4b
+  {:statement
+   "$(2n-2) \\cdot 4/4^n \\leq 2n \\cdot 4/4^n = 8n/4^n = O(n \\cdot 4^{-n})$.",
+   :taint :clean,
+   :parent :L5-step2-4,
+   :content-hash "e9d98f0e705e523a",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step2-4b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{:L5-step2-4a}},
+  :L5-qed-5a
+  {:statement
+   "$\\ln 3 \\approx 1.0986$ and $\\ln 2 \\approx 0.6931$ (standard values).",
+   :taint :clean,
+   :parent :L5-qed-5,
+   :content-hash "d248526b3615a258",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :external-application,
+   :status :verified,
+   :id :L5-qed-5a,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
+  :L5-qed-4
+  {:statement
+   "Therefore: $\\lim_{n \\to \\infty} \\frac{S}{I} = \\log_2 3 + 4$",
+   :taint :clean,
+   :parent :L5-qed,
+   :content-hash "d2ac8f45e5961f45",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L5-qed-4,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-qed-2 :L5-qed-3}},
+  :L5-discharge-1
+  {:statement
+   "The result $\\lim g(n) = 4$ is independent of the notation $\\varepsilon$.",
+   :taint :clean,
+   :parent :L5-discharge,
+   :content-hash "623216145a995a9b",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-discharge-1,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step4-9}},
+  :L5-step3-5b
+  {:statement
+   "$= O(\\frac{(1+n)}{n} \\cdot 2^{n-1} \\cdot 4 \\cdot 4^{-n}) = O(\\frac{1+n}{n} \\cdot 2^{1-n}) = O(2^{1-n}) = O(\\varepsilon)$",
+   :taint :clean,
+   :parent :L5-step3-5,
+   :content-hash "71a23357d0474cb9",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step3-5b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{:L5-step3-5a}},
+  :L5-step4-2
+  {:statement
+   "$g(n) = \\frac{1}{n}\\left[\\frac{2}{\\ln 2} + 4(n-1)\\right] + O(\\varepsilon)$",
+   :taint :clean,
+   :parent :L5-step4,
+   :content-hash "7220cded8ba57ec6",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :substitution,
+   :status :verified,
+   :id :L5-step4-2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step4-1 :L5-step3-5}},
+  :L5-step4-5
+  {:statement
+   "Therefore: $g(n) = \\frac{2}{n \\ln 2} + 4 - \\frac{4}{n} + O(\\varepsilon)$",
+   :taint :clean,
+   :parent :L5-step4,
+   :content-hash "ab015d1358350520",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :substitution,
+   :status :verified,
+   :id :L5-step4-5,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step4-3 :L5-step4-4}},
+  :L5-step4-1b
+  {:statement "$(n-1) + (1-n) = n - 1 + 1 - n = 0$.",
+   :taint :clean,
+   :parent :L5-step4-1,
+   :content-hash "1364ae2e99e8585e",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step4-1b,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 4,
+   :dependencies #{}},
+  :L5-step4-3
+  {:statement
+   "$g(n) = \\frac{2}{n \\ln 2} + \\frac{4(n-1)}{n} + O(\\varepsilon)$",
+   :taint :clean,
+   :parent :L5-step4,
+   :content-hash "104ee28a301c239a",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step4-3,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step4-2}},
+  :L5-step4-4
+  {:statement
+   "$\\frac{4(n-1)}{n} = \\frac{4n - 4}{n} = 4 - \\frac{4}{n}$",
+   :taint :clean,
+   :parent :L5-step4,
+   :content-hash "a7bbc0c4e9269b7e",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step4-4,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{}},
+  :L5-assume-2
+  {:statement
+   "For $n \\geq 2$: $\\varepsilon = 2^{1-n} \\leq 2^{-1} = 1/2 < 1$.",
+   :taint :clean,
+   :parent :L5-assume,
+   :content-hash "79b117651cdb1ebb",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-assume-2,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-assume-1}},
+  :L5-step3-3
+  {:statement
+   "Substitute: $(2n-2)(1-p_0) = 4(n-1)\\varepsilon + O(n\\varepsilon^2)$ from L5-step2.",
+   :taint :clean,
+   :parent :L5-step3,
+   :content-hash "1b041a38e75c9668",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :substitution,
+   :status :verified,
+   :id :L5-step3-3,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step2}},
+  :L5-step3-4
+  {:statement
+   "$g(n) = \\frac{2^{n-1}}{n}\\left[\\frac{2\\varepsilon}{\\ln 2} + 4(n-1)\\varepsilon + O((1+n)\\varepsilon^2)\\right]$",
+   :taint :clean,
+   :parent :L5-step3,
+   :content-hash "2b94ba5a45464954",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L5-step3-4,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step3-1 :L5-step3-2 :L5-step3-3}},
+  :L5-step1-7
+  {:statement
+   "Therefore: $-p_0 \\log_2(p_0) = \\frac{2\\varepsilon}{\\ln 2} + O(\\varepsilon^2)$.",
+   :taint :clean,
+   :parent :L5-step1,
+   :content-hash "7f8342206b01443f",
+   :display-order 0,
+   :type :claim,
+   :scope #{:L5-assume},
+   :justification :substitution,
+   :status :verified,
+   :id :L5-step1-7,
+   :provenance
+   {:created-at "2025-01-01T00:00:00Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 3,
+   :dependencies #{:L5-step1-6 :L5-step1-5}}},
+ :graph-id "L5-asymptotic-expanded",
+ :version 52,
+ :lemmas {},
+ :metadata
+ {:created-at "2025-12-28T17:07:00Z",
+  :last-modified "2025-12-28T17:15:00Z",
+  :proof-mode :strict-mathematics,
+  :iteration-counts
+  {:verification
+   {:L5-assume 3,
+    :L5-step1 5,
+    :L5-step2 3,
+    :L5-step3 4,
+    :L5-step4 6,
+    :L5-discharge 2,
+    :L5-qed 3},
+   :expansion
+   {:L5-assume 2,
+    :L5-step1 3,
+    :L5-step2 2,
+    :L5-step3 2,
+    :L5-step4 3,
+    :L5-discharge 1,
+    :L5-qed 2},
+   :strategy 1},
+  :context-budget {:max-tokens 100000, :current-estimate 18500},
+  :rigor-level :strictest},
  :symbols
  {:sym-eps
-  {:id :sym-eps
-   :name "epsilon"
-   :type "Small parameter"
-   :tex "\\varepsilon = 2^{1-n}"
-   :constraints "$\\varepsilon \\to 0$ as $n \\to \\infty$, $\\varepsilon > 0$"
-   :scope :lemma}
-
+  {:id :sym-eps,
+   :name "epsilon",
+   :type "Small parameter",
+   :tex "\\varepsilon = 2^{1-n}",
+   :constraints
+   "$\\varepsilon \\to 0$ as $n \\to \\infty$, $\\varepsilon > 0$",
+   :scope :lemma,
+   :introduced-at :unknown},
   :sym-p0
-  {:id :sym-p0
-   :name "p_0"
-   :type "Probability"
-   :tex "p_0 = (1-\\varepsilon)^2"
-   :constraints "$0 < p_0 < 1$ for $n \\geq 2$"
-   :scope :lemma}
-
+  {:id :sym-p0,
+   :name "p_0",
+   :type "Probability",
+   :tex "p_0 = (1-\\varepsilon)^2",
+   :constraints "$0 < p_0 < 1$ for $n \\geq 2$",
+   :scope :lemma,
+   :introduced-at :unknown},
   :sym-gn
-  {:id :sym-gn
-   :name "g(n)"
-   :type "Correction term"
-   :tex "g(n) = \\frac{S}{I} - \\log_2 3"
-   :constraints "$g(n) \\to 4$ as $n \\to \\infty$"
-   :scope :lemma}}
-
- :external-refs {}
- :lemmas {}
- :obligations []
- :archived-nodes {}}
+  {:id :sym-gn,
+   :name "g(n)",
+   :type "Correction term",
+   :tex "g(n) = \\frac{S}{I} - \\log_2 3",
+   :constraints "$g(n) \\to 4$ as $n \\to \\infty$",
+   :scope :lemma,
+   :introduced-at :unknown}}}
