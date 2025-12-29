@@ -15,7 +15,8 @@ This document serves as a guide for **Prover** and **Formalizer** agents using t
     *   L5Asymptotic: ⚠️ In Progress
         *   Step1-2: ✅ 0 sorries
         *   Step3 (Taylor): ✅ 0 sorries
-        *   Step4-8: ⚠️ ~5 sorries remaining (numerical bounds)
+        *   Step4-5: ✅ 0 sorries (error bounds proved)
+        *   Step6-8: ⚠️ ~3 sorries remaining (numerical ln/log bounds)
 *   **Build Command**:
     ```bash
     lake build
@@ -290,6 +291,21 @@ These are the primary verified results available for use in higher-level proofs.
     $$\text{entropyTerm\_p0}(n) = \frac{2\varepsilon}{\ln 2} + O(\varepsilon^2)$$
     *Usage*: Asymptotic form of entropy term as $n \to \infty$.
 
+#### Step5: g(n) Substitution and Error Bounds
+
+*   **`two_pow_mul_eps_sq {n} (hn : n ≥ 1)`**:
+    $$2^{n-1} \cdot \varepsilon^2 = \varepsilon$$
+    *Usage*: Key identity for simplifying error terms.
+
+*   **`error_is_O_epsilon {n} (hn : n ≥ 2)`**:
+    $$\frac{2^{n-1}}{n} \cdot \left(\frac{10}{\ln 2} + 2n\right) \cdot \varepsilon^2 \leq \left(\frac{10}{\ln 2} + 2\right) \cdot \left(1 + \frac{1}{n}\right) \cdot \varepsilon$$
+    *Usage*: Shows the error term is $O(\varepsilon)$ as $n \to \infty$.
+
+*   **`g_expansion {n} (hn : n ≥ 2)`**:
+    $$g(n) = \frac{2^{n-1} \cdot \varepsilon}{n} \cdot \left(\frac{2}{\ln 2} + 4(n-1)\right) + R$$
+    where $|R| \leq \left(\frac{10}{\ln 2} + 2\right) \cdot \left(1 + \frac{1}{n}\right) \cdot \varepsilon$.
+    *Usage*: **Key result** - Expansion of $g(n)$ with provable error bound.
+
 #### Step6: Key Cancellation
 
 *   **`key_cancellation (n) (hn : n ≥ 1)`**:
@@ -308,7 +324,7 @@ These are the primary verified results available for use in higher-level proofs.
     $$|\log_2 3 + 4 - 5.585| < 0.001$$
     *Usage*: Numerical approximation of the limit.
 
-**Note**: Step3 Taylor expansion theorems are now fully proven (0 sorries). Remaining `sorry` placeholders in L5 are in Step4-8 for numerical verification of logarithm bounds (e.g., `log(2) ≈ 0.693`, `log(3) ≈ 1.099`). The proof structure is complete.
+**Note**: Step1-5 theorems are now fully proven (0 sorries). Remaining `sorry` placeholders in L5 are in Step6-8 for numerical verification of logarithm bounds (e.g., `log(2) ≈ 0.693`, `log(3) ≈ 1.099`). The proof structure is complete.
 
 ## 5. Agent Guidelines
 
