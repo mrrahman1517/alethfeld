@@ -3,7 +3,7 @@
    Based on orchestrator-prompt-v4.md specification."
   (:require [malli.core :as m]
             [malli.error :as me]
-            [malli.util :as mu]))
+            [validate-graph.config :as config]))
 
 ;; =============================================================================
 ;; Primitive Schemas
@@ -14,16 +14,18 @@
   :keyword)
 
 (def ContentHash
-  "SHA256 hash prefix (16 chars hex)"
-  [:re #"^[a-f0-9]{16}$"])
+  "SHA256 hash prefix (configurable length hex string)"
+  [:re {:error/message (str "Content hash must be " config/content-hash-length " lowercase hex characters")}
+   config/content-hash-pattern])
 
 (def ISO8601
   "ISO 8601 datetime string"
-  [:re #"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"])
+  [:re {:error/message "Must be ISO 8601 format: YYYY-MM-DDTHH:MM:SS"}
+   #"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"])
 
 (def LaTeXString
   "LaTeX mathematical statement (non-empty string)"
-  [:string {:min 1}])
+  [:string {:min 1 :error/message "Statement must be a non-empty string"}])
 
 ;; =============================================================================
 ;; Enum Schemas
@@ -31,7 +33,7 @@
 
 (def NodeType
   "All valid node types"
-  [:enum
+  [:enum {:error/message "Invalid node type. Must be one of: assumption, local-assume, local-discharge, definition, claim, lemma-ref, external-ref, qed"}
    :assumption        ; global hypothesis (from theorem statement)
    :local-assume      ; scoped assumption introduction
    :local-discharge   ; discharges a local-assume
@@ -72,15 +74,18 @@
 
 (def NodeStatus
   "Verification status of a node"
-  [:enum :proposed :verified :admitted :rejected])
+  [:enum {:error/message "Invalid status. Must be: proposed, verified, admitted, or rejected"}
+   :proposed :verified :admitted :rejected])
 
 (def TaintStatus
   "Taint propagation status"
-  [:enum :clean :tainted :self-admitted])
+  [:enum {:error/message "Invalid taint. Must be: clean, tainted, or self-admitted"}
+   :clean :tainted :self-admitted])
 
 (def ProofMode
   "Proof mode determines strictness level"
-  [:enum :strict-mathematics :formal-physics :algebraic-derivation])
+  [:enum {:error/message "Invalid proof mode. Must be: strict-mathematics, formal-physics, or algebraic-derivation"}
+   :strict-mathematics :formal-physics :algebraic-derivation])
 
 (def CreatedBy
   "Who created this node"

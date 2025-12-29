@@ -11,12 +11,14 @@
 (import '[java.security MessageDigest]
         '[java.io PushbackReader])
 
+(def content-hash-length 16)  ; Match config/content-hash-length
+
 (defn sha256-hex [s]
-  "Generate SHA-256 hash of string, return first 16 hex chars"
+  "Generate SHA-256 hash of string, return first N hex chars"
   (let [md (MessageDigest/getInstance "SHA-256")
         bytes (.digest md (.getBytes (str s) "UTF-8"))
         full-hex (apply str (map #(format "%02x" (bit-and % 0xff)) bytes))]
-    (subs full-hex 0 16)))
+    (subs full-hex 0 content-hash-length)))
 
 (defn normalize-latex [s]
   "Normalize LaTeX for consistent hashing"
@@ -28,12 +30,26 @@
   (sha256-hex (normalize-latex statement)))
 
 (defn fix-hash [h]
-  "Ensure hash is exactly 16 lowercase hex chars"
+  "Ensure hash is exactly N lowercase hex chars"
   (cond
     (nil? h) (sha256-hex (str (System/currentTimeMillis)))
-    (>= (count h) 16) (subs (str/lower-case h) 0 16)
+    (>= (count h) content-hash-length) (subs (str/lower-case h) 0 content-hash-length)
     :else (sha256-hex (str h (System/currentTimeMillis)))))
 
+(defn current-iso8601 []
+  "Get current time as ISO8601 string"
+  (let [now (java.time.Instant/now)
+        formatter (java.time.format.DateTimeFormatter/ISO_INSTANT)]
+    (.format formatter now)))
+
+(defn make-default-provenance []
+  "Generate default provenance with current timestamp"
+  {:created-at (current-iso8601)
+   :created-by :orchestrator
+   :round 0
+   :revision-of nil})
+
+;; For backwards compat, also provide a static version for cases where we want deterministic output
 (def default-provenance
   {:created-at "2025-01-01T00:00:00Z"
    :created-by :orchestrator
@@ -88,12 +104,23 @@
     (nil? (:id sym)) (assoc :id sym-id)
     (nil? (:introduced-at sym)) (assoc :introduced-at :unknown)))
 
+(def default-max-tokens 100000)
+
+(defn make-default-metadata []
+  "Generate default metadata with current timestamp"
+  {:created-at (current-iso8601)
+   :last-modified (current-iso8601)
+   :proof-mode :strict-mathematics
+   :iteration-counts {:verification {} :expansion {} :strategy 0}
+   :context-budget {:max-tokens default-max-tokens :current-estimate 0}})
+
+;; For backwards compat
 (def default-metadata
   {:created-at "2025-01-01T00:00:00Z"
    :last-modified "2025-01-01T00:00:00Z"
    :proof-mode :strict-mathematics
    :iteration-counts {:verification {} :expansion {} :strategy 0}
-   :context-budget {:max-tokens 100000 :current-estimate 0}})
+   :context-budget {:max-tokens default-max-tokens :current-estimate 0}})
 
 (defn fix-metadata [metadata]
   "Fix metadata: ensure all required fields are present"

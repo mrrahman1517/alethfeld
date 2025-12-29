@@ -31,7 +31,7 @@
            :depth depth
            :parent parent
            :display-order order
-           :provenance {:created-at "2024-01-01T00:00:00"
+           :provenance {:created-at "2024-01-01T00:00:00Z"
                         :created-by :prover
                         :round 1
                         :revision-of nil}}
@@ -59,8 +59,8 @@
    :lemmas lemmas
    :obligations []
    :archived-nodes archived-nodes
-   :metadata {:created-at "2024-01-01T00:00:00"
-              :last-modified "2024-01-01T00:00:00"
+   :metadata {:created-at "2024-01-01T00:00:00Z"
+              :last-modified "2024-01-01T00:00:00Z"
               :proof-mode :strict-mathematics
               :iteration-counts {:verification {}
                                  :expansion {}

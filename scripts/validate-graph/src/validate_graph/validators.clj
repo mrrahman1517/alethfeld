@@ -1,7 +1,17 @@
 (ns validate-graph.validators
   "Semantic validators for proof graphs beyond schema validation.
    Checks referential integrity, acyclicity, scope validity, and taint correctness."
-  (:require [clojure.set :as set]))
+  (:require [clojure.set :as set]
+            [clojure.string :as str]))
+
+;; =============================================================================
+;; Helper Functions
+;; =============================================================================
+
+(defn node-ids
+  "Get the set of all node IDs in the graph."
+  [graph]
+  (set (keys (:nodes graph))))
 
 ;; =============================================================================
 ;; Referential Integrity
@@ -10,10 +20,10 @@
 (defn check-dependency-refs
   "Check that all :dependencies reference existing nodes."
   [graph]
-  (let [node-ids (set (keys (:nodes graph)))
+  (let [ids (node-ids graph)
         errors (for [[node-id node] (:nodes graph)
                      dep-id (:dependencies node)
-                     :when (not (contains? node-ids dep-id))]
+                     :when (not (contains? ids dep-id))]
                  {:type :missing-dependency
                   :node-id node-id
                   :missing-ref dep-id
@@ -23,10 +33,10 @@
 (defn check-parent-refs
   "Check that all :parent references point to existing nodes."
   [graph]
-  (let [node-ids (set (keys (:nodes graph)))
+  (let [ids (node-ids graph)
         errors (for [[node-id node] (:nodes graph)
                      :let [parent (:parent node)]
-                     :when (and parent (not (contains? node-ids parent)))]
+                     :when (and parent (not (contains? ids parent)))]
                  {:type :missing-parent
                   :node-id node-id
                   :missing-ref parent
@@ -64,10 +74,10 @@
 (defn check-symbol-refs
   "Check that symbol :introduced-at references existing nodes."
   [graph]
-  (let [node-ids (set (keys (:nodes graph)))
+  (let [ids (node-ids graph)
         errors (for [[sym-id sym] (:symbols graph)
                      :let [intro-at (:introduced-at sym)]
-                     :when (not (contains? node-ids intro-at))]
+                     :when (not (contains? ids intro-at))]
                  {:type :missing-symbol-intro
                   :symbol-id sym-id
                   :missing-ref intro-at
@@ -78,8 +88,7 @@
   "Check that lemma :root-node references exist in archived-nodes."
   [graph]
   (let [archived-ids (set (keys (:archived-nodes graph)))
-        node-ids (set (keys (:nodes graph)))
-        all-ids (set/union archived-ids node-ids)
+        all-ids (set/union archived-ids (node-ids graph))
         errors (for [[lemma-id lemma] (:lemmas graph)
                      :let [root (:root-node lemma)]
                      :when (not (contains? all-ids root))]
@@ -104,63 +113,59 @@
 ;; Acyclicity
 ;; =============================================================================
 
+(defn- dfs-visit
+  "Perform DFS visit on a node, returning updated state.
+   State is {:color map, :parent map, :cycle nil-or-vec}.
+   Colors: :white (unvisited), :gray (in-progress), :black (done)."
+  [nodes node state]
+  (let [{:keys [color parent]} state
+        node-color (get color node :white)]
+    (case node-color
+      :black state  ; Already fully processed
+      :gray  state  ; Back edge detected elsewhere
+      :white
+      (let [state (assoc-in state [:color node] :gray)
+            deps (get-in nodes [node :dependencies] #{})
+            valid-deps (filter #(contains? nodes %) deps)]
+        ;; Check for back edges (cycle detection)
+        (if-let [gray-dep (first (filter #(= :gray (get (:color state) %)) valid-deps))]
+          ;; Found cycle - reconstruct path
+          (let [cycle-path (loop [path [gray-dep node]
+                                  curr (get parent node)]
+                             (if (or (nil? curr) (= curr gray-dep))
+                               (conj path gray-dep)
+                               (recur (conj path curr) (get parent curr))))]
+            (assoc state :cycle (vec (reverse (butlast cycle-path)))))
+          ;; No cycle yet - visit unvisited deps
+          (let [white-deps (filter #(= :white (get (:color state) % :white)) valid-deps)
+                state (reduce (fn [s d] (assoc-in s [:parent d] node)) state white-deps)
+                state (reduce (fn [s d]
+                                (if (:cycle s)
+                                  s  ; Stop if cycle found
+                                  (dfs-visit nodes d s)))
+                              state white-deps)]
+            (if (:cycle state)
+              state
+              (assoc-in state [:color node] :black))))))))
+
 (defn find-cycle
   "Find a cycle in the dependency graph using DFS with coloring.
    Returns nil if no cycle, or a vector of node IDs forming the cycle."
   [graph]
   (let [nodes (:nodes graph)]
     (when (seq nodes)
-      (let [;; WHITE = 0, GRAY = 1, BLACK = 2
-            color (atom (zipmap (keys nodes) (repeat 0)))
-            parent (atom {})
-            cycle-found (atom nil)]
-        (doseq [start (keys nodes)
-                :while (nil? @cycle-found)]
-          (when (zero? (get @color start 2))
-            ;; DFS from this node
-            (loop [stack [start]]
-              (when (and (seq stack) (nil? @cycle-found))
-                (let [node (peek stack)]
-                  (case (get @color node 2)
-                    ;; WHITE - not visited, start processing
-                    0 (do
-                        (swap! color assoc node 1)  ; Mark GRAY
-                        (let [deps (get-in nodes [node :dependencies] #{})
-                              valid-deps (filter #(contains? nodes %) deps)]
-                          (if (empty? valid-deps)
-                            ;; No deps, mark BLACK and pop
-                            (do
-                              (swap! color assoc node 2)
-                              (recur (pop stack)))
-                            ;; Check deps
-                            (let [gray-dep (first (filter #(= 1 (get @color % 2)) valid-deps))]
-                              (if gray-dep
-                                ;; Found back edge = cycle!
-                                (let [;; Reconstruct cycle from parent chain
-                                      cycle-path (loop [path [gray-dep]
-                                                        curr node]
-                                                   (if (= curr gray-dep)
-                                                     path
-                                                     (recur (conj path curr)
-                                                            (get @parent curr))))]
-                                  (reset! cycle-found (vec (reverse cycle-path))))
-                                ;; Push unvisited deps
-                                (let [white-deps (filter #(zero? (get @color % 2)) valid-deps)]
-                                  (doseq [d white-deps]
-                                    (swap! parent assoc d node))
-                                  (if (empty? white-deps)
-                                    (do
-                                      (swap! color assoc node 2)
-                                      (recur (pop stack)))
-                                    (recur (into stack white-deps)))))))))
-                    ;; GRAY - currently processing, should be handled above
-                    1 (do
-                        ;; All deps processed, mark BLACK
-                        (swap! color assoc node 2)
-                        (recur (pop stack)))
-                    ;; BLACK - already done
-                    2 (recur (pop stack))))))))
-        @cycle-found))))
+      (let [initial-state {:color (zipmap (keys nodes) (repeat :white))
+                           :parent {}
+                           :cycle nil}
+            final-state (reduce (fn [state node]
+                                  (if (:cycle state)
+                                    (reduced state)  ; Stop early if cycle found
+                                    (if (= :white (get (:color state) node))
+                                      (dfs-visit nodes node state)
+                                      state)))
+                                initial-state
+                                (keys nodes))]
+        (:cycle final-state)))))
 
 (defn check-acyclicity
   "Check that the dependency graph has no cycles."
@@ -168,7 +173,7 @@
   (if-let [cycle (find-cycle graph)]
     [{:type :dependency-cycle
       :cycle cycle
-      :message (str "Dependency cycle detected: " (clojure.string/join " -> " cycle))}]
+      :message (str "Dependency cycle detected: " (str/join " -> " cycle))}]
     []))
 
 ;; =============================================================================
@@ -236,7 +241,7 @@
                     :target target
                     :message (str "Node " node-id " discharges " target " which is not an ancestor")}
 
-                   (not (contains? (conj in-scope target) target))
+                   (not (contains? in-scope target))
                    {:type :discharge-out-of-scope
                     :node-id node-id
                     :target target

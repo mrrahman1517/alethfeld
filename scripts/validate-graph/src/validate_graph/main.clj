@@ -4,6 +4,7 @@
             [clojure.java.io :as io]
             [clojure.pprint :as pprint]
             [clojure.tools.cli :refer [parse-opts]]
+            [clojure.tools.logging :as log]
             [clojure.string :as str]
             [validate-graph.schema :as schema]
             [validate-graph.validators :as validators])
@@ -35,7 +36,7 @@
 (defn read-edn-file [path]
   (try
     (let [content (slurp path)]
-      (if (clojure.string/blank? content)
+      (if (str/blank? content)
         {:error (str "Empty file: " path)}
         (let [parsed (edn/read-string content)]
           (if (nil? parsed)
@@ -60,29 +61,54 @@
     (str (count errors) " semantic error(s) found")))
 
 (defn validate-file [path {:keys [verbose quiet schema-only]}]
-  (let [result (read-edn-file path)]
-    (if (:error result)
-      {:exit-code 2 :message (:error result)}
-      (let [graph (:ok result)
+  (log/debug "Starting validation of" path)
+  (let [file-result (read-edn-file path)]
+    (cond
+      ;; File read error
+      (:error file-result)
+      (do
+        (log/error "File read error:" (:error file-result))
+        {:exit-code 2 :message (:error file-result)})
+
+      ;; Schema validation
+      :else
+      (let [graph (:ok file-result)
+            _ (log/debug "File parsed successfully, running schema validation")
             schema-result (schema/validate-schema graph)]
-        (if-not (:valid schema-result)
-          {:exit-code 1
-           :message (if quiet
-                      "FAIL: Schema validation failed"
-                      (str "FAIL: Schema validation\n"
-                           (format-schema-errors (:errors schema-result) verbose)))}
-          (if schema-only
+        (cond
+          ;; Schema failed
+          (not (:valid schema-result))
+          (do
+            (log/info "Schema validation failed with" (count (flatten (vals (:errors schema-result)))) "errors")
+            {:exit-code 1
+             :message (if quiet
+                        "FAIL: Schema validation failed"
+                        (str "FAIL: Schema validation\n"
+                             (format-schema-errors (:errors schema-result) verbose)))})
+
+          ;; Schema-only mode - success
+          schema-only
+          (do
+            (log/debug "Schema validation passed (schema-only mode)")
             {:exit-code 0
-             :message (when-not quiet "OK: Schema validation passed")}
-            (let [semantic-result (validators/validate-semantics graph)]
-              (if-not (:valid semantic-result)
+             :message (when-not quiet "OK: Schema validation passed")})
+
+          ;; Full validation - run semantic checks
+          :else
+          (let [_ (log/debug "Schema validation passed, running semantic validation")
+                semantic-result (validators/validate-semantics graph)]
+            (if (:valid semantic-result)
+              (do
+                (log/debug "All validations passed")
+                {:exit-code 0
+                 :message (when-not quiet "OK: All validations passed")})
+              (do
+                (log/info "Semantic validation failed with" (count (:errors semantic-result)) "errors")
                 {:exit-code 1
                  :message (if quiet
                             "FAIL: Semantic validation failed"
                             (str "FAIL: Semantic validation\n"
-                                 (format-semantic-errors (:errors semantic-result) verbose)))}
-                {:exit-code 0
-                 :message (when-not quiet "OK: All validations passed")}))))))))
+                                 (format-semantic-errors (:errors semantic-result) verbose)))}))))))))
 
 (defn -main [& args]
   (let [{:keys [options arguments errors summary]} (parse-opts args cli-options)]
