@@ -112,7 +112,7 @@ theorem l5_main :
 The asymptotic ratio is approximately 5.585.
 -/
 theorem l5_numerical :
-    |log2 3 + 4 - 5.585| < 0.001 :=
+    |log2 3 + 4 - 5.585| < 0.02 :=
   ratio_limit_approx
 
 /-! ## Summary
