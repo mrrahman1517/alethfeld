@@ -219,28 +219,37 @@ the following hold:
    for all rank-1 product state QBFs, we require C ≥ 5.585
 -/
 structure QBFRank1MasterResult where
-  -- Part 1: Influence independence (for any n)
+  -- Part 1: Influence independence (L2)
   influence_constant : ∀ {n : ℕ} (bloch : Fin n → BlochVector),
     totalInfluence bloch = n * (2 : ℝ)^(1 - (n : ℤ))
   influence_universal : ∀ {n : ℕ} (bloch₁ bloch₂ : Fin n → BlochVector),
     totalInfluence bloch₁ = totalInfluence bloch₂
-  -- Part 2: Bloch entropy bound
+  -- Part 2: General entropy formula (L3)
+  entropy_formula : ∀ {n : ℕ} (bloch : Fin n → BlochVector)
+    (hq_all : ∀ j : Fin n, ∀ ℓ : Fin 4, ℓ ≠ 0 → (bloch j).q ℓ > 0)
+    (hp : ∀ α : MultiIndex n, (∃ k, α k ≠ 0) → fourierWeight bloch α > 0),
+    totalEntropy bloch =
+    L3Entropy.entropyTerm (p_zero n) + (2*(n : ℤ) - 2) * (1 - p_zero n) +
+    (2 : ℝ)^(1 - (n : ℤ)) * totalBlochEntropy bloch
+  -- Part 3: Bloch entropy bound (L4)
   blochEntropy_bound : ∀ (v : BlochVector),
     blochEntropy v ≤ ShannonMax.log2 3
-  -- Part 3: Magic state optimality
+  -- Part 4: Magic state optimality (L4)
   magic_optimal : ∀ (v : BlochVector) (hq : ∀ ℓ : Fin 4, ℓ ≠ 0 → v.q ℓ > 0),
     blochEntropy v = ShannonMax.log2 3 ↔ isMagicState v
-  -- Part 4: Asymptotic ratio
+  -- Part 5: Asymptotic ratio (L5)
   asymptotic_ratio : Tendsto entropy_influence_ratio atTop (nhds (ShannonMax.log2 3 + 4))
 
 /--
 **Proof of Master Theorem**
 
 Combines all component lemmas L1-L5 into a single comprehensive result.
+The proof chain is: L2 (influence) → L3 (entropy) → L4 (maximum) → L5 (asymptotic)
 -/
 def qbfRank1Master : QBFRank1MasterResult where
   influence_constant := fun {n} bloch => total_influence_formula bloch
   influence_universal := fun {n} bloch₁ bloch₂ => influence_independent_of_bloch bloch₁ bloch₂
+  entropy_formula := fun {n} bloch hq_all hp => L3Entropy.entropy_formula bloch hq_all hp
   blochEntropy_bound := blochEntropy_le_log2_three
   magic_optimal := fun v hq => (l4_maximum_entropy v hq).2
   asymptotic_ratio := l5_asymptotic_ratio
