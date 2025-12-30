@@ -263,6 +263,100 @@
    [:metadata Metadata]])
 
 ;; =============================================================================
+;; Verification Log Schemas
+;; =============================================================================
+
+(def RigorLevel
+  "Rigor level for verification"
+  [:enum :strictest :strict :moderate :lenient])
+
+(def QuantifierStatus
+  "Status of quantifier handling in a step"
+  [:enum :explicit :implicit-universal :universal-implicit :universal :implicit :na])
+
+(def GapStatus
+  "Whether gaps were identified"
+  [:enum :none :minor :significant])
+
+(def TypeStatus
+  "Type consistency check result"
+  [:enum :consistent :inconsistent :na])
+
+(def RigorCheck
+  "Result of rigor check for a verification step"
+  [:map
+   [:quantifiers QuantifierStatus]
+   [:types TypeStatus]
+   [:gaps GapStatus]])
+
+(def VerificationVerdict
+  "Verdict for a single node verification"
+  [:enum :accept :reject :challenge :admit])
+
+(def VerificationResult
+  "Result of verifying a single node"
+  [:map
+   [:node-id NodeId]
+   [:verdict VerificationVerdict]
+   [:reason :string]
+   [:rigor-check {:optional true} RigorCheck]])
+
+(def VerificationSession
+  "Metadata about the verification session"
+  [:map
+   [:graph-id :string]
+   [:verifier-mode {:optional true} ProofMode]
+   [:rigor-level {:optional true} RigorLevel]
+   [:timestamp {:optional true} :string]])
+
+(def ExternalReferenceLog
+  "External reference as logged in verification"
+  [:map
+   [:id :keyword]
+   [:doi {:optional true} :string]
+   [:arxiv {:optional true} :string]
+   [:verification-status ExternalVerificationStatus]
+   [:found-statement {:optional true} :string]
+   [:bibdata {:optional true} [:map
+                               [:authors [:vector :string]]
+                               [:title :string]
+                               [:journal {:optional true} :string]
+                               [:year :int]
+                               [:volume {:optional true} :int]
+                               [:pages {:optional true} :string]]]
+   [:notes {:optional true} :string]])
+
+(def VerificationSummary
+  "Summary of verification results"
+  [:map
+   [:total-nodes :int]
+   [:verified :int]
+   [:rejected :int]
+   [:admitted :int]
+   [:taint-status TaintStatus]
+   [:verification-rounds {:optional true} :int]
+   [:challenges-issued {:optional true} :int]
+   [:revisions-required {:optional true} :int]])
+
+(def FinalVerdict
+  "Final verdict of verification"
+  [:map
+   [:status [:enum :proven :rejected :admitted :incomplete]]
+   [:taint TaintStatus]
+   [:confidence {:optional true} [:enum :high :medium :low]]
+   [:notes {:optional true} :string]])
+
+(def VerificationLog
+  "Complete verification log for a proof"
+  [:map
+   [:verification-session VerificationSession]
+   [:verification-results [:vector VerificationResult]]
+   [:summary VerificationSummary]
+   [:external-references {:optional true} [:vector ExternalReferenceLog]]
+   [:obligations {:optional true} [:vector :any]]
+   [:final-verdict FinalVerdict]])
+
+;; =============================================================================
 ;; Validation Functions
 ;; =============================================================================
 
@@ -289,6 +383,14 @@
     {:valid true}
     {:valid false
      :errors (me/humanize (m/explain NodePartial node))}))
+
+(defn validate-verification-log
+  "Validate a verification log against the VerificationLog schema."
+  [log]
+  (if (m/validate VerificationLog log)
+    {:valid true}
+    {:valid false
+     :errors (me/humanize (m/explain VerificationLog log))}))
 
 (defn explain-schema
   "Get detailed explanation of schema violations."

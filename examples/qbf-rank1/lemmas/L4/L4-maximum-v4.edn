@@ -1,0 +1,181 @@
+{:theorem
+ {:id :theorem,
+  :statement
+  "The ratio $S/I$ is maximized when all qubits are in the magic state $(x_k^2, y_k^2, z_k^2) = (\\frac{1}{3}, \\frac{1}{3}, \\frac{1}{3})$.",
+  :content-hash "1c1b12fbc79a7ea1"},
+ :obligations [],
+ :archived-nodes {},
+ :external-refs
+ {"L2"
+  {:id "L2",
+   :claimed-statement
+   "Influence independence: $I(U) = n \\cdot 2^{1-n}$",
+   :verification-status :verified,
+   :verified-statement
+   "Influence independence: $I(U) = n \\cdot 2^{1-n}$"},
+  "L3"
+  {:id "L3",
+   :claimed-statement
+   "Entropy formula: $S = -p_0 \\log_2 p_0 + (2n-2)(1-p_0) + 2^{1-n} \\sum_k f_k$",
+   :verification-status :verified,
+   :verified-statement
+   "Entropy formula: $S = -p_0 \\log_2 p_0 + (2n-2)(1-p_0) + 2^{1-n} \\sum_k f_k$"},
+  "ext-shannon"
+  {:id "ext-shannon",
+   :claimed-statement
+   "Shannon entropy maximum: $H(p_1,...,p_k) \\leq \\log_2 k$ with equality iff uniform",
+   :verification-status :verified,
+   :verified-statement
+   "Shannon entropy maximum: $H(p_1,...,p_k) \\leq \\log_2 k$ with equality iff uniform"}},
+ :nodes
+ {:L4-root
+  {:statement
+   "$S/I$ is maximized when all qubits are in the magic state.",
+   :taint :clean,
+   :parent nil,
+   :content-hash "74e2e2bbd1b2c5d4",
+   :display-order 0,
+   :type :claim,
+   :scope #{},
+   :justification :conjunction-intro,
+   :status :verified,
+   :id :L4-root,
+   :provenance
+   {:created-at "2025-12-30T12:46:43.400048047Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 1,
+   :dependencies #{:L3 :L2}},
+  :L4-step1
+  {:statement
+   "Since $I = n \\cdot 2^{1-n}$ is constant, maximizing $S/I$ is equivalent to maximizing $S$.",
+   :taint :clean,
+   :parent :L4-root,
+   :content-hash "5802ff5d18d0dea6",
+   :display-order 1,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :verified,
+   :id :L4-step1,
+   :provenance
+   {:created-at "2025-12-30T12:46:43.401431222Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L2}},
+  :L4-step2
+  {:statement
+   "In the entropy formula, only $2^{1-n} \\sum_k f_k$ depends on Bloch vectors.",
+   :taint :clean,
+   :parent :L4-root,
+   :content-hash "6a25c4516cb0e575",
+   :display-order 2,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :verified,
+   :id :L4-step2,
+   :provenance
+   {:created-at "2025-12-30T12:46:43.403479140Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L3}},
+  :L4-step3
+  {:statement
+   "Each $f_k = H(x_k^2, y_k^2, z_k^2)$ is Shannon entropy of a distribution on 3 outcomes.",
+   :taint :clean,
+   :parent :L4-root,
+   :content-hash "4cd1a981d532db90",
+   :display-order 3,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :L4-step3,
+   :provenance
+   {:created-at "2025-12-30T12:46:43.403997831Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:D3}},
+  :L4-step4
+  {:statement
+   "By maximum entropy principle: $f_k \\leq \\log_2 3$ with equality iff $(x_k^2, y_k^2, z_k^2) = (\\frac{1}{3}, \\frac{1}{3}, \\frac{1}{3})$.",
+   :taint :clean,
+   :parent :L4-root,
+   :content-hash "ef1db13e43b3c107",
+   :display-order 4,
+   :type :claim,
+   :scope #{},
+   :justification :external-application,
+   :status :verified,
+   :id :L4-step4,
+   :provenance
+   {:created-at "2025-12-30T12:46:43.405388264Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L4-step3 :ext-shannon}},
+  :L4-qed
+  {:statement
+   "$S$ is maximized when all $f_k = \\log_2 3$, achieved at the magic state.",
+   :taint :clean,
+   :parent :L4-root,
+   :content-hash "9469c7af9e848f8a",
+   :display-order 5,
+   :type :qed,
+   :scope #{},
+   :justification :qed,
+   :status :verified,
+   :id :L4-qed,
+   :provenance
+   {:created-at "2025-12-30T12:46:43.407164360Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:L4-step4 :L4-step1 :L4-step2}},
+  :D3
+  {:statement "Bloch entropy $f_k = H(x_k^2, y_k^2, z_k^2)$",
+   :taint :clean,
+   :parent nil,
+   :content-hash "3cd62b6575a2fad1",
+   :display-order 6,
+   :type :definition,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :verified,
+   :id :D3,
+   :provenance
+   {:created-at "2025-12-30T12:46:43.408573087Z",
+    :created-by :orchestrator,
+    :round 0,
+    :revision-of nil},
+   :depth 0,
+   :dependencies #{}}},
+ :graph-id "lemma-L4-maximum-45be0b",
+ :version 1,
+ :lemmas {},
+ :metadata
+ {:created-at "2025-12-30T12:46:43.408756920Z",
+  :last-modified "2025-12-30T12:46:43.408777799Z",
+  :proof-mode :strict-mathematics,
+  :iteration-counts {:verification {}, :expansion {}, :strategy 0},
+  :context-budget {:max-tokens 100000, :current-estimate 0}},
+ :symbols
+ {:sym-magic
+  {:id :sym-magic,
+   :name "magic state",
+   :type "Bloch vector",
+   :tex
+   "(\\frac{1}{\\sqrt{3}}, \\frac{1}{\\sqrt{3}}, \\frac{1}{\\sqrt{3}})",
+   :constraints "",
+   :scope :global,
+   :introduced-at :theorem}}}

@@ -274,6 +274,121 @@
      :metadata metadata}))
 
 ;; =============================================================================
+;; Lemma Format Conversion
+;; =============================================================================
+
+(defn- convert-lemma-node
+  "Convert a node from lemma format to v4 format."
+  [node order]
+  (let [id (:id node)
+        statement (:statement node)]
+    (merge node
+           {:scope (or (:scope node) #{})
+            :display-order order
+            :content-hash (or (:content-hash node)
+                              (config/compute-content-hash statement))
+            :provenance (or (:provenance node) (make-provenance))})))
+
+(defn- convert-external-dependency
+  "Convert external dependency to v4 external-ref format."
+  [[id dep] order]
+  (let [statement (:statement dep)
+        id-str (name id)]
+    ;; Return [string-key ref-map] for map-of :string ExternalRef
+    [id-str {:id id-str
+             :claimed-statement statement
+             :verification-status :verified
+             :verified-statement statement}]))
+
+(defn convert-lemma-to-v4
+  "Convert a lemma format file to v4 semantic graph.
+
+   Input: Lemma format with :lemma-id, :name, :statement, :nodes, :external-dependencies
+   Output: v4 SemanticGraph format"
+  [lemma & {:keys [graph-id] :or {graph-id nil}}]
+  (let [;; Convert lemma statement to theorem (always compute fresh hash)
+        theorem-statement (:statement lemma)
+        theorem {:id :theorem
+                 :statement theorem-statement
+                 :content-hash (config/compute-content-hash theorem-statement)}
+
+        ;; Convert nodes with added v4 fields
+        old-nodes (:nodes lemma)
+        nodes-map (->> old-nodes
+                       (map-indexed (fn [i [id node]] [id (convert-lemma-node node i)]))
+                       (into {}))
+
+        ;; Convert external dependencies to external-refs (definitions become nodes)
+        ext-deps (:external-dependencies lemma)
+        external-refs (->> ext-deps
+                           (filter (fn [[_ dep]] (not= :definition (:type dep))))
+                           (map-indexed (fn [i [id dep]] (convert-external-dependency [id dep] i)))
+                           (into {}))
+
+        ;; Convert definitions from external-dependencies to nodes
+        def-nodes (->> ext-deps
+                       (filter (fn [[_ dep]] (= :definition (:type dep))))
+                       (map-indexed (fn [i [id dep]]
+                                      [id {:id id
+                                           :type :definition
+                                           :statement (:statement dep)
+                                           :content-hash (config/compute-content-hash (:statement dep))
+                                           :dependencies #{}
+                                           :scope #{}
+                                           :justification :definition-expansion
+                                           :status :verified
+                                           :taint :clean
+                                           :depth 0
+                                           :parent nil
+                                           :display-order (+ (count old-nodes) i)
+                                           :provenance (make-provenance)}]))
+                       (into {}))
+
+        ;; Merge definition nodes into nodes-map
+        all-nodes (merge nodes-map def-nodes)
+
+        ;; Convert symbols
+        old-symbols (:symbols lemma)
+        symbols-map (if (map? old-symbols)
+                      (->> old-symbols
+                           (map (fn [[id sym]]
+                                  [id {:id id
+                                       :name (or (:name sym) (name id))
+                                       :type (or (:type sym) "unknown")
+                                       :tex (or (:tex sym) (name id))
+                                       :constraints ""
+                                       :scope :global
+                                       :introduced-at :theorem}]))
+                           (into {}))
+                      {})
+
+        ;; Build metadata
+        metadata {:created-at (config/current-iso8601)
+                  :last-modified (config/current-iso8601)
+                  :proof-mode :strict-mathematics
+                  :iteration-counts {:verification {}
+                                     :expansion {}
+                                     :strategy 0}
+                  :context-budget {:max-tokens 100000
+                                   :current-estimate 0}}]
+
+    {:graph-id (or graph-id (str "lemma-" (:lemma-id lemma) "-" (config/generate-uuid-prefix)))
+     :version (or (:version lemma) 1)
+     :theorem theorem
+     :nodes all-nodes
+     :symbols symbols-map
+     :external-refs external-refs
+     :lemmas {}
+     :obligations []
+     :archived-nodes {}
+     :metadata metadata}))
+
+(defn- is-lemma-format?
+  "Check if the EDN file is in lemma format."
+  [data]
+  (and (:lemma-id data) (:nodes data)))
+
+;; =============================================================================
 ;; CLI Support
 ;; =============================================================================
 
@@ -285,9 +400,16 @@
     (let [content (slurp input-path)
           old-graph (clojure.edn/read-string content)
           ;; Detect if already v4 format
-          is-v4? (and (:graph-id old-graph) (:nodes old-graph))]
-      (if is-v4?
+          is-v4? (and (:graph-id old-graph) (:nodes old-graph) (:theorem old-graph))
+          is-lemma? (is-lemma-format? old-graph)]
+      (cond
+        is-v4?
         {:ok old-graph :already-v4 true}
+
+        is-lemma?
+        {:ok (convert-lemma-to-v4 old-graph)}
+
+        :else
         {:ok (convert-legacy-to-v4 old-graph)}))
     (catch Exception e
       {:error (str "Failed to convert: " (.getMessage e))})))
