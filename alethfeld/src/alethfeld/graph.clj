@@ -149,6 +149,40 @@
                         set)]
     (set/difference assumes discharged)))
 
+(defn compute-all-scopes
+  "Compute valid scopes for all nodes in a single topological pass.
+   Returns a map of {node-id -> scope-set}.
+   More efficient than calling compute-valid-scope for each node individually."
+  [graph]
+  (let [nodes (:nodes graph)
+        sorted (topological-sort graph)
+        ;; Build ancestors map incrementally in topo order
+        ;; Each node's ancestors = deps + all their ancestors
+        ancestors-map (reduce
+                       (fn [acc nid]
+                         (let [deps (get-in nodes [nid :dependencies] #{})
+                               ancs (reduce (fn [a d]
+                                              (set/union a (get acc d #{}) #{d}))
+                                            #{}
+                                            deps)]
+                           (assoc acc nid ancs)))
+                       {}
+                       sorted)]
+    ;; Compute scope for each node using precomputed ancestors
+    (reduce (fn [acc nid]
+              (let [ancestors (get ancestors-map nid #{})
+                    assumes (->> ancestors
+                                 (filter #(= :local-assume (get-in nodes [% :type])))
+                                 set)
+                    discharged (->> ancestors
+                                    (filter #(= :local-discharge (get-in nodes [% :type])))
+                                    (map #(get-in nodes [% :discharges]))
+                                    (remove nil?)
+                                    set)]
+                (assoc acc nid (set/difference assumes discharged))))
+            {}
+            sorted)))
+
 (defn active-assumptions
   "Get all active assumptions (global and local) in scope for a node."
   [graph node-id]

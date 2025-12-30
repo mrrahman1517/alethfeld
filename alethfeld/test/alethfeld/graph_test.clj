@@ -153,7 +153,7 @@
   (testing "Reverse dependencies work correctly"
     ;; Verify get-descendants still works with cache optimization
     (let [desc1 (g/get-descendants f/linear-chain-graph :1-aaa111)]
-      ;; Second call uses cached version  
+      ;; Second call uses cached version
       (let [desc2 (g/get-descendants f/linear-chain-graph :1-aaa111)]
         (is (= desc1 desc2)))))
 
@@ -166,3 +166,30 @@
           desc-after (g/get-descendants graph2 :1-aaa111)]
       ;; Should still give same result even after cache invalidation
       (is (= desc-before desc-after)))))
+
+(deftest compute-all-scopes-test
+  (testing "Batch scope computation matches individual calls"
+    ;; For each test fixture, verify compute-all-scopes matches compute-valid-scope
+    (doseq [graph [f/minimal-valid-graph f/linear-chain-graph f/diamond-graph f/scoped-graph]]
+      (let [all-scopes (g/compute-all-scopes graph)
+            individual-scopes (into {} (for [nid (g/node-ids graph)]
+                                         [nid (g/compute-valid-scope graph nid)]))]
+        (is (= all-scopes individual-scopes)
+            (str "Scopes should match for graph with nodes: " (g/node-ids graph))))))
+
+  (testing "Batch scope for scoped graph"
+    (let [all-scopes (g/compute-all-scopes f/scoped-graph)]
+      ;; :1-ccc333 should have :1-bbb222 in scope (local-assume before discharge)
+      (is (contains? (get all-scopes :1-ccc333) :1-bbb222))
+      ;; After discharge, :1-bbb222 should be out of scope
+      ;; Add a node after the discharge and verify scope is empty
+      (let [after-discharge (assoc-in f/scoped-graph [:nodes :1-eee555]
+                                      (f/make-node :1-eee555 :deps #{:1-ddd444} :order 4))
+            all-scopes-after (g/compute-all-scopes after-discharge)]
+        (is (empty? (get all-scopes-after :1-eee555))))))
+
+  (testing "Batch scope returns empty set for nodes without scope"
+    (let [all-scopes (g/compute-all-scopes f/linear-chain-graph)]
+      ;; Linear chain has no local-assume nodes, so all scopes should be empty
+      (doseq [nid (g/node-ids f/linear-chain-graph)]
+        (is (empty? (get all-scopes nid)))))))

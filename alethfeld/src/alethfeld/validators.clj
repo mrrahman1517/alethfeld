@@ -181,28 +181,14 @@
 ;; Scope Validation
 ;; =============================================================================
 
-(defn compute-valid-scope
-  "Compute which local-assume nodes are validly in scope for a node."
-  [graph node-id]
-  (let [nodes (:nodes graph)
-        ancestors (g/get-ancestors graph node-id)
-        ;; Find local-assume nodes among ancestors
-        assumes (->> ancestors
-                     (filter #(= :local-assume (get-in nodes [% :type])))
-                     set)
-        ;; Find discharged assumptions among ancestors
-        discharged (->> ancestors
-                        (filter #(= :local-discharge (get-in nodes [% :type])))
-                        (map #(get-in nodes [% :discharges]))
-                        set)]
-    (set/difference assumes discharged)))
-
 (defn check-scope-validity
-  "Check that all nodes have valid :scope entries."
+  "Check that all nodes have valid :scope entries.
+   Uses batch scope computation for O(n) instead of O(n²) performance."
   [graph]
-  (let [errors (for [[node-id node] (:nodes graph)
+  (let [all-scopes (g/compute-all-scopes graph)
+        errors (for [[node-id node] (:nodes graph)
                      :let [actual-scope (:scope node)
-                           valid-scope (compute-valid-scope graph node-id)
+                           valid-scope (get all-scopes node-id #{})
                            invalid-entries (set/difference actual-scope valid-scope)]
                      :when (seq invalid-entries)]
                  {:type :invalid-scope
@@ -215,11 +201,12 @@
   "Check that :local-discharge nodes discharge valid in-scope ancestors."
   [graph]
   (let [nodes (:nodes graph)
+        all-scopes (g/compute-all-scopes graph)
         errors (for [[node-id node] nodes
                      :when (= :local-discharge (:type node))
                      :let [target (:discharges node)
                            ancestors (g/get-ancestors graph node-id)
-                           in-scope (compute-valid-scope graph node-id)]]
+                           in-scope (get all-scopes node-id #{})]]
                  (cond
                    (not (contains? ancestors target))
                    {:type :discharge-not-ancestor

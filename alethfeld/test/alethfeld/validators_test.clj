@@ -1,6 +1,7 @@
 (ns alethfeld.validators-test
   (:require [clojure.test :refer [deftest testing is]]
             [alethfeld.validators :as v]
+            [alethfeld.graph :as g]
             [alethfeld.fixtures :as f]))
 
 (deftest referential-integrity-test
@@ -34,8 +35,8 @@
   (testing "Valid scoped graph passes"
     (is (empty? (v/check-scopes f/scoped-graph))))
 
-  (testing "Valid scope computation"
-    (let [scope (v/compute-valid-scope f/scoped-graph :1-ccc333)]
+  (testing "Valid scope computation via graph module"
+    (let [scope (g/compute-valid-scope f/scoped-graph :1-ccc333)]
       (is (contains? scope :1-bbb222)))))
 
 (deftest taint-validation-test
