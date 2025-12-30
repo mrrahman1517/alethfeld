@@ -178,6 +178,7 @@ pom.xml.asc
 /lib/
 /classes/
 /target/
+alethfeld/target/
 /checkouts/
 .lein-deps-sum
 .lein-repl-history

@@ -69,4 +69,28 @@
     (let [data {:a 1 :b [2 3]}
           formatted (io/format-edn data)]
       (is (string? formatted))
-      (is (= data (read-string formatted))))))
+      (is (= data (read-string formatted)))))
+
+  (testing "Compact format produces readable EDN"
+    (let [data {:a 1 :b [2 3]}
+          formatted (io/format-edn-compact data)]
+      (is (string? formatted))
+      (is (= data (read-string formatted)))))
+
+  (testing "Pretty format produces readable EDN"
+    (let [data {:a 1 :b [2 3]}
+          formatted (io/format-edn-pretty data)]
+      (is (string? formatted))
+      (is (= data (read-string formatted)))))
+
+  (testing "Compact format is smaller than pretty format"
+    (let [data {:foo "bar" :nested {:a 1 :b 2 :c [1 2 3 4 5]}}
+          compact (io/format-edn-compact data)
+          pretty (io/format-edn-pretty data)]
+      (is (< (count compact) (count pretty)))))
+
+  (testing "Both formats parse identically"
+    (let [data f/minimal-valid-graph
+          compact (io/format-edn-compact data)
+          pretty (io/format-edn-pretty data)]
+      (is (= (read-string compact) (read-string pretty))))))

@@ -43,10 +43,23 @@
 ;; Writing
 ;; =============================================================================
 
-(defn format-edn
-  "Pretty-print data as EDN string."
+(defn format-edn-compact
+  "Format data as compact EDN string (no pretty-printing).
+   Faster than pretty-print, suitable for machine consumption."
+  [data]
+  (with-out-str (pr data)))
+
+(defn format-edn-pretty
+  "Pretty-print data as EDN string.
+   Human-readable but slower for large structures."
   [data]
   (with-out-str (pprint/pprint data)))
+
+(defn format-edn
+  "Pretty-print data as EDN string.
+   Alias for format-edn-pretty for backwards compatibility."
+  [data]
+  (format-edn-pretty data))
 
 (defn write-edn-atomic
   "Write data to file atomically (write temp, then rename).
