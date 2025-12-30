@@ -1,0 +1,128 @@
+(ns alethfeld.graph-test
+  (:require [clojure.test :refer [deftest testing is]]
+            [alethfeld.graph :as g]
+            [alethfeld.fixtures :as f]))
+
+(deftest node-queries-test
+  (testing "node-ids returns all IDs"
+    (is (= #{:1-abc123} (g/node-ids f/minimal-valid-graph)))
+    (is (= #{:1-aaa111 :1-bbb222 :1-ccc333} (g/node-ids f/linear-chain-graph))))
+
+  (testing "get-node returns node or nil"
+    (is (= :assumption (:type (g/get-node f/minimal-valid-graph :1-abc123))))
+    (is (nil? (g/get-node f/minimal-valid-graph :nonexistent))))
+
+  (testing "nodes-of-type filters correctly"
+    (let [claims (g/nodes-of-type f/linear-chain-graph :claim)]
+      (is (= 2 (count claims)))
+      (is (every? #(= :claim (:type %)) (vals claims))))))
+
+(deftest ancestor-descendant-test
+  (testing "get-ancestors in linear chain"
+    (is (empty? (g/get-ancestors f/linear-chain-graph :1-aaa111)))
+    (is (= #{:1-aaa111} (g/get-ancestors f/linear-chain-graph :1-bbb222)))
+    (is (= #{:1-aaa111 :1-bbb222} (g/get-ancestors f/linear-chain-graph :1-ccc333))))
+
+  (testing "get-ancestors in diamond"
+    (is (= #{:1-aaa111 :1-bbb222 :1-ccc333}
+           (g/get-ancestors f/diamond-graph :1-ddd444))))
+
+  (testing "get-descendants in linear chain"
+    (is (= #{:1-bbb222 :1-ccc333} (g/get-descendants f/linear-chain-graph :1-aaa111)))
+    (is (= #{:1-ccc333} (g/get-descendants f/linear-chain-graph :1-bbb222)))
+    (is (empty? (g/get-descendants f/linear-chain-graph :1-ccc333))))
+
+  (testing "get-direct-dependents"
+    (is (= #{:1-bbb222} (g/get-direct-dependents f/linear-chain-graph :1-aaa111)))
+    (is (= #{:1-bbb222 :1-ccc333} (g/get-direct-dependents f/diamond-graph :1-aaa111)))))
+
+(deftest topological-sort-test
+  (testing "Linear chain sorted correctly"
+    (let [sorted (g/topological-sort f/linear-chain-graph)]
+      (is (= [:1-aaa111 :1-bbb222 :1-ccc333] sorted))))
+
+  (testing "Diamond sorted correctly (deps before dependents)"
+    (let [sorted (g/topological-sort f/diamond-graph)]
+      (is (< (.indexOf sorted :1-aaa111)
+             (.indexOf sorted :1-bbb222)))
+      (is (< (.indexOf sorted :1-aaa111)
+             (.indexOf sorted :1-ccc333)))
+      (is (< (.indexOf sorted :1-bbb222)
+             (.indexOf sorted :1-ddd444)))
+      (is (< (.indexOf sorted :1-ccc333)
+             (.indexOf sorted :1-ddd444))))))
+
+(deftest scope-queries-test
+  (testing "compute-valid-scope for node in scope"
+    (let [scope (g/compute-valid-scope f/scoped-graph :1-ccc333)]
+      (is (contains? scope :1-bbb222))))
+
+  (testing "compute-valid-scope after discharge"
+    (let [graph f/scoped-graph
+          ;; Add a node after discharge
+          after-discharge (assoc-in graph [:nodes :1-eee555]
+                                    (f/make-node :1-eee555 :deps #{:1-ddd444} :order 4))]
+      (let [scope (g/compute-valid-scope after-discharge :1-eee555)]
+        (is (empty? scope)))))
+
+  (testing "active-assumptions includes globals"
+    (let [assumptions (g/active-assumptions f/linear-chain-graph :1-ccc333)]
+      (is (contains? assumptions :1-aaa111)))))
+
+(deftest taint-queries-test
+  (testing "compute-taint for clean node"
+    (is (= :clean (g/compute-taint f/minimal-valid-graph :1-abc123))))
+
+  (testing "compute-taint for admitted node"
+    (let [graph (assoc-in f/minimal-valid-graph [:nodes :1-abc123 :status] :admitted)]
+      (is (= :self-admitted (g/compute-taint graph :1-abc123)))))
+
+  (testing "compute-taint propagation"
+    (let [graph (-> f/linear-chain-graph
+                    (assoc-in [:nodes :1-aaa111 :status] :admitted)
+                    (assoc-in [:nodes :1-aaa111 :taint] :self-admitted))]
+      (is (= :tainted (g/compute-taint graph :1-bbb222)))))
+
+  (testing "tainted-nodes returns only tainted"
+    (let [tainted (g/tainted-nodes f/incorrect-taint-chain-graph)]
+      (is (contains? tainted :1-aaa111))
+      (is (not (contains? tainted :1-bbb222)))))) ; Bug in fixture, but tests the function
+
+(deftest independence-check-test
+  (testing "Valid single node extraction"
+    (let [result (g/check-independence f/minimal-valid-graph :1-abc123 #{:1-abc123})]
+      (is (:valid result))))
+
+  (testing "Root not in set"
+    (let [result (g/check-independence f/linear-chain-graph :1-aaa111 #{:1-bbb222})]
+      (is (not (:valid result)))
+      (is (some #(= :root-not-in-set (:type %)) (:errors result)))))
+
+  (testing "Non-verified node rejection"
+    (let [graph (assoc-in f/minimal-valid-graph [:nodes :1-abc123 :status] :proposed)
+          result (g/check-independence graph :1-abc123 #{:1-abc123})]
+      (is (not (:valid result)))
+      (is (some #(= :node-not-verified (:type %)) (:errors result))))))
+
+(deftest token-estimation-test
+  (testing "estimate-node-tokens returns positive"
+    (let [node (f/make-node :test :statement "Test statement")]
+      (is (pos? (g/estimate-node-tokens node)))))
+
+  (testing "estimate-graph-tokens returns positive"
+    (is (pos? (g/estimate-graph-tokens f/minimal-valid-graph)))
+    (is (pos? (g/estimate-graph-tokens f/linear-chain-graph)))))
+
+(deftest cycle-detection-test
+  (testing "would-create-cycle? detects back-edge"
+    ;; Adding a new node that depends on :1-ccc333 but is depended on by :1-aaa111 would create cycle
+    ;; First add node that :1-aaa111 depends on
+    (let [graph (assoc-in f/linear-chain-graph [:nodes :1-aaa111 :dependencies] #{:1-new})]
+      (is (g/would-create-cycle? graph :1-new #{:1-ccc333}))))
+
+  (testing "would-create-cycle? detects indirect cycle"
+    ;; Adding :1-aaa111 -> :1-ccc333 would create cycle since :1-ccc333 depends on :1-aaa111
+    (is (g/would-create-cycle? f/linear-chain-graph :1-aaa111 #{:1-ccc333})))
+
+  (testing "would-create-cycle? allows valid addition"
+    (is (not (g/would-create-cycle? f/linear-chain-graph :1-new #{:1-ccc333})))))
