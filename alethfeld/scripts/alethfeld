@@ -1,0 +1,19 @@
+#!/bin/bash
+# Alethfeld CLI wrapper - runs compiled uberjar with 67% faster startup
+#
+# Usage: alethfeld <command> [options] [args]
+# Example: alethfeld validate proof.edn
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+JAR_PATH="$SCRIPT_DIR/../target/alethfeld.jar"
+
+if [ ! -f "$JAR_PATH" ]; then
+  echo "Error: alethfeld.jar not found at $JAR_PATH"
+  echo ""
+  echo "Build it with:"
+  echo "  cd $(dirname "$SCRIPT_DIR")"
+  echo "  clojure -T:build uber"
+  exit 1
+fi
+
+exec java -jar "$JAR_PATH" "$@"

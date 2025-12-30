@@ -4,13 +4,30 @@ A Clojure CLI tool for semantic proof graph operations.
 
 ## Quick Start
 
-```bash
-# Run with Clojure
-clojure -M:run <command> [options]
+### Using Compiled Uberjar (Recommended - 67% Faster)
 
-# Show help
+```bash
+# Build the uberjar (one-time)
+clojure -T:build uber
+
+# Run via wrapper script
+./scripts/alethfeld <command> [options]
+./scripts/alethfeld --help
+
+# Or run directly with Java
+java -jar target/alethfeld.jar <command> [options]
+```
+
+**Performance:** 1.1s startup (67% faster than Clojure CLI)
+
+### Using Clojure CLI (Development)
+
+```bash
+clojure -M:run <command> [options]
 clojure -M:run --help
 ```
+
+**Performance:** 3.3s startup (convenient for development)
 
 ## Commands
 
@@ -85,11 +102,28 @@ clojure -M:run validate proof.edn -v
 clojure -M:test
 ```
 
-### Build uberjar
+### Build and Distribution
 
+**Uberjar (Recommended for Distribution):**
 ```bash
+# Build
 clojure -T:build uber
+
+# Test
 java -jar target/alethfeld.jar --help
+
+# Or use wrapper script
+./scripts/alethfeld --help
+
+# Size: 7.3 MB (includes all dependencies)
+# Startup: ~1.1 seconds (67% faster than Clojure CLI)
+```
+
+**Docker:**
+```dockerfile
+FROM eclipse-temurin:21-jre-alpine
+COPY target/alethfeld.jar /app/
+ENTRYPOINT ["java", "-jar", "/app/alethfeld.jar"]
 ```
 
 ## Project Structure
