@@ -11,7 +11,8 @@
             [alethfeld.commands.extract-lemma :as extract-lemma]
             [alethfeld.commands.init :as init]
             [alethfeld.commands.stats :as stats]
-            [alethfeld.commands.recompute :as recompute])
+            [alethfeld.commands.recompute :as recompute]
+            [alethfeld.commands.convert :as convert])
   (:gen-class))
 
 ;; =============================================================================
@@ -48,7 +49,10 @@
             :options stats/cli-options}
    "recompute" {:fn recompute/run
                 :desc "Recompute taint propagation"
-                :options recompute/cli-options}})
+                :options recompute/cli-options}
+   "convert" {:fn convert/run
+              :desc "Convert legacy proof format to v4 schema"
+              :options convert/cli-options}})
 
 ;; =============================================================================
 ;; Global Options
