@@ -18,7 +18,7 @@ Use this command to:
 ## Invocation
 
 ```bash
-cd /home/tobiasosborne/Projects/alethfeld/alethfeld && clojure -M:run stats <graph.edn>
+cd /home/tobiasosborne/Projects/alethfeld/alethfeld && ./scripts/alethfeld stats <graph.edn>
 ```
 
 ## Options

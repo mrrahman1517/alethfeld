@@ -16,7 +16,7 @@ The user will provide a file path to an EDN proof graph (`.edn`). If no path is 
 ### 1. Run the Validator
 
 ```bash
-cd /home/tobiasosborne/Projects/alethfeld/alethfeld && clojure -M:run validate -v <path-to-edn-file>
+cd /home/tobiasosborne/Projects/alethfeld/alethfeld && ./scripts/alethfeld validate -v <path-to-edn-file>
 ```
 
 The `-v` (verbose) flag provides detailed error information.
@@ -72,12 +72,12 @@ RECOMMENDATIONS:
 
 If the user wants schema-only validation (skip semantic checks):
 ```bash
-clojure -M:run validate -s -v <path-to-edn-file>
+./scripts/alethfeld validate -s -v <path-to-edn-file>
 ```
 
 If the user wants quiet output (just pass/fail):
 ```bash
-clojure -M:run validate -q <path-to-edn-file>
+./scripts/alethfeld validate -q <path-to-edn-file>
 ```
 
 ## When Validation Fails

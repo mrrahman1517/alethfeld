@@ -17,7 +17,7 @@ Use this command when:
 ## Invocation
 
 ```bash
-cd /home/tobiasosborne/Projects/alethfeld/alethfeld && clojure -M:run extract-lemma <graph.edn> <root-node-id> --name "Lemma Name"
+cd /home/tobiasosborne/Projects/alethfeld/alethfeld && ./scripts/alethfeld extract-lemma <graph.edn> <root-node-id> --name "Lemma Name"
 ```
 
 ## Arguments
@@ -46,17 +46,17 @@ cd /home/tobiasosborne/Projects/alethfeld/alethfeld && clojure -M:run extract-le
 
 Extract with automatic ancestor detection:
 ```bash
-clojure -M:run extract-lemma proof.edn :1-abc123 -n L1-fourier
+./scripts/alethfeld extract-lemma proof.edn :1-abc123 -n L1-fourier
 ```
 
 Extract specific nodes:
 ```bash
-clojure -M:run extract-lemma proof.edn :1-abc123 -n L2-result -N :1-abc123,:1-def456,:2-ghi789
+./scripts/alethfeld extract-lemma proof.edn :1-abc123 -n L2-result -N :1-abc123,:1-def456,:2-ghi789
 ```
 
 Dry run to check validity:
 ```bash
-clojure -M:run extract-lemma proof.edn :1-abc123 -n Test --dry-run
+./scripts/alethfeld extract-lemma proof.edn :1-abc123 -n Test --dry-run
 ```
 
 ## What Happens

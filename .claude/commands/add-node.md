@@ -19,12 +19,12 @@ Use this command when the Prover needs to add a new step to a proof, including:
 ## Invocation
 
 ```bash
-cd /home/tobiasosborne/Projects/alethfeld/alethfeld && clojure -M:run add-node <graph.edn> <node.edn>
+cd /home/tobiasosborne/Projects/alethfeld/alethfeld && ./scripts/alethfeld add-node <graph.edn> <node.edn>
 ```
 
 Or with stdin:
 ```bash
-echo '{:id :1-abc ... }' | clojure -M:run add-node --stdin <graph.edn>
+echo '{:id :1-abc ... }' | ./scripts/alethfeld add-node --stdin <graph.edn>
 ```
 
 ## Input Format (node.edn)

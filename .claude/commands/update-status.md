@@ -17,7 +17,7 @@ Use this command when:
 ## Invocation
 
 ```bash
-cd /home/tobiasosborne/Projects/alethfeld/alethfeld && clojure -M:run update-status <graph.edn> <node-id> <status>
+cd /home/tobiasosborne/Projects/alethfeld/alethfeld && ./scripts/alethfeld update-status <graph.edn> <node-id> <status>
 ```
 
 ## Arguments
@@ -29,7 +29,7 @@ cd /home/tobiasosborne/Projects/alethfeld/alethfeld && clojure -M:run update-sta
 ## Example
 
 ```bash
-clojure -M:run update-status proof.edn :1-abc123 verified
+./scripts/alethfeld update-status proof.edn :1-abc123 verified
 ```
 
 ## Status Values

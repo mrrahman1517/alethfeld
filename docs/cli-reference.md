@@ -6,12 +6,16 @@ Complete command reference for the `alethfeld` CLI tool.
 
 ```bash
 cd alethfeld
-# Run directly with Clojure
-clojure -M:run <command> [options]
 
-# Or build an uberjar
+# Recommended: Use the pre-built wrapper (fast, ~1s startup)
+./scripts/alethfeld <command> [options]
+
+# Alternative: Build your own uberjar
 clojure -T:build uber
 java -jar target/alethfeld.jar <command> [options]
+
+# Development only (slow, ~3s startup)
+clojure -M:run <command> [options]
 ```
 
 ## Global Options

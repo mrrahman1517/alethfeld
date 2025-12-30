@@ -14,7 +14,7 @@ Use this command when starting a new proof project.
 ## Invocation
 
 ```bash
-cd /home/tobiasosborne/Projects/alethfeld/alethfeld && clojure -M:run init <output.edn> --theorem "Theorem statement"
+cd /home/tobiasosborne/Projects/alethfeld/alethfeld && ./scripts/alethfeld init <output.edn> --theorem "Theorem statement"
 ```
 
 ## Required Arguments
@@ -35,12 +35,12 @@ cd /home/tobiasosborne/Projects/alethfeld/alethfeld && clojure -M:run init <outp
 
 Basic initialization:
 ```bash
-clojure -M:run init proof.edn -t 'For all $n \geq 1$, $\sum_{k=1}^n k = \frac{n(n+1)}{2}$'
+./scripts/alethfeld init proof.edn -t 'For all $n \geq 1$, $\sum_{k=1}^n k = \frac{n(n+1)}{2}$'
 ```
 
 With custom mode:
 ```bash
-clojure -M:run init quantum-proof.edn -t 'Quantum channel composition' -m formal-physics
+./scripts/alethfeld init quantum-proof.edn -t 'Quantum channel composition' -m formal-physics
 ```
 
 ## Output Format

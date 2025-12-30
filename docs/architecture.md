@@ -82,7 +82,7 @@ All graph mutations go through the `alethfeld` CLI, ensuring consistent validati
 
 ```bash
 cd alethfeld
-clojure -M:run <command> [options]
+./scripts/alethfeld <command> [options]
 ```
 
 **Key commands:**
