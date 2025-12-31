@@ -17,7 +17,7 @@ Use this command when:
 ## Invocation
 
 ```bash
-cd /home/tobiasosborne/Projects/alethfeld/alethfeld && ./scripts/alethfeld update-status <graph.edn> <node-id> <status>
+./cli/scripts/alethfeld update-status <graph.edn> <node-id> <status>
 ```
 
 ## Arguments

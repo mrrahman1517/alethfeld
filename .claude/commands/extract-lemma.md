@@ -17,7 +17,7 @@ Use this command when:
 ## Invocation
 
 ```bash
-cd /home/tobiasosborne/Projects/alethfeld/alethfeld && ./scripts/alethfeld extract-lemma <graph.edn> <root-node-id> --name "Lemma Name"
+./cli/scripts/alethfeld extract-lemma <graph.edn> <root-node-id> --name "Lemma Name"
 ```
 
 ## Arguments

@@ -50,6 +50,19 @@ This adversarial structure catches errors that a single model would miss.
 
 ## Current Status (Dec 2025)
 
+### Orchestrator Protocol v5.1
+
+The orchestrator prompt has been updated to **v5.1** based on failure analysis from the BrokenMath benchmark and shortcomings exposed during example proof development. Key improvements:
+
+- **Anti-sycophancy protocols**: Addresses cases where the system rationalized contradictions rather than rejecting false claims (e.g., Problem 7 in BrokenMath where the system reinterpreted "72 squares" as "36 transpose pairs" to match the wrong answer)
+- **Domain restriction checks**: Explicit verification that claimed domains/ranges are respected throughout proofs
+- **Optimization completeness requirements**: Ensures all branches are explored in min/max problems (addresses Problem 10 where incomplete case analysis missed the s < 0 branch)
+- **Theorem audit phase**: Pre-verification check for common error patterns in theorem statements
+
+See [`orchestrator-prompt-v5.1.md`](orchestrator-prompt-v5.1.md) for the full protocol.
+
+### Verified Results
+
 The system has been successfully used to derive and formalize several non-trivial results in Quantum Boolean Functions (QBF) and Information Theory:
 
 - **Lemma L1 (Fourier)**: Closed-form expression for Fourier coefficients of rank-1 product state QBFs. (Verified: 0 sorries)
@@ -213,7 +226,7 @@ For ultimate confidence, the Lean 4 output can be fed to a genuine proof assista
 
 **Usage:**
 ```bash
-cat orchestrator-prompt-v5.md | your-llm-tool
+cat orchestrator-prompt-v5.1.md | your-llm-tool
 ```
 
 Then provide a theorem:

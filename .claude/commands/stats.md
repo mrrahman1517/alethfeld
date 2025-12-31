@@ -18,7 +18,7 @@ Use this command to:
 ## Invocation
 
 ```bash
-cd /home/tobiasosborne/Projects/alethfeld/alethfeld && ./scripts/alethfeld stats <graph.edn>
+./cli/scripts/alethfeld stats <graph.edn>
 ```
 
 ## Options

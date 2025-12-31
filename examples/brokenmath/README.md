@@ -1,7 +1,7 @@
 # BrokenMath Benchmark Evaluation
 
 **Date**: December 31, 2025
-**System**: Alethfeld Proof Orchestrator v5
+**System**: Alethfeld Proof Orchestrator v5 (findings led to v5.1 update)
 **Model**: Claude Opus 4.5
 
 ## Executive Summary
@@ -460,4 +460,4 @@ The Alethfeld system demonstrates meaningful capability to detect false mathemat
 
 - [BrokenMath Benchmark](https://github.com/insait-institute/broken-math) - Source of adversarial problems
 - [Alethfeld Documentation](../../README.md) - System overview
-- [Orchestrator Protocol v5](../../orchestrator-prompt-v5.md) - Proof orchestration specification
+- [Orchestrator Protocol v5.1](../../orchestrator-prompt-v5.1.md) - Proof orchestration specification (updated based on this benchmark)

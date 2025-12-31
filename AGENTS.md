@@ -18,7 +18,7 @@ bd sync               # Sync with git
 1. Check `bd ready` for available work
 2. Review `lean/API.md` for existing Lean library documentation
 3. Run `lake build` to verify no regressions
-4. See `orchestrator-prompt-v5.md` for the current proof orchestration protocol
+4. See `orchestrator-prompt-v5.1.md` for the current proof orchestration protocol
 
 ## Landing the Plane (Session Completion)
 
