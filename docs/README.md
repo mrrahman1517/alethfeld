@@ -24,6 +24,10 @@ Welcome to the documentation for **Alethfeld**, a system for developing rigorous
    - The `AlethfeldLean` library structure.
    - Handling `sorry` (admitted steps) and taint tracking.
 
+5. **[CLI Tools Reference](cli-reference.md)**
+   - Detailed command reference for the main `alethfeld` CLI.
+   - [ANSI Visualization Tool](ansi-viz.md) - Terminal-based proof graph viewer.
+
 ## Quick Links
 
 - **Project Root**: See the top-level [README](../README.md) for a quick start.

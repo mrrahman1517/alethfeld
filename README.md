@@ -290,6 +290,17 @@ See [`cli/README.md`](cli/README.md) for complete documentation and build instru
 
 See [docs/cli-reference.md](docs/cli-reference.md) for complete documentation.
 
+### ansi-viz
+
+A lightweight terminal-based visualization tool for proof graphs. Located in [`scripts/ansi-viz.clj`](scripts/ansi-viz.clj).
+
+**Usage:**
+```bash
+./scripts/ansi-viz.clj <proof-graph.edn>
+```
+
+See [docs/ansi-viz.md](docs/ansi-viz.md) for details.
+
 ### validate-graph (Legacy)
 
 The original validation tool in [`scripts/validate-graph/`](scripts/validate-graph/) is superseded by `alethfeld validate` but remains available for compatibility.
