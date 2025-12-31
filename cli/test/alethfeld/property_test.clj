@@ -9,7 +9,8 @@
             [alethfeld.validators :as validators]
             [alethfeld.ops.add-node :as add-node]
             [alethfeld.ops.update-status :as update-status]
-            [alethfeld.schema :as schema]))
+            [alethfeld.schema :as schema]
+            [alethfeld.fixtures :as f]))
 
 ;; =============================================================================
 ;; Generators for Valid Graphs
@@ -49,8 +50,9 @@
   "Generate valid status values."
   (gen/elements [:proposed :verified :rejected :admitted]))
 
+;; Use fixtures for make-node and make-graph (with dynamic content-hash for property tests)
 (defn make-node
-  "Create a node with given or generated values."
+  "Create a node using fixtures with dynamic content-hash."
   [id & {:keys [type statement deps scope justification status taint depth order]
          :or {type :claim
               statement "Test statement"
@@ -61,45 +63,19 @@
               taint :clean
               depth 1
               order 0}}]
-  {:id id
-   :type type
-   :statement statement
-   :content-hash (format "%016x" (hash [id statement]))
-   :dependencies deps
-   :scope scope
-   :justification justification
-   :status status
-   :taint taint
-   :depth depth
-   :parent nil
-   :display-order order
-   :provenance {:created-at "2024-01-01T00:00:00Z"
-                :created-by :prover
-                :round 1
-                :revision-of nil}})
+  (f/make-node id
+               :type type
+               :statement statement
+               :deps deps
+               :scope scope
+               :justification justification
+               :status status
+               :taint taint
+               :depth depth
+               :order order
+               :content-hash :dynamic))
 
-(defn make-graph
-  "Create a minimal valid graph with given nodes."
-  [nodes]
-  {:graph-id "test-graph-001"
-   :version 1
-   :theorem {:id :theorem
-             :statement "Test theorem"
-             :content-hash "fedcba9876543210"}
-   :nodes (into {} (map (juxt :id identity) nodes))
-   :symbols {}
-   :external-refs {}
-   :lemmas {}
-   :obligations []
-   :archived-nodes {}
-   :metadata {:created-at "2024-01-01T00:00:00Z"
-              :last-modified "2024-01-01T00:00:00Z"
-              :proof-mode :strict-mathematics
-              :iteration-counts {:verification {}
-                                 :expansion {}
-                                 :strategy 0}
-              :context-budget {:max-tokens 100000
-                               :current-estimate 1000}}})
+(def make-graph f/make-graph)
 
 (def simple-dag-gen
   "Generate simple valid DAGs with 1-10 nodes and valid dependencies."

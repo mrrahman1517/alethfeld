@@ -1,14 +1,36 @@
 (ns alethfeld.fixtures
-  "Test fixtures for semantic proof graph validation tests.")
+  "Test fixtures for semantic proof graph validation tests.
+
+   This is the authoritative source for test helper functions.
+   All test files should require this namespace for make-node, make-graph, etc.")
 
 ;; =============================================================================
 ;; Helper Functions
 ;; =============================================================================
 
 (defn make-node
-  "Create a node with defaults filled in."
+  "Create a complete node with all fields filled in.
+   Use this for creating test graphs directly (not via add-node).
+
+   Options:
+   - :type - Node type (default :claim)
+   - :statement - Statement text (default \"Test statement\")
+   - :deps - Set of dependency IDs (default #{})
+   - :scope - Set of in-scope assumption IDs (default #{})
+   - :justification - Justification type (default :modus-ponens)
+   - :status - Node status (default :verified)
+   - :taint - Taint value (default :clean)
+   - :depth - Lamport depth (default 1)
+   - :parent - Parent node ID (default nil)
+   - :order - Display order (default 0)
+   - :content-hash - Content hash (default fixed, or :dynamic for hash of [id statement])
+   - :introduces - For local-assume nodes
+   - :discharges - For local-discharge nodes
+   - :lemma-id - For lemma-ref nodes
+   - :external-id - For external-ref nodes
+   - :assumption-label - Label for assumptions"
   [id & {:keys [type statement deps scope justification status taint depth parent order
-                introduces discharges lemma-id external-id assumption-label]
+                content-hash introduces discharges lemma-id external-id assumption-label]
          :or {type :claim
               statement "Test statement"
               deps #{}
@@ -18,28 +40,70 @@
               taint :clean
               depth 1
               parent nil
+              order 0
+              content-hash nil}}]
+  (let [hash-value (case content-hash
+                     :dynamic (format "%016x" (hash [id statement]))
+                     nil "0123456789abcdef"
+                     content-hash)]
+    (cond-> {:id id
+             :type type
+             :statement statement
+             :content-hash hash-value
+             :dependencies deps
+             :scope scope
+             :justification justification
+             :status status
+             :taint taint
+             :depth depth
+             :parent parent
+             :display-order order
+             :provenance {:created-at "2024-01-01T00:00:00Z"
+                          :created-by :prover
+                          :round 1
+                          :revision-of nil}}
+      introduces (assoc :introduces introduces)
+      discharges (assoc :discharges discharges)
+      lemma-id (assoc :lemma-id lemma-id)
+      external-id (assoc :external-id external-id)
+      assumption-label (assoc :assumption-label assumption-label))))
+
+(defn make-partial-node
+  "Create a partial node for use with add-node/add-node.
+   Does not include status, taint, content-hash, or provenance
+   (those are filled in by the add-node operation).
+
+   Options:
+   - :type - Node type (default :claim)
+   - :statement - Statement text (default \"Test statement\")
+   - :deps - Set of dependency IDs (default #{})
+   - :scope - Set of in-scope assumption IDs (default #{})
+   - :justification - Justification type (default :modus-ponens)
+   - :depth - Lamport depth (default 1)
+   - :order - Display order (default 0)
+   - :introduces - For local-assume nodes
+   - :discharges - For local-discharge nodes
+   - :external-id - For external-ref nodes"
+  [id & {:keys [type statement deps scope justification depth order
+                introduces discharges external-id]
+         :or {type :claim
+              statement "Test statement"
+              deps #{}
+              scope #{}
+              justification :modus-ponens
+              depth 1
               order 0}}]
   (cond-> {:id id
            :type type
            :statement statement
-           :content-hash "0123456789abcdef"
            :dependencies deps
            :scope scope
            :justification justification
-           :status status
-           :taint taint
            :depth depth
-           :parent parent
-           :display-order order
-           :provenance {:created-at "2024-01-01T00:00:00Z"
-                        :created-by :prover
-                        :round 1
-                        :revision-of nil}}
+           :display-order order}
     introduces (assoc :introduces introduces)
     discharges (assoc :discharges discharges)
-    lemma-id (assoc :lemma-id lemma-id)
-    external-id (assoc :external-id external-id)
-    assumption-label (assoc :assumption-label assumption-label)))
+    external-id (assoc :external-id external-id)))
 
 (defn make-graph
   "Create a minimal valid graph with given nodes."

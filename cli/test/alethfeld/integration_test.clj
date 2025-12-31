@@ -10,34 +10,15 @@
             [alethfeld.ops.external-ref :as external-ref]
             [alethfeld.graph :as graph]
             [alethfeld.schema :as schema]
-            [alethfeld.validators :as validators]))
+            [alethfeld.validators :as validators]
+            [alethfeld.fixtures :refer [make-partial-node]]))
 
 ;; =============================================================================
 ;; Helper Functions
 ;; =============================================================================
 
-(defn make-node
-  "Create a partial node for add-node."
-  [id & {:keys [type statement deps scope justification depth order
-                introduces discharges external-id]
-         :or {type :claim
-              statement "Test statement"
-              deps #{}
-              scope #{}
-              justification :modus-ponens
-              depth 1
-              order 0}}]
-  (cond-> {:id id
-           :type type
-           :statement statement
-           :dependencies deps
-           :scope scope
-           :justification justification
-           :depth depth
-           :display-order order}
-    introduces (assoc :introduces introduces)
-    discharges (assoc :discharges discharges)
-    external-id (assoc :external-id external-id)))
+;; Use make-partial-node from fixtures (aliased as make-node for convenience)
+(def make-node make-partial-node)
 
 (defn assert-ok [result]
   (is (:ok result) (str "Expected success, got: " (pr-str (:error result))))
