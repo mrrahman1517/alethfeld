@@ -7,7 +7,45 @@
  :archived-nodes {},
  :external-refs {},
  :nodes
- {:1-b00007
+ {:2-c00002
+  {:statement
+   "$\\tilde{P}$ is a valid probability distribution since $\\int \\tilde{P}(w) dw = \\frac{\\mathbb{E}_{w \\sim P}[e^{\\beta h(w)}]}{\\mathbb{E}_{w \\sim P}[e^{\\beta h(w)}]} = 1$",
+   :taint :clean,
+   :parent :1-b00005,
+   :content-hash "853ed3fa84468117",
+   :display-order 13,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :proposed,
+   :id :2-c00002,
+   :provenance
+   {:created-at "2026-01-05T10:45:22.077191Z",
+    :created-by :prover,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:2-c00001}},
+  :2-c00001
+  {:statement
+   "Let $\\tilde{P}$ be the tilted distribution defined by $\\tilde{P}(w) = \\frac{e^{\\beta h(w)} P(w)}{\\mathbb{E}_{w \\sim P}[e^{\\beta h(w)}]}$",
+   :taint :clean,
+   :parent :1-b00005,
+   :content-hash "e6db567217ca84f1",
+   :display-order 12,
+   :type :assumption,
+   :scope #{},
+   :justification :assumption,
+   :status :proposed,
+   :id :2-c00001,
+   :provenance
+   {:created-at "2026-01-05T10:45:13.732094Z",
+    :created-by :prover,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{}},
+  :1-b00007
   {:statement
    "$\\mathrm{KL}(Q \\| P) = \\mathbb{E}_{w \\sim Q}\\left[\\ln \\frac{Q(w)}{P(w)}\\right] = \\mathbb{E}_{w \\sim Q}\\left[\\ln \\frac{1}{P(\\mathcal{S})}\\right] = \\ln \\frac{1}{P(\\mathcal{S})}$",
    :taint :clean,
@@ -26,6 +64,63 @@
     :revision-of nil},
    :depth 1,
    :dependencies #{:1-b00006}},
+  :2-c00003
+  {:statement
+   "By non-negativity of KL divergence: $\\mathrm{KL}(Q \\| \\tilde{P}) \\geq 0$",
+   :taint :clean,
+   :parent :1-b00005,
+   :content-hash "02a25006c5872df6",
+   :display-order 14,
+   :type :claim,
+   :scope #{},
+   :justification :external-application,
+   :status :proposed,
+   :id :2-c00003,
+   :provenance
+   {:created-at "2026-01-05T10:45:54.551897Z",
+    :created-by :prover,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:2-c00002}},
+  :2-c00004
+  {:statement
+   "Expanding the KL divergence: $\\mathrm{KL}(Q \\| \\tilde{P}) = \\mathbb{E}_{w \\sim Q}\\left[\\ln \\frac{Q(w)}{\\tilde{P}(w)}\\right] = \\mathbb{E}_{w \\sim Q}\\left[\\ln Q(w) - \\ln \\tilde{P}(w)\\right]$",
+   :taint :clean,
+   :parent :1-b00005,
+   :content-hash "94410717f1741ae1",
+   :display-order 15,
+   :type :claim,
+   :scope #{},
+   :justification :definition-expansion,
+   :status :proposed,
+   :id :2-c00004,
+   :provenance
+   {:created-at "2026-01-05T10:46:03.089087Z",
+    :created-by :prover,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:2-c00003}},
+  :2-c00008
+  {:statement
+   "Rearranging: $\\beta \\mathbb{E}_{w \\sim Q}[h(w)] \\leq \\mathrm{KL}(Q \\| P) + \\ln Z$, hence $\\mathbb{E}_{w \\sim Q}[h(w)] \\leq \\frac{\\mathrm{KL}(Q \\| P) + \\ln \\mathbb{E}_{w \\sim P}[e^{\\beta h(w)}]}{\\beta}$",
+   :taint :clean,
+   :parent :1-b00005,
+   :content-hash "db426021ea34d4f3",
+   :display-order 19,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :proposed,
+   :id :2-c00008,
+   :provenance
+   {:created-at "2026-01-05T10:46:37.877897Z",
+    :created-by :prover,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:2-c00007}},
   :1-b00002
   {:statement
    "Let $Q$ be the posterior distribution, defined as $P$ restricted to the set of solutions $\\mathcal{S} = \\{w : \\text{train error}(w) = 0\\}$",
@@ -64,6 +159,25 @@
     :revision-of nil},
    :depth 1,
    :dependencies #{}},
+  :2-c00005
+  {:statement
+   "Substituting $\\tilde{P}(w) = \\frac{e^{\\beta h(w)} P(w)}{Z}$ where $Z = \\mathbb{E}_{w \\sim P}[e^{\\beta h(w)}]$: $\\ln \\tilde{P}(w) = \\beta h(w) + \\ln P(w) - \\ln Z$",
+   :taint :clean,
+   :parent :1-b00005,
+   :content-hash "2dac962756f88727",
+   :display-order 16,
+   :type :claim,
+   :scope #{},
+   :justification :substitution,
+   :status :proposed,
+   :id :2-c00005,
+   :provenance
+   {:created-at "2026-01-05T10:46:12.052118Z",
+    :created-by :prover,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:2-c00001 :2-c00004}},
   :1-b00004
   {:statement
    "Let $\\beta = m - 1$ where $m$ is the number of training points",
@@ -83,6 +197,25 @@
     :revision-of nil},
    :depth 1,
    :dependencies #{}},
+  :2-c00007
+  {:statement
+   "From $\\mathrm{KL}(Q \\| \\tilde{P}) \\geq 0$: $\\mathrm{KL}(Q \\| P) - \\beta \\mathbb{E}_{w \\sim Q}[h(w)] + \\ln Z \\geq 0$",
+   :taint :clean,
+   :parent :1-b00005,
+   :content-hash "2f0a3a75685fc894",
+   :display-order 18,
+   :type :claim,
+   :scope #{},
+   :justification :modus-ponens,
+   :status :proposed,
+   :id :2-c00007,
+   :provenance
+   {:created-at "2026-01-05T10:46:28.641095Z",
+    :created-by :prover,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:2-c00003 :2-c00006}},
   :1-b00009
   {:statement
    "For $w \\in \\text{supp}(Q) = \\mathcal{S}$, the training error is 0, so $h(w)$ measures the population (generalization) error directly",
@@ -131,7 +264,7 @@
    :type :claim,
    :scope #{},
    :justification :admitted,
-   :status :proposed,
+   :status :verified,
    :id :1-b00005,
    :provenance
    {:created-at "2026-01-05T10:35:38.849835Z",
@@ -215,14 +348,33 @@
     :round 0,
     :revision-of nil},
    :depth 1,
-   :dependencies #{:1-b00009 :1-b00010}}},
+   :dependencies #{:1-b00009 :1-b00010}},
+  :2-c00006
+  {:statement
+   "Therefore: $\\mathrm{KL}(Q \\| \\tilde{P}) = \\mathbb{E}_{w \\sim Q}[\\ln Q(w) - \\beta h(w) - \\ln P(w) + \\ln Z] = \\mathrm{KL}(Q \\| P) - \\beta \\mathbb{E}_{w \\sim Q}[h(w)] + \\ln Z$",
+   :taint :clean,
+   :parent :1-b00005,
+   :content-hash "7871de4f7ba48bce",
+   :display-order 17,
+   :type :claim,
+   :scope #{},
+   :justification :algebraic-rewrite,
+   :status :proposed,
+   :id :2-c00006,
+   :provenance
+   {:created-at "2026-01-05T10:46:20.975485Z",
+    :created-by :prover,
+    :round 0,
+    :revision-of nil},
+   :depth 2,
+   :dependencies #{:2-c00004 :2-c00005}}},
  :graph-id "graph-18d478-4253a9",
- :version 12,
+ :version 21,
  :lemmas {},
  :metadata
  {:created-at "2026-01-05T10:34:37.088141Z",
-  :last-modified "2026-01-05T10:36:34.810128Z",
+  :last-modified "2026-01-05T10:46:46.990632Z",
   :proof-mode :strict-mathematics,
   :iteration-counts {:verification {}, :expansion {}, :strategy 0},
-  :context-budget {:max-tokens 100000, :current-estimate 1419}},
+  :context-budget {:max-tokens 100000, :current-estimate 2120}},
  :symbols {}}
