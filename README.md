@@ -59,7 +59,12 @@ The orchestrator prompt has been updated to **v5.1** based on failure analysis f
 - **Optimization completeness requirements**: Ensures all branches are explored in min/max problems (addresses Problem 10 where incomplete case analysis missed the s < 0 branch)
 - **Theorem audit phase**: Pre-verification check for common error patterns in theorem statements
 
-See [`orchestrator-prompt-v5.1.md`](orchestrator-prompt-v5.1.md) for the full protocol.
+Model-specific orchestrator prompts are available:
+- [`orchestrator-prompt-v5.1-claude.md`](orchestrator-prompt-v5.1-claude.md) — Optimized for Claude Code
+- [`orchestrator-prompt-v5.1-gemini.md`](orchestrator-prompt-v5.1-gemini.md) — Optimized for Gemini CLI (experimental)
+- [`orchestrator-prompt-v5.1-codex.md`](orchestrator-prompt-v5.1-codex.md) — Optimized for Codex CLI (experimental)
+
+*Note: The Gemini and Codex prompts are experimental. Results with these tools have been suboptimal compared to Claude Code.*
 
 ### Verified Results
 
@@ -117,7 +122,7 @@ Proofs are represented in [EDN](https://github.com/edn-format/edn) (Extensible D
 
 **For extensibility:** New fields can be added without breaking existing tooling. Proofs are data, not strings.
 
-**For tooling:** The Clojure ecosystem offers powerful tools for working with structured data—spec checking, generative testing, data transformation. The [`validate-graph`](scripts/validate-graph/) tool uses Malli to validate proof graphs against the schema.
+**For tooling:** The Clojure ecosystem offers powerful tools for working with structured data—spec checking, generative testing, data transformation.
 
 A proof schema in Malli might look like:
 
@@ -221,12 +226,20 @@ For ultimate confidence, the Lean 4 output can be fed to a genuine proof assista
 ## For Engineers
 
 **Requirements:**
-- Claude Code CLI (or Claude API access)
+- An AI coding assistant CLI: Claude Code, Gemini CLI, or Codex CLI
 - ~100 turns for a moderately complex proof
+- **Recommended for Claude Code:** Install the [Lean LSP MCP server](https://github.com/oOo0oOo/lean-lsp-mcp) for direct Lean 4 type checking and goal state inspection
 
 **Usage:**
 ```bash
-cat orchestrator-prompt-v5.1.md | your-llm-tool
+# For Claude Code
+cat orchestrator-prompt-v5.1-claude.md | claude
+
+# For Gemini CLI
+cat orchestrator-prompt-v5.1-gemini.md | gemini
+
+# For Codex CLI
+cat orchestrator-prompt-v5.1-codex.md | codex
 ```
 
 Then provide a theorem:
