@@ -17,7 +17,8 @@ examples/
 ├── implicit-function-theorem/         # Implicit function theorem
 ├── n-copy-purification-channel/       # Quantum channel existence
 ├── prop-infinite-Z/                   # Permutation vs function expectations
-└── qbf-rank1/                         # QBF entropy-influence (verified)
+├── qbf-rank1/                         # QBF entropy-influence (verified)
+└── sum-degrees-even/                  # Sum of degrees is even (graph theory)
 ```
 
 Additional Lean formalizations in `lean/AlethfeldLean/Examples/BrokenMath/`:
@@ -355,6 +356,32 @@ where $\mathcal{C}$ is regarded as both a left and right $\mathcal{C}$-module ca
 
 ---
 
+## Example 12: Sum of Degrees is Even
+
+**Status:** ✅ **All steps verified**
+
+**Theorem:** For any graph $G = (V, E)$, the sum of degrees of all vertices is even:
+\[
+\sum_{v \in V} \deg(v) = 2|E|
+\]
+
+**Why this example:** A fundamental result in graph theory that demonstrates a simple but elegant counting argument. Each edge contributes exactly 2 to the total degree sum (one for each endpoint), so the sum equals $2|E|$, which is even.
+
+**Proof Strategy:**
+1. Define graph and vertex degree
+2. Observe that each edge contributes 2 to the sum
+3. Calculate that the sum equals $2|E|$
+4. Conclude that $2|E|$ is even
+
+**Files:**
+- `sum-degrees-even/sum-degrees-even.edn` — Semantic proof graph (6 nodes, all verified)
+- `sum-degrees-even/sum-degrees-even.tex` — LaTeX output
+- `sum-degrees-even/README.md` — Documentation
+- `sum-degrees-even/INSTALL.md` — Installation guide for required tools
+- `sum-degrees-even/install-tools.sh` — Automated installation script
+
+---
+
 ## How to Read These Examples
 
 Each proof is in three formats:
@@ -390,6 +417,7 @@ Publication-ready output. Compile with `pdflatex`. Uses Lamport-style step numbe
 | n-Copy Purification | 47 | 0 | ❌ | Covers d≥n only |
 | **Prop:infinite-Z** | 16 | 0 | ❌ | Orchestrator v5; all verified |
 | **Cantor Trick** | — | — | — | Robustness test: false statement rejected |
+| **Sum Degrees Even** | 6 | 0 | ❌ | Graph theory: fundamental result |
 
 "Admitted" = gaps explicitly acknowledged. "Lean 4" = compiles with no `sorry`.
 
